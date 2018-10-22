@@ -1,3 +1,9 @@
+mod library;
+
+use library::load_library;
+
 fn main() {
-    println!("Hello, world!");
+    for song in load_library().songs {
+        println!("{}", song.name);
+    }
 }
