@@ -1,0 +1,6 @@
+[package]
+name = "rhythmical"
+version = "0.1.0"
+authors = ["Robert Brignull <robertbrignull@gmail.com>"]
+
+[dependencies]
