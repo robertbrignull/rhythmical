@@ -3,14 +3,15 @@ use std::path::Path;
 use std::process::Command;
 
 fn main() {
-    let current_dir = env::current_dir().unwrap();
     let out_dir = env::var("OUT_DIR").unwrap();
 
-    Command::new("tsc")
-        .arg("--project")
-        .arg(current_dir.join("frontend/tsconfig.json"))
-        .arg("--outFile")
-        .arg(Path::new(&out_dir).join("app.js"))
+    env::set_current_dir("frontend").unwrap();
+
+    Command::new("./node_modules/.bin/webpack")
+        .arg("--output-filename")
+        .arg("app.js")
+        .arg("--output-path")
+        .arg(Path::new(&out_dir))
         .output()
-        .expect("Fails to execute tsc");
+        .unwrap();
 }
