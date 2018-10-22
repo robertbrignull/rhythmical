@@ -1,3 +1,5 @@
 /.idea
 /target
 **/*.rs.bk
+/frontend/node_modules
+
