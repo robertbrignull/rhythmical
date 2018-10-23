@@ -5,6 +5,8 @@ use std::fs::File;
 use std::io::Read;
 use rocket::{response::content};
 
+use api::get_api_routes;
+
 #[get("/")]
 fn root() -> content::Html<String> {
     let current_dir = env::current_dir().unwrap();
@@ -26,5 +28,6 @@ fn app_js() -> content::JavaScript<String> {
 pub fn start_server() {
     rocket::ignite()
         .mount("/", routes![root, app_js])
+        .mount("/api", get_api_routes())
         .launch();
 }

@@ -2,17 +2,17 @@
 
 #![plugin(rocket_codegen)]
 extern crate rocket;
+extern crate rocket_contrib;
+extern crate serde;
+#[macro_use] extern crate serde_derive;
+extern crate serde_json;
 
 mod library;
 mod server;
+mod api;
 
-use library::load_library;
 use server::start_server;
 
 fn main() {
-    for song in load_library().songs {
-        println!("{}", song.name);
-    }
-
     start_server();
 }
