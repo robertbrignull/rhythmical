@@ -10,7 +10,7 @@ use std::fs::File;
 use rocket::Route;
 use rocket_contrib::Json;
 
-use library;
+use library::Library;
 
 #[derive(Serialize)]
 struct ApiSong {
@@ -21,7 +21,7 @@ struct ApiSong {
 #[get("/songs")]
 fn songs() -> Json<Vec<ApiSong>> {
     let mut songs: Vec<ApiSong> = Vec::new();
-    for song in library::load_library().songs.values() {
+    for song in Library::get().songs.values() {
         songs.push(ApiSong {
             id: song.id,
             name: song.name.clone(),
@@ -32,7 +32,7 @@ fn songs() -> Json<Vec<ApiSong>> {
 
 #[get("/songs/<id>/contents")]
 fn song_contents(id: u32) -> Option<Vec<u8>> {
-    return library::load_library().songs.get(&id).map(|song| {
+    return Library::get().songs.get(&id).map(|song| {
         let mut song_file = File::open(Path::new(&song.file_location)).unwrap();
         let mut contents: Vec<u8> = Vec::new();
         song_file.read_to_end(&mut contents).unwrap();
