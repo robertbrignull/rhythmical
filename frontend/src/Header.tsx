@@ -30,6 +30,12 @@ export class Header extends React.Component<HeaderProps, {}> {
     }
   }
 
+  public restartSong() {
+    if (this.audio.current) {
+      this.audio.current.currentTime = 0;
+    }
+  }
+
   private static getSongSource(song: Song): string {
     return "/api/songs/" + song.id + "/contents";
   }
