@@ -29,10 +29,9 @@ export class SongList extends React.Component<SongListProps, SongListState> {
       return (
         <div>
           {... this.state.songs.map(song =>
-            <div key={song.id} className="song">
-              <button onClick={() => this.props.onSongSelected(song)}>
-                Play
-              </button>
+            <div key={song.id}
+                 className="song"
+                 onDoubleClick={() => this.props.onSongSelected(song)}>
               { song.name }
             </div>
           )}
