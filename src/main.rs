@@ -11,9 +11,14 @@ extern crate serde_json;
 mod library;
 mod server;
 mod api;
+mod args;
 
+use args::Args;
 use server::start_server;
 
 fn main() {
+    // Make sure the args parse correctly
+    Args::get();
+
     start_server();
 }
