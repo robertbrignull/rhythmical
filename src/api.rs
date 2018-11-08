@@ -4,13 +4,11 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
-use std::io::Read;
-use std::path::Path;
-use std::fs::File;
 use rocket::Route;
 use rocket_contrib::Json;
 
 use library::Library;
+use gsutil;
 
 #[derive(Serialize)]
 struct ApiSong {
@@ -33,10 +31,7 @@ fn songs() -> Json<Vec<ApiSong>> {
 #[get("/songs/<id>/contents")]
 fn song_contents(id: u32) -> Option<Vec<u8>> {
     return Library::get().songs.get(&id).map(|song| {
-        let mut song_file = File::open(Path::new(&song.file_location)).unwrap();
-        let mut contents: Vec<u8> = Vec::new();
-        song_file.read_to_end(&mut contents).unwrap();
-        return contents;
+        return gsutil::cat(&format!("/Music{}", song.file_location));
     });
 }
 
