@@ -1,16 +1,25 @@
 import * as React from "react";
 import {RefObject} from "react";
+import Api from "./api";
 
 interface HeaderProps {
   currentSong?: Song;
 }
 
-export class Header extends React.Component<HeaderProps, {}> {
+interface HeaderState {
+  currentSongSrc?: string;
+}
+
+export class Header extends React.Component<HeaderProps, HeaderState> {
 
   private readonly audio: RefObject<HTMLAudioElement>;
 
   constructor(props: HeaderProps) {
     super(props);
+
+    this.state = {
+      currentSongSrc: undefined,
+    };
 
     this.audio = React.createRef();
   }
@@ -23,9 +32,19 @@ export class Header extends React.Component<HeaderProps, {}> {
       } else if (!prevProps.currentSong ||
         this.props.currentSong.id != prevProps.currentSong.id) {
 
-        this.audio.current.load();
-        this.audio.current.play()
-          .catch(error => console.error("Unable to play: ", error));
+        Api.songs.getSrc(this.props.currentSong).then(songSrc => {
+          this.setState({
+            currentSongSrc: songSrc,
+          }, () => {
+            if (this.audio.current) {
+              this.audio.current.load();
+              this.audio.current.play()
+                .catch(error => console.error("Unable to play: ", error));
+            }
+          });
+        }, error => {
+          console.error("Unable to get song src: ", error)
+        });
       }
     }
   }
@@ -36,15 +55,11 @@ export class Header extends React.Component<HeaderProps, {}> {
     }
   }
 
-  private static getSongSource(song: Song): string {
-    return "/api/songs/" + song.id + "/contents";
-  }
-
   public render() {
     return (
       <audio controls ref={this.audio}>
-        { this.props.currentSong
-          ? <source src={Header.getSongSource(this.props.currentSong)} />
+        { this.state.currentSongSrc
+          ? <source src={this.state.currentSongSrc} />
           : null }
       </audio>
     );

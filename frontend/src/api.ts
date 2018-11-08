@@ -35,6 +35,9 @@ const Api = {
   songs: {
     getAll: (): Promise<Song[]> => {
       return doGet('songs');
+    },
+    getSrc: (song: Song): Promise<string> => {
+      return doGet("songs/" + song.id + "/contents");
     }
   }
 };

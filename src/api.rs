@@ -29,9 +29,9 @@ fn songs() -> Json<Vec<ApiSong>> {
 }
 
 #[get("/songs/<id>/contents")]
-fn song_contents(id: u32) -> Option<Vec<u8>> {
+fn song_contents(id: u32) -> Option<String> {
     return Library::get().songs.get(&id).map(|song| {
-        return gsutil::cat(&format!("/Music{}", song.file_location));
+        return gsutil::sign(&format!("/Music{}", song.file_location));
     });
 }
 
