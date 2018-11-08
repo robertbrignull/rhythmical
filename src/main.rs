@@ -14,12 +14,13 @@ mod api;
 mod args;
 mod gsutil;
 
-use args::Args;
+use args::{Args, Mode};
 use server::start_server;
 
 fn main() {
-    // Make sure the args parse correctly
-    Args::get();
-
-    start_server();
+    match Args::get().mode {
+        Mode::SERVE => {
+            start_server();
+        }
+    }
 }
