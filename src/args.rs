@@ -1,18 +1,18 @@
 extern crate lazy_static;
 
 pub struct Args {
-    access_token: String,
+    project_name: String,
 }
 
 lazy_static! {
     static ref ARGS: Args = {
         let args: Vec<String> = std::env::args().collect();
         if args.len() != 2 {
-            panic!("Incorrect arguments. Usage: rhythmical access-token");
+            panic!("Incorrect arguments. Usage: rhythmical project-name");
         }
 
         Args {
-            access_token: args[1].clone(),
+            project_name: args[1].clone(),
         }
     };
 }
