@@ -12,6 +12,7 @@ mod library;
 mod server;
 mod api;
 mod args;
+mod gsutil;
 
 use args::Args;
 use server::start_server;

@@ -1,7 +1,7 @@
 extern crate lazy_static;
 
 pub struct Args {
-    project_name: String,
+    pub project_name: String,
 }
 
 lazy_static! {
