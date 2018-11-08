@@ -2,7 +2,10 @@ import * as React from "react";
 import Api from "./api";
 
 interface SongListProps {
+  currentSong?: Song;
+  playing: boolean;
   onSongSelected: (song: Song) => void;
+  onPause: () => void;
 }
 
 interface SongListState {
@@ -24,15 +27,29 @@ export class SongList extends React.Component<SongListProps, SongListState> {
     });
   }
 
+  private isPlaying(song: Song): boolean {
+    return this.props.playing &&
+      this.props.currentSong !== undefined &&
+      this.props.currentSong.id === song.id;
+  }
+
   public render() {
     if (this.state.songs) {
       return (
         <ul>
           {... this.state.songs.map(song =>
             <li>
-              <button onClick={() => this.props.onSongSelected(song)}>
-                <i className="fa fa-play"/>
-              </button>
+              {
+                this.isPlaying(song) ? (
+                  <button onClick={() => this.props.onPause()}>
+                    <i className="fa fa-pause"/>
+                  </button>
+                ) : (
+                  <button onClick={() => this.props.onSongSelected(song)}>
+                    <i className="fa fa-play"/>
+                  </button>
+                )
+              }
               <span key={song.id}
                    className="song"
                    onDoubleClick={() => this.props.onSongSelected(song)}>

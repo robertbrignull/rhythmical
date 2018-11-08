@@ -4,6 +4,8 @@ import Api from "./api";
 
 interface HeaderProps {
   currentSong?: Song;
+  onPlay: () => void;
+  onPause: () => void;
 }
 
 interface HeaderState {
@@ -32,6 +34,8 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
       } else if (!prevProps.currentSong ||
         this.props.currentSong.id != prevProps.currentSong.id) {
 
+        this.audio.current.pause();
+        this.props.onPause();
         Api.songs.getSrc(this.props.currentSong).then(songSrc => {
           this.setState({
             currentSongSrc: songSrc,
@@ -55,9 +59,17 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     }
   }
 
+  public pause() {
+    if (this.audio.current) {
+      this.audio.current.pause();
+    }
+  }
+
   public render() {
     return (
-      <audio controls ref={this.audio}>
+      <audio controls ref={this.audio}
+             onPlay={this.props.onPlay}
+             onPause={this.props.onPause}>
         { this.state.currentSongSrc
           ? <source src={this.state.currentSongSrc} />
           : null }
