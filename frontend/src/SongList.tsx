@@ -27,15 +27,20 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   public render() {
     if (this.state.songs) {
       return (
-        <div>
+        <ul>
           {... this.state.songs.map(song =>
-            <div key={song.id}
-                 className="song"
-                 onDoubleClick={() => this.props.onSongSelected(song)}>
-              { song.name }
-            </div>
+            <li>
+              <button onClick={() => this.props.onSongSelected(song)}>
+                <i className="fa fa-play"/>
+              </button>
+              <span key={song.id}
+                   className="song"
+                   onDoubleClick={() => this.props.onSongSelected(song)}>
+                { song.name }
+              </span>
+            </li>
           )}
-        </div>
+        </ul>
       );
     } else {
       return (
