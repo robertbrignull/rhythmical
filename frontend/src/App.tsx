@@ -1,5 +1,4 @@
 import * as React from 'react';
-import './App.css';
 import {SongList} from "./SongList";
 import {Header} from "./Header";
 import {RefObject} from "react";
