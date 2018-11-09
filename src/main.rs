@@ -13,9 +13,11 @@ mod server;
 mod api;
 mod args;
 mod gsutil;
+mod parse_rhythm_db;
 
 use args::{Args, Mode};
 use server::start_server;
+use parse_rhythm_db::parse_rhythm_db;
 
 fn main() {
     match Args::get_mode() {
@@ -23,7 +25,7 @@ fn main() {
             start_server();
         }
         Mode::ParseRhythmDb => {
-            // do nothing
+            parse_rhythm_db();
         }
     }
 }
