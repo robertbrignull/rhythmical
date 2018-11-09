@@ -41,8 +41,8 @@ lazy_static! {
     static ref ARGS: Args = {
         let args: Vec<String> = std::env::args().collect();
         if args.len() != 4 {
-            panic!("Incorrect arguments. Usage:\
-              serve rhythmical project-name private-key\
+            panic!("Incorrect arguments. Usage:
+              serve rhythmical project-name private-key
               parse-rhythm-db input-file output-file");
         }
 
