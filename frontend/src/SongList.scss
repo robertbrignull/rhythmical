@@ -1,0 +1,17 @@
+ul.song-list {
+  margin-top: 64px;
+  list-style-type: none;
+
+  > li {
+    margin-bottom: 4px;
+
+    > .song {
+      padding: 1rem;
+    }
+  }
+}
+
+.loading-message {
+  margin-top: 64px;
+  text-align: center;
+}

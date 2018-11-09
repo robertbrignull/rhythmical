@@ -68,6 +68,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   public render() {
     return (
       <audio controls ref={this.audio}
+             className="audio-controls"
              onPlay={this.props.onPlay}
              onPause={this.props.onPause}>
         { this.state.currentSongSrc

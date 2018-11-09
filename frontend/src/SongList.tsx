@@ -36,7 +36,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   public render() {
     if (this.state.songs) {
       return (
-        <ul>
+        <ul className="song-list">
           {... this.state.songs.map(song =>
             <li>
               {
