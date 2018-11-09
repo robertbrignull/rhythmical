@@ -6,9 +6,10 @@ use std::io::Write;
 use std::io::BufReader;
 use std::io::BufRead;
 use percent_encoding::percent_decode;
+use std::collections::HashMap;
 
 use args::ParseRhythmDbArgs;
-use library::Song;
+use library::{Library, Song};
 
 #[derive(PartialEq)]
 enum Element {
@@ -37,19 +38,21 @@ pub fn parse_rhythm_db() {
     reader.read_line(&mut line).unwrap();
     reader.read_line(&mut line).unwrap();
 
-    let mut songs: Vec<Song> = Vec::new();
+    let mut library = Library {
+        songs: HashMap::new(),
+    };
     loop {
         match read_song(&mut reader) {
             Some(song) => {
                 let mut song = song.clone();
-                song.id = songs.len() as u32;
-                songs.push(song);
+                song.id = library.songs.len() as u32;
+                library.songs.insert(song.id,song);
             },
             None => break
         }
     }
 
-    let data = serde_json::to_string_pretty(&songs).unwrap();
+    let data = serde_json::to_string_pretty(&library).unwrap();
     output_file.write_all(data.as_bytes())
         .expect("Unable to write to output file");
 }
