@@ -1,9 +1,9 @@
 use std::process::Command;
 
-use args::Args;
+use args::ServeArgs;
 
 pub fn cat(path: &String) -> Vec<u8> {
-    let project_name = &Args::get().project_name;
+    let project_name = &ServeArgs::get().project_name;
     let mut cmd = Command::new("gsutil");
     cmd.arg("cat");
     cmd.arg(format!("gs://{}{}", project_name, path));
@@ -11,7 +11,7 @@ pub fn cat(path: &String) -> Vec<u8> {
 }
 
 pub fn sign(path: &String) -> String {
-    let args = Args::get();
+    let args = ServeArgs::get();
     let mut cmd = Command::new("gsutil");
     cmd.arg("signurl")
         .arg("-d").arg("60m")

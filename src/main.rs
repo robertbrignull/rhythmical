@@ -18,8 +18,8 @@ use args::{Args, Mode};
 use server::start_server;
 
 fn main() {
-    match Args::get().mode {
-        Mode::SERVE => {
+    match Args::get_mode() {
+        Mode::Serve => {
             start_server();
         }
     }

@@ -1,20 +1,27 @@
 extern crate lazy_static;
 
+#[derive(Clone)]
 pub enum Mode {
-    SERVE
+    Serve,
 }
 
 impl Mode {
     fn parse(val: String) -> Self {
         if val.eq("serve") {
-            return Mode::SERVE;
+            return Mode::Serve;
         }
         panic!(format!("Unknown mode '{}'", val));
     }
 }
 
+#[derive(Clone)]
 pub struct Args {
-    pub mode: Mode,
+    mode: Mode,
+    serve: Option<ServeArgs>,
+}
+
+#[derive(Clone)]
+pub struct ServeArgs {
     pub project_name: String,
     pub private_key: String,
 }
@@ -27,16 +34,27 @@ lazy_static! {
               serve rhythmical project-name private-key");
         }
 
-        Args {
-            mode: Mode::parse(args[1].clone()),
-            project_name: args[2].clone(),
-            private_key: args[3].clone(),
+        match Mode::parse(args[1].clone()) {
+            Mode::Serve =>
+                Args {
+                    mode: Mode::Serve,
+                    serve: Option::Some(ServeArgs {
+                        project_name: args[2].clone(),
+                        private_key: args[3].clone(),
+                    })
+                }
         }
     };
 }
 
 impl Args {
-    pub fn get() -> &'static Args {
-        return &ARGS;
+    pub fn get_mode() -> &'static Mode {
+        return &ARGS.mode;
+    }
+}
+
+impl ServeArgs {
+    pub fn get() -> ServeArgs {
+        return ARGS.clone().serve.unwrap();
     }
 }
