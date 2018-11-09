@@ -22,5 +22,8 @@ fn main() {
         Mode::Serve => {
             start_server();
         }
+        Mode::ParseRhythmDb => {
+            // do nothing
+        }
     }
 }

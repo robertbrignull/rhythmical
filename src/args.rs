@@ -3,12 +3,16 @@ extern crate lazy_static;
 #[derive(Clone)]
 pub enum Mode {
     Serve,
+    ParseRhythmDb,
 }
 
 impl Mode {
     fn parse(val: String) -> Self {
         if val.eq("serve") {
             return Mode::Serve;
+        }
+        if val.eq("parse-rhythm-db") {
+            return Mode::ParseRhythmDb;
         }
         panic!(format!("Unknown mode '{}'", val));
     }
@@ -18,6 +22,7 @@ impl Mode {
 pub struct Args {
     mode: Mode,
     serve: Option<ServeArgs>,
+    parse_rhythm_db: Option<ParseRhythmDbArgs>,
 }
 
 #[derive(Clone)]
@@ -26,12 +31,19 @@ pub struct ServeArgs {
     pub private_key: String,
 }
 
+#[derive(Clone)]
+pub struct ParseRhythmDbArgs {
+    pub input_file: String,
+    pub output_file: String,
+}
+
 lazy_static! {
     static ref ARGS: Args = {
         let args: Vec<String> = std::env::args().collect();
         if args.len() != 4 {
             panic!("Incorrect arguments. Usage:\
-              serve rhythmical project-name private-key");
+              serve rhythmical project-name private-key\
+              parse-rhythm-db input-file output-file");
         }
 
         match Mode::parse(args[1].clone()) {
@@ -41,8 +53,18 @@ lazy_static! {
                     serve: Option::Some(ServeArgs {
                         project_name: args[2].clone(),
                         private_key: args[3].clone(),
-                    })
-                }
+                    }),
+                    parse_rhythm_db: Option::None,
+                },
+            Mode::ParseRhythmDb =>
+                Args {
+                    mode: Mode::ParseRhythmDb,
+                    serve: Option::None,
+                    parse_rhythm_db: Option::Some(ParseRhythmDbArgs {
+                        input_file: args[2].clone(),
+                        output_file: args[3].clone(),
+                    }),
+                },
         }
     };
 }
@@ -56,5 +78,11 @@ impl Args {
 impl ServeArgs {
     pub fn get() -> ServeArgs {
         return ARGS.clone().serve.unwrap();
+    }
+}
+
+impl ParseRhythmDbArgs {
+    pub fn get() -> ParseRhythmDbArgs {
+        return ARGS.clone().parse_rhythm_db.unwrap();
     }
 }
