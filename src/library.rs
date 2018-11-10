@@ -9,6 +9,11 @@ use gsutil;
 pub struct Song {
     pub id: u32,
     pub title: String,
+    pub genre: String,
+    pub artist: String,
+    pub album: String,
+    pub duration: u32,
+    pub rating: u32,
     pub file_location: String,
 }
 

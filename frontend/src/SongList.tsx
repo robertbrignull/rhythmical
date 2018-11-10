@@ -36,28 +36,45 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   public render() {
     if (this.state.songs) {
       return (
-        <ul className="song-list">
-          {... this.state.songs.map(song =>
-            <li>
-              {
-                this.isPlaying(song) ? (
-                  <button onClick={() => this.props.onPause()}>
-                    <i className="fa fa-pause"/>
-                  </button>
-                ) : (
-                  <button onClick={() => this.props.onSongSelected(song)}>
-                    <i className="fa fa-play"/>
-                  </button>
-                )
-              }
-              <span key={song.id}
-                   className="song"
-                   onDoubleClick={() => this.props.onSongSelected(song)}>
-                { song.title }
-              </span>
-            </li>
-          )}
-        </ul>
+        <table className="song-list">
+          <thead>
+            <tr>
+              <th/>
+              <th>Title</th>
+              <th>Genre</th>
+              <th>Artist</th>
+              <th>Album</th>
+              <th>Duration</th>
+              <th>Rating</th>
+            </tr>
+          </thead>
+          <tbody>
+            {... this.state.songs.map(song =>
+              <tr key={song.id}
+                  onDoubleClick={() => this.props.onSongSelected(song)}>
+                <td>
+                  {
+                    this.isPlaying(song) ? (
+                      <button onClick={() => this.props.onPause()}>
+                        <i className="fa fa-pause"/>
+                      </button>
+                    ) : (
+                      <button onClick={() => this.props.onSongSelected(song)}>
+                        <i className="fa fa-play"/>
+                      </button>
+                    )
+                  }
+                </td>
+                <td>{ song.title }</td>
+                <td>{ song.genre }</td>
+                <td>{ song.artist }</td>
+                <td>{ song.album }</td>
+                <td>{ song.duration }</td>
+                <td>{ song.rating }</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       );
     } else {
       return (

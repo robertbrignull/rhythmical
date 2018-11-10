@@ -1,12 +1,40 @@
-ul.song-list {
+table.song-list {
   margin-top: 64px;
-  list-style-type: none;
+  table-layout: fixed;
+  width: 100%;
 
-  > li {
+  th {
+    text-align: left;
+  }
+
+  tr {
     margin-bottom: 4px;
 
-    > .song {
-      padding: 1rem;
+    td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:first-child {
+        padding-right: 1rem;
+      }
+    }
+  }
+
+  th, td {
+    &:nth-child(1) {
+      width: 45px;
+    }
+
+    &:nth-child(3) {
+      width: 180px;
+    }
+
+    &:nth-child(6) {
+      width: 100px;
+    }
+
+    &:nth-child(7) {
+      width: 70px;
     }
   }
 }
