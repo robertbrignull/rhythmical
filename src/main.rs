@@ -8,6 +8,7 @@ extern crate serde;
 extern crate serde_json;
 #[macro_use] extern crate lazy_static;
 extern crate percent_encoding;
+extern crate htmlescape;
 
 mod library;
 mod server;

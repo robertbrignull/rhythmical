@@ -1,5 +1,6 @@
 extern crate serde_json;
 extern crate percent_encoding;
+extern crate htmlescape;
 
 use std::fs::File;
 use std::io::Write;
@@ -10,6 +11,7 @@ use std::collections::HashMap;
 
 use args::ParseRhythmDbArgs;
 use library::{Library, Song};
+use htmlescape::decode_html;
 
 #[derive(PartialEq)]
 enum Element {
@@ -85,16 +87,16 @@ fn read_song(input_file: &mut BufReader<File>) -> Option<Song> {
     while !element.eq(&Element::CloseEntry) && !element.eq(&Element::EOF) {
         match element {
             Element::Title(title) => {
-                song.title = title.clone();
+                song.title = decode(&title);
             },
             Element::Genre(genre) => {
-                song.genre = genre.clone();
+                song.genre = decode(&genre);
             },
             Element::Artist(artist) => {
-                song.artist = artist.clone();
+                song.artist = decode(&artist);
             },
             Element::Album(album) => {
-                song.album = album.clone();
+                song.album = decode(&album);
             },
             Element::Duration(duration) => {
                 song.duration = duration
@@ -106,9 +108,7 @@ fn read_song(input_file: &mut BufReader<File>) -> Option<Song> {
                 if !location.starts_with(LOCATION_PREFIX) {
                     panic!(format!("location {} does not start with file:///home/robert/Music", location));
                 }
-                let location_bytes = &location[LOCATION_PREFIX.len()..].as_bytes();
-                song.file_location = percent_decode(location_bytes)
-                    .decode_utf8().unwrap().to_string();
+                song.file_location = decode(&location[LOCATION_PREFIX.len()..].to_string());
             },
             _ => {
                 // skip
@@ -122,6 +122,12 @@ fn read_song(input_file: &mut BufReader<File>) -> Option<Song> {
     } else {
         return Option::Some(song);
     }
+}
+
+fn decode(value: &String) -> String {
+    let value = percent_decode(value.as_bytes())
+        .decode_utf8().unwrap().to_string();
+    return decode_html(&value).unwrap();
 }
 
 fn read_element(input_file: &mut BufReader<File>) -> Element {
