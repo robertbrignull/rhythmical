@@ -33,6 +33,16 @@ export class SongList extends React.Component<SongListProps, SongListState> {
       this.props.currentSong.id === song.id;
   }
 
+  private renderDuration(duration: number) {
+    const minutes = Math.floor(duration / 60);
+    const seconds = duration % 60;
+    if (minutes < 1) {
+      return seconds + "s";
+    } else {
+      return minutes + "m " + seconds + "s";
+    }
+  }
+
   private renderRating(rating: number) {
     let stars = [];
     for (let i = 0; i < Math.min(rating, 5); i++) {
@@ -77,7 +87,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
                 <td>{ song.genre }</td>
                 <td>{ song.artist }</td>
                 <td>{ song.album }</td>
-                <td>{ song.duration }</td>
+                <td>{ this.renderDuration(song.duration) }</td>
                 <td>{ this.renderRating(song.rating) }</td>
               </tr>
             )}
