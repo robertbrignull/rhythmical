@@ -34,8 +34,12 @@ table.song-list {
     }
 
     &:nth-child(7) {
-      width: 70px;
+      width: 100px;
     }
+  }
+
+  .stars {
+    font-size: 12px;
   }
 }
 
