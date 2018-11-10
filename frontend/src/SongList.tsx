@@ -36,7 +36,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   public render() {
     if (this.state.songs) {
       return (
-        <table className="song-list">
+        <table className="table song-list">
           <thead>
             <tr>
               <th/>
