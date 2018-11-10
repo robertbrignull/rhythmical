@@ -68,14 +68,14 @@ fn read_song(input_file: &mut BufReader<File>) -> Option<Song> {
 
     let mut song = Song {
         id: 0,
-        name: String::new(),
+        title: String::new(),
         file_location: String::new(),
     };
 
     while !element.eq(&Element::CloseEntry) && !element.eq(&Element::EOF) {
         match element {
             Element::Title(title) => {
-                song.name = title.clone();
+                song.title = title.clone();
             },
             Element::Location(location) => {
                 if !location.starts_with(LOCATION_PREFIX) {

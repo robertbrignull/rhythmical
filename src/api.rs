@@ -22,7 +22,7 @@ fn songs() -> Json<Vec<ApiSong>> {
     for song in Library::get().songs.values() {
         songs.push(ApiSong {
             id: song.id,
-            name: song.name.clone(),
+            name: song.title.clone(),
         });
     }
     return Json(songs);

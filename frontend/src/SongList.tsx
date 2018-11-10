@@ -53,7 +53,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
               <span key={song.id}
                    className="song"
                    onDoubleClick={() => this.props.onSongSelected(song)}>
-                { song.name }
+                { song.title }
               </span>
             </li>
           )}

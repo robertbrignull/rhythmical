@@ -8,7 +8,7 @@ use gsutil;
 #[derive(PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Serialize, Deserialize)]
 pub struct Song {
     pub id: u32,
-    pub name: String,
+    pub title: String,
     pub file_location: String,
 }
 
