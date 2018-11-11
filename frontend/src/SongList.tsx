@@ -50,6 +50,14 @@ export class SongList extends React.Component<SongListProps, SongListState> {
     this.state = { sortedSongs, sortMode, sortDirection };
   }
 
+  public componentWillReceiveProps(nextProps: Readonly<SongListProps>) {
+    this.setState((state, props) => {
+      let sortedSongs = props.allSongs.slice();
+      sortSongs(sortedSongs, this.state.sortMode, this.state.sortDirection);
+      return { sortedSongs };
+    });
+  }
+
   private isPlaying(song: Song): boolean {
     return this.props.playing &&
       this.props.currentSong !== undefined &&

@@ -7,7 +7,8 @@ import {Footer} from "./Footer";
 import {defaultPlaylist, Playlists} from "./Playlists";
 
 interface AppState {
-  songs?: Song[];
+  allSongs?: Song[];
+  filteredSongs?: Song[];
   currentSong?: Song;
   playing: boolean;
   currentPlaylist: Playlist;
@@ -36,7 +37,10 @@ class App extends React.Component<{}, AppState> {
 
   public componentDidMount() {
     Api.songs.getAll().then((songs: Song[]) => {
-      this.setState({ songs });
+      this.setState({
+        allSongs: songs,
+        filteredSongs: songs.slice().filter(this.state.currentPlaylist.predicate),
+      });
     });
   }
 
@@ -68,13 +72,17 @@ class App extends React.Component<{}, AppState> {
   }
 
   private onPlaylistSelected(playlist: Playlist) {
-    this.setState({
-      currentPlaylist: playlist
+    this.setState((state) => {
+      return {
+        currentPlaylist: playlist,
+        filteredSongs: state.allSongs !== undefined
+          ? state.allSongs.slice().filter(playlist.predicate) : undefined
+      };
     });
   }
 
   public render() {
-    return this.state.songs !== undefined ? (
+    return this.state.filteredSongs !== undefined ? (
       <div className="app">
         <div className="header-container">
             <Header ref={this.header}
@@ -87,14 +95,14 @@ class App extends React.Component<{}, AppState> {
                      onPlaylistSelected={this.onPlaylistSelected}/>
         </div>
         <div className="song-list-container">
-          <SongList allSongs={this.state.songs}
+          <SongList allSongs={this.state.filteredSongs}
                     currentSong={this.state.currentSong}
                     playing={this.state.playing}
                     onSongSelected={this.onSongSelected}
                     onPause={this.onPause}/>
         </div>
         <div className="footer-container">
-          <Footer songs={this.state.songs}/>
+          <Footer songs={this.state.filteredSongs}/>
         </div>
       </div>
     ) : (
