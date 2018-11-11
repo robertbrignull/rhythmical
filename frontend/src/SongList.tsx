@@ -65,45 +65,51 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   public render() {
     if (this.state.songs) {
       return (
-        <table className="table song-list">
-          <thead>
-            <tr>
-              <th/>
-              <th>Title</th>
-              <th>Genre</th>
-              <th>Artist</th>
-              <th>Album</th>
-              <th>Duration</th>
-              <th>Rating</th>
-            </tr>
-          </thead>
-          <tbody>
-            {... this.state.songs.map(song =>
-              <tr key={song.id}
-                  onDoubleClick={() => this.props.onSongSelected(song)}>
-                <td>
-                  {
-                    this.isPlaying(song) ? (
-                      <button onClick={() => this.props.onPause()}>
-                        <i className="fa fa-pause"/>
-                      </button>
-                    ) : (
-                      <button onClick={() => this.props.onSongSelected(song)}>
-                        <i className="fa fa-play"/>
-                      </button>
-                    )
-                  }
-                </td>
-                <td>{ song.title }</td>
-                <td>{ song.genre }</td>
-                <td>{ song.artist }</td>
-                <td>{ song.album }</td>
-                <td>{ this.renderDuration(song.duration) }</td>
-                <td>{ this.renderRating(song.rating) }</td>
+        <div className="song-list">
+          <table className="table">
+            <thead>
+              <tr>
+                <th/>
+                <th>Title</th>
+                <th>Genre</th>
+                <th>Artist</th>
+                <th>Album</th>
+                <th>Duration</th>
+                <th>Rating</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+          </table>
+          <div>
+            <table className="table">
+              <tbody>
+                {... this.state.songs.map(song =>
+                  <tr key={song.id}
+                      onDoubleClick={() => this.props.onSongSelected(song)}>
+                    <td>
+                      {
+                        this.isPlaying(song) ? (
+                          <button onClick={() => this.props.onPause()}>
+                            <i className="fa fa-pause"/>
+                          </button>
+                        ) : (
+                          <button onClick={() => this.props.onSongSelected(song)}>
+                            <i className="fa fa-play"/>
+                          </button>
+                        )
+                      }
+                    </td>
+                    <td>{ song.title }</td>
+                    <td>{ song.genre }</td>
+                    <td>{ song.artist }</td>
+                    <td>{ song.album }</td>
+                    <td>{ this.renderDuration(song.duration) }</td>
+                    <td>{ this.renderRating(song.rating) }</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       );
     } else {
       return (
