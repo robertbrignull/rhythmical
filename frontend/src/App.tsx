@@ -1,9 +1,11 @@
 import * as React from 'react';
-import {SongList} from "./SongList";
+import {SongList, sortSongs} from "./SongList";
 import {Header} from "./Header";
 import {RefObject} from "react";
+import Api from "./api";
 
 interface AppState {
+  songs?: Song[];
   currentSong?: Song;
   playing: boolean;
 }
@@ -25,6 +27,13 @@ class App extends React.Component<{}, AppState> {
       currentSong: undefined,
       playing: false,
     };
+  }
+
+  public componentDidMount() {
+    Api.songs.getAll().then((songs: Song[]) => {
+      sortSongs(songs, 'title', 'ascending');
+      this.setState({ songs });
+    });
   }
 
   private onSongSelected(song: Song) {
@@ -55,22 +64,25 @@ class App extends React.Component<{}, AppState> {
   }
 
   public render() {
-    return (
+    return this.state.songs !== undefined ? (
       <div className="app">
         <div className="header-container">
-          <Header
-            ref={this.header}
-            currentSong={this.state.currentSong}
-            onPlay={this.onPlay}
-            onPause={this.onPause}/>
+            <Header ref={this.header}
+                    currentSong={this.state.currentSong}
+                    onPlay={this.onPlay}
+                    onPause={this.onPause}/>
         </div>
         <div className="song-list-container">
-          <SongList
-            currentSong={this.state.currentSong}
-            playing={this.state.playing}
-            onSongSelected={this.onSongSelected}
-            onPause={this.onPause}/>
+          <SongList songs={this.state.songs}
+                    currentSong={this.state.currentSong}
+                    playing={this.state.playing}
+                    onSongSelected={this.onSongSelected}
+                    onPause={this.onPause}/>
         </div>
+      </div>
+    ) : (
+      <div className="loading-message">
+        Loading...
       </div>
     );
   }
