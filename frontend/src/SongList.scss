@@ -62,6 +62,12 @@ $scrollBarWidth: 15px;
         width: 100px;
       }
     }
+
+    &.songs-table-body {
+      tr:hover {
+        background-color: #e5e5ff;
+      }
+    }
     
     .selected-sort {
       color: #6565ff;
@@ -69,6 +75,7 @@ $scrollBarWidth: 15px;
 
     .pause-button, .play-button {
       font-size: 12px;
+      cursor: pointer;
     }
 
     .stars {

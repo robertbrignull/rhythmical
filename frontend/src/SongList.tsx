@@ -111,7 +111,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   public render() {
     return (
       <div className="song-list">
-        <table className="table">
+        <table className="table songs-table-header">
           <thead>
             <tr>
               <th/>
@@ -143,11 +143,10 @@ export class SongList extends React.Component<SongListProps, SongListState> {
           </thead>
         </table>
         <div>
-          <table className="table">
+          <table className="table songs-table-body">
             <tbody>
               {... this.state.sortedSongs.map(song =>
-                <tr key={song.id}
-                    onDoubleClick={() => this.props.onSongSelected(song)}>
+                <tr key={song.id}>
                   <td>
                     {
                       this.isPlaying(song) ? (

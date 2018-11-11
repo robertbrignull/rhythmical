@@ -40,7 +40,7 @@ export class Playlists extends React.Component<PlaylistsProps, {}> {
           return (
             <div key={p.name}
                  className={className}
-                 onDoubleClick={() => this.props.onPlaylistSelected(p)}>
+                 onClick={() => this.props.onPlaylistSelected(p)}>
               <i className="fas fa-search"/>
               <span className="playlist-name">{p.name}</span>
             </div>
