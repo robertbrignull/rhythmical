@@ -1,0 +1,17 @@
+.playlists {
+  height: 100%;
+  border-top: 1px solid #dee2e6;
+  border-right: 2px solid #dee2e6;
+
+  .playlist {
+    padding: 4px 10px;
+
+    &.selected {
+      color: #6565ff;
+    }
+
+    .playlist-name {
+      padding-left: 5px;
+    }
+  }
+}

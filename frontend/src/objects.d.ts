@@ -7,3 +7,8 @@ interface Song {
   duration: number,
   rating: number,
 }
+
+interface Playlist {
+  name: string;
+  predicate: (s: Song) => boolean;
+}

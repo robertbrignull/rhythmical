@@ -4,11 +4,13 @@ import {Header} from "./Header";
 import {RefObject} from "react";
 import Api from "./api";
 import {Footer} from "./Footer";
+import {defaultPlaylist, Playlists} from "./Playlists";
 
 interface AppState {
   songs?: Song[];
   currentSong?: Song;
   playing: boolean;
+  currentPlaylist: Playlist;
 }
 
 class App extends React.Component<{}, AppState> {
@@ -21,12 +23,14 @@ class App extends React.Component<{}, AppState> {
     this.onSongSelected = this.onSongSelected.bind(this);
     this.onPlay = this.onPlay.bind(this);
     this.onPause = this.onPause.bind(this);
+    this.onPlaylistSelected = this.onPlaylistSelected.bind(this);
 
     this.header = React.createRef();
 
     this.state = {
       currentSong: undefined,
       playing: false,
+      currentPlaylist: defaultPlaylist,
     };
   }
 
@@ -63,6 +67,12 @@ class App extends React.Component<{}, AppState> {
     });
   }
 
+  private onPlaylistSelected(playlist: Playlist) {
+    this.setState({
+      currentPlaylist: playlist
+    });
+  }
+
   public render() {
     return this.state.songs !== undefined ? (
       <div className="app">
@@ -71,6 +81,10 @@ class App extends React.Component<{}, AppState> {
                     currentSong={this.state.currentSong}
                     onPlay={this.onPlay}
                     onPause={this.onPause}/>
+        </div>
+        <div className="playlists-container">
+          <Playlists currentPlaylist={this.state.currentPlaylist.name}
+                     onPlaylistSelected={this.onPlaylistSelected}/>
         </div>
         <div className="song-list-container">
           <SongList allSongs={this.state.songs}
