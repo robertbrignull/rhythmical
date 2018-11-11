@@ -1,6 +1,8 @@
 import * as React from "react";
 import Api from "./api";
 
+type SortMode = 'id';
+
 interface SongListProps {
   currentSong?: Song;
   playing: boolean;
@@ -10,6 +12,7 @@ interface SongListProps {
 
 interface SongListState {
   songs?: Song[];
+  sortMode: SortMode;
 }
 
 export class SongList extends React.Component<SongListProps, SongListState> {
@@ -18,13 +21,21 @@ export class SongList extends React.Component<SongListProps, SongListState> {
 
     this.state = {
       songs: undefined,
+      sortMode: 'id'
     };
   }
 
   public componentDidMount() {
     Api.songs.getAll().then((songs: Song[]) => {
+      this.sortSongs(songs);
       this.setState({ songs });
     });
+  }
+
+  private sortSongs(songs: Song[]) {
+    if (this.state.sortMode === 'id') {
+      songs.sort((a, b) => a.id - b.id);
+    }
   }
 
   private isPlaying(song: Song): boolean {
