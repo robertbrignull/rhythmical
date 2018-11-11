@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {SongList, sortSongs} from "./SongList";
+import {SongList} from "./SongList";
 import {Header} from "./Header";
 import {RefObject} from "react";
 import Api from "./api";
@@ -31,7 +31,6 @@ class App extends React.Component<{}, AppState> {
 
   public componentDidMount() {
     Api.songs.getAll().then((songs: Song[]) => {
-      sortSongs(songs, 'title', 'ascending');
       this.setState({ songs });
     });
   }
@@ -73,7 +72,7 @@ class App extends React.Component<{}, AppState> {
                     onPause={this.onPause}/>
         </div>
         <div className="song-list-container">
-          <SongList songs={this.state.songs}
+          <SongList allSongs={this.state.songs}
                     currentSong={this.state.currentSong}
                     playing={this.state.playing}
                     onSongSelected={this.onSongSelected}

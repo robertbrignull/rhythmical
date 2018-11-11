@@ -3,7 +3,7 @@ import * as React from "react";
 type SortMode = 'title' | 'genre' | 'artist' | 'album' | 'duration' | 'rating';
 type SortDirection = 'ascending' | 'descending';
 
-export function sortSongs(songs: Song[], sortMode: SortMode, sortDirection: SortDirection) {
+function sortSongs(songs: Song[], sortMode: SortMode, sortDirection: SortDirection) {
   let cmp: (a: Song, b: Song) => number;
   if (sortMode === 'title') {
     cmp = (a, b) => a.title.localeCompare(b.title);
@@ -26,7 +26,7 @@ export function sortSongs(songs: Song[], sortMode: SortMode, sortDirection: Sort
 }
 
 interface SongListProps {
-  songs: Song[];
+  allSongs: Song[];
   currentSong?: Song;
   playing: boolean;
   onSongSelected: (song: Song) => void;
@@ -34,6 +34,7 @@ interface SongListProps {
 }
 
 interface SongListState {
+  sortedSongs: Song[];
   sortMode: SortMode;
   sortDirection: SortDirection;
 }
@@ -42,10 +43,11 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   constructor(props: SongListProps) {
     super(props);
 
-    this.state = {
-      sortMode: 'artist',
-      sortDirection: 'ascending',
-    };
+    let sortMode: SortMode = 'artist';
+    let sortDirection: SortDirection = 'ascending';
+    let sortedSongs = props.allSongs;
+    sortSongs(sortedSongs, sortMode, sortDirection);
+    this.state = { sortedSongs, sortMode, sortDirection };
   }
 
   private isPlaying(song: Song): boolean {
@@ -57,15 +59,13 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   private renderSortIcon(key: SortMode) {
     let onClick = () => {
       this.setState((state, props) => {
+        let sortedSongs = props.allSongs.slice();
         let sortMode = key;
-        let songs = props.songs;
         let sortDirection: SortDirection =
           state.sortMode === key && state.sortDirection === 'ascending'
             ? 'descending' : 'ascending';
-        if (songs !== undefined) {
-          sortSongs(songs, sortMode, sortDirection);
-        }
-        return { songs, sortMode, sortDirection };
+        sortSongs(sortedSongs, sortMode, sortDirection);
+        return { sortedSongs, sortMode, sortDirection };
       });
     };
 
@@ -137,7 +137,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
         <div>
           <table className="table">
             <tbody>
-              {... this.props.songs.map(song =>
+              {... this.state.sortedSongs.map(song =>
                 <tr key={song.id}
                     onDoubleClick={() => this.props.onSongSelected(song)}>
                   <td>
