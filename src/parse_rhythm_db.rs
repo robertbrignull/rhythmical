@@ -28,8 +28,6 @@ enum Element {
     EOF,
 }
 
-const LOCATION_PREFIX: &str = "file:///home/robert/Music";
-
 pub fn parse_rhythm_db() {
     let args = ParseRhythmDbArgs::get();
 
@@ -105,10 +103,11 @@ fn read_song(input_file: &mut BufReader<File>) -> Option<Song> {
                 song.rating = rating;
             },
             Element::Location(location) => {
-                if !location.starts_with(LOCATION_PREFIX) {
-                    panic!(format!("location {} does not start with file:///home/robert/Music", location));
+                let prefix = format!("file://{}", ParseRhythmDbArgs::get().library_location_prefix);
+                if !location.starts_with(&prefix) {
+                    panic!(format!("location {} does not start with {}", location, prefix));
                 }
-                song.file_location = decode(&location[LOCATION_PREFIX.len()..].to_string());
+                song.file_location = decode(&location[prefix.len()..].to_string());
             },
             _ => {
                 // skip

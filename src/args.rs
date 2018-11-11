@@ -35,19 +35,25 @@ pub struct ServeArgs {
 pub struct ParseRhythmDbArgs {
     pub input_file: String,
     pub output_file: String,
+    pub library_location_prefix: String,
 }
+
+const USAGE_MESSAGE: &str = "Incorrect arguments. Usage:
+  serve rhythmical project-name private-key
+  parse-rhythm-db input-file output-file library-location-prefix";
 
 lazy_static! {
     static ref ARGS: Args = {
         let args: Vec<String> = std::env::args().collect();
-        if args.len() != 4 {
-            panic!("Incorrect arguments. Usage:
-              serve rhythmical project-name private-key
-              parse-rhythm-db input-file output-file");
+        if args.len() < 2 {
+            panic!(USAGE_MESSAGE);
         }
 
         match Mode::parse(args[1].clone()) {
-            Mode::Serve =>
+            Mode::Serve => {
+                if args.len() != 4 {
+                    panic!(USAGE_MESSAGE);
+                }
                 Args {
                     mode: Mode::Serve,
                     serve: Option::Some(ServeArgs {
@@ -55,16 +61,22 @@ lazy_static! {
                         private_key: args[3].clone(),
                     }),
                     parse_rhythm_db: Option::None,
-                },
-            Mode::ParseRhythmDb =>
+                }
+            },
+            Mode::ParseRhythmDb => {
+                if args.len() != 5 {
+                    panic!(USAGE_MESSAGE);
+                }
                 Args {
                     mode: Mode::ParseRhythmDb,
                     serve: Option::None,
                     parse_rhythm_db: Option::Some(ParseRhythmDbArgs {
                         input_file: args[2].clone(),
                         output_file: args[3].clone(),
+                        library_location_prefix: args[4].clone(),
                     }),
-                },
+                }
+            },
         }
     };
 }
