@@ -44,6 +44,8 @@ $scrollBarWidth: 15px;
     }
 
     th, td {
+      padding: 7px;
+
       &:nth-child(1) {
         width: 45px;
       }
@@ -59,6 +61,10 @@ $scrollBarWidth: 15px;
       &:nth-child(7) {
         width: 100px;
       }
+    }
+
+    .pause-button, .play-button {
+      font-size: 12px;
     }
 
     .stars {

@@ -88,11 +88,13 @@ export class SongList extends React.Component<SongListProps, SongListState> {
                     <td>
                       {
                         this.isPlaying(song) ? (
-                          <button onClick={() => this.props.onPause()}>
+                          <button className="pause-button"
+                                  onClick={() => this.props.onPause()}>
                             <i className="fa fa-pause"/>
                           </button>
                         ) : (
-                          <button onClick={() => this.props.onSongSelected(song)}>
+                          <button className="play-button"
+                                  onClick={() => this.props.onSongSelected(song)}>
                             <i className="fa fa-play"/>
                           </button>
                         )
