@@ -10,6 +10,14 @@ const allPlaylists: Playlist[] = [
     predicate: (s: Song) => s.rating >= 5
   },
   {
+    name: "Great",
+    predicate: (s: Song) => s.rating >= 4
+  },
+  {
+    name: "Good",
+    predicate: (s: Song) => s.rating >= 3
+  },
+  {
     name: "Unrated",
     predicate: (s: Song) => s.rating === 0
   }
