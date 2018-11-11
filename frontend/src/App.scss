@@ -1,4 +1,5 @@
 $headerHeight: 64px;
+$footerHeight: 38px;
 
 .app {
   position: relative;
@@ -15,8 +16,15 @@ $headerHeight: 64px;
 .song-list-container {
   position: absolute;
   top: $headerHeight;
+  bottom: $footerHeight;
+  width: 100%;
+}
+
+.footer-container {
+  position: absolute;
   bottom: 0;
   width: 100%;
+  height: $footerHeight;
 }
 
 .loading-message {

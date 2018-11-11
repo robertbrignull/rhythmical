@@ -3,6 +3,7 @@ import {SongList} from "./SongList";
 import {Header} from "./Header";
 import {RefObject} from "react";
 import Api from "./api";
+import {Footer} from "./Footer";
 
 interface AppState {
   songs?: Song[];
@@ -77,6 +78,9 @@ class App extends React.Component<{}, AppState> {
                     playing={this.state.playing}
                     onSongSelected={this.onSongSelected}
                     onPause={this.onPause}/>
+        </div>
+        <div className="footer-container">
+          <Footer songs={this.state.songs}/>
         </div>
       </div>
     ) : (
