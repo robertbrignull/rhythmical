@@ -56,17 +56,21 @@ class App extends React.Component<{}, AppState> {
 
   public render() {
     return (
-      <div>
-        <Header
-          ref={this.header}
-          currentSong={this.state.currentSong}
-          onPlay={this.onPlay}
-          onPause={this.onPause}/>
-        <SongList
-          currentSong={this.state.currentSong}
-          playing={this.state.playing}
-          onSongSelected={this.onSongSelected}
-          onPause={this.onPause}/>
+      <div className="app">
+        <div className="header-container">
+          <Header
+            ref={this.header}
+            currentSong={this.state.currentSong}
+            onPlay={this.onPlay}
+            onPause={this.onPause}/>
+        </div>
+        <div className="song-list-container">
+          <SongList
+            currentSong={this.state.currentSong}
+            playing={this.state.playing}
+            onSongSelected={this.onSongSelected}
+            onPause={this.onPause}/>
+        </div>
       </div>
     );
   }

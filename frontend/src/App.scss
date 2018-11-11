@@ -1,0 +1,21 @@
+$headerHeight: 64px;
+
+.app {
+  position: relative;
+  height: 100%;
+}
+
+.header-container {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: $headerHeight;
+}
+
+.song-list-container {
+  position: absolute;
+  top: $headerHeight;
+  bottom: 0;
+  width: 100%;
+  overflow: scroll;
+}
