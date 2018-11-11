@@ -35,13 +35,14 @@ export class Playlists extends React.Component<PlaylistsProps, {}> {
     return <div className="playlists">
       {...
         allPlaylists.map(p => {
-          let className = "playlist" +
-            ((p.name === this.props.currentPlaylist) ? " selected" : "");
+          let isSelected = p.name === this.props.currentPlaylist;
+          let className = "playlist" + (isSelected ? " selected" : "");
           return (
             <div key={p.name}
                  className={className}
                  onClick={() => this.props.onPlaylistSelected(p)}>
               <i className="fas fa-search"/>
+              { isSelected ? <i className="fas fa-caret-right"/> : null}
               <span className="playlist-name">{p.name}</span>
             </div>
           );
