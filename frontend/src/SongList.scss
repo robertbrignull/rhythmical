@@ -1,85 +1,115 @@
-$tableHeaderHeight: 51px;
+$tableHeaderHeight: 35px;
 $scrollBarWidth: 15px;
+$songRowHeight: 31px;
+
+$playColWidth: 45px;
+$genreColWidth: 175px;
+$durationColWidth: 100px;
+$ratingColWidth: 85px;
 
 .song-list {
   position: relative;
   height: 100%;
 
-  > *:nth-child(1) {
+  .songs-table-header {
     position: absolute;
-    width: calc(100% - #{$scrollBarWidth});
-    right: $scrollBarWidth;
     top: 0;
     height: $tableHeaderHeight;
-    margin-bottom: 0;
+    right: $scrollBarWidth;
+    width: calc(100% - #{$scrollBarWidth});
+    border-top: 2px solid #dee2e6;
+    border-bottom: 2px solid #dee2e6;
+
+    > * {
+      height: $tableHeaderHeight;
+
+      .selected-sort {
+        color: #6565ff;
+      }
+    }
   }
 
-  > *:nth-child(2) {
+  .songs-table-body {
     position: absolute;
     width: 100%;
     top: $tableHeaderHeight;
     bottom: 0;
     overflow-y: scroll;
-  }
 
-  table {
-    table-layout: fixed;
-    width: 100%;
+    .song-row {
+      width: 100%;
+      border-top: 1px solid #dee2e6;
+      height: $songRowHeight;
 
-    th {
-      text-align: left;
-    }
-
-    tr {
-      margin-bottom: 4px;
-
-      td {
-        overflow: hidden;
-        text-overflow: ellipsis;
-
-        &:first-child {
-          padding-right: 1rem;
-        }
-      }
-    }
-
-    th, td {
-      padding: 7px;
-
-      &:nth-child(1) {
-        width: 45px;
-      }
-
-      &:nth-child(3) {
-        width: 180px;
-      }
-
-      &:nth-child(6) {
-        width: 100px;
-      }
-
-      &:nth-child(7) {
-        width: 100px;
-      }
-    }
-
-    &.songs-table-body {
-      tr:hover {
+      &:hover {
         background-color: #e5e5ff;
       }
+
+      > * {
+        height: $songRowHeight;
+      }
     }
-    
-    .selected-sort {
-      color: #6565ff;
+  }
+
+  .songs-table-header,
+  .songs-table-body .song-row {
+    > * {
+      display: inline-block;
+      border-right: 1px solid #dee2e6;
+
+      &:last-child {
+        border-right: 0;
+      }
     }
 
-    .pause-button, .play-button {
-      font-size: 12px;
-      cursor: pointer;
+    > *:not(.play-col) {
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 25px;
+      padding: 2px 6px;
     }
 
-    .stars {
-      font-size: 12px;
+    .play-col {
+      width: $playColWidth;
+      text-align: center;
+      overflow: hidden;
+
+      .pause-button, .play-button {
+        font-size: 12px;
+        cursor: pointer;
+        vertical-align: top;
+        margin-top: 3px;
+      }
+    }
+
+    .title-col {
+      width: calc((100% - #{$playColWidth} - #{$genreColWidth} - #{$durationColWidth} - #{$ratingColWidth}) / 3);
+    }
+
+    .genre-col {
+      width: $genreColWidth;
+    }
+
+    .artist-col {
+      width: calc((100% - #{$playColWidth} - #{$genreColWidth} - #{$durationColWidth} - #{$ratingColWidth}) / 3);
+    }
+
+    .album-col {
+      width: calc((100% - #{$playColWidth} - #{$genreColWidth} - #{$durationColWidth} - #{$ratingColWidth}) / 3);
+    }
+
+    .duration-col {
+      width: $durationColWidth;
+    }
+
+    .rating-col {
+      width: $ratingColWidth;
+
+      .stars {
+        font-size: 12px;
+      }
     }
   }
 }

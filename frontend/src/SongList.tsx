@@ -111,67 +111,71 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   public render() {
     return (
       <div className="song-list">
-        <table className="table songs-table-header">
-          <thead>
-            <tr>
-              <th/>
-              <th>
-                Title
-                { this.renderSortIcon('title') }
-              </th>
-              <th>
-                Genre
-                { this.renderSortIcon('genre') }
-              </th>
-              <th>
-                Artist
-                { this.renderSortIcon('artist') }
-              </th>
-              <th>
-                Album
-                { this.renderSortIcon('album') }
-              </th>
-              <th>
-                Duration
-                { this.renderSortIcon('duration') }
-              </th>
-              <th>
-                Rating
-                { this.renderSortIcon('rating') }
-              </th>
-            </tr>
-          </thead>
-        </table>
-        <div>
-          <table className="table songs-table-body">
-            <tbody>
-              {... this.state.sortedSongs.map(song =>
-                <tr key={song.id}>
-                  <td>
-                    {
-                      this.isPlaying(song) ? (
-                        <button className="pause-button"
-                                onClick={() => this.props.onPause()}>
-                          <i className="fa fa-pause"/>
-                        </button>
-                      ) : (
-                        <button className="play-button"
-                                onClick={() => this.props.onSongSelected(song)}>
-                          <i className="fa fa-play"/>
-                        </button>
-                      )
-                    }
-                  </td>
-                  <td>{ song.title }</td>
-                  <td>{ song.genre }</td>
-                  <td>{ song.artist }</td>
-                  <td>{ song.album }</td>
-                  <td>{ this.renderDuration(song.duration) }</td>
-                  <td>{ this.renderRating(song.rating) }</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <div className="songs-table-header">
+          <div className="play-col"/>
+          <div className="title-col">
+            Title
+            { this.renderSortIcon('title') }
+          </div>
+          <div className="genre-col">
+            Genre
+            { this.renderSortIcon('genre') }
+          </div>
+          <div className="artist-col">
+            Artist
+            { this.renderSortIcon('artist') }
+          </div>
+          <div className="album-col">
+            Album
+            { this.renderSortIcon('album') }
+          </div>
+          <div className="duration-col">
+            Duration
+            { this.renderSortIcon('duration') }
+          </div>
+          <div className="rating-col">
+            Rating
+            { this.renderSortIcon('rating') }
+          </div>
+        </div>
+        <div className="songs-table-body">
+          {... this.state.sortedSongs.map(song =>
+            <div key={song.id} className="song-row">
+              <div className="play-col">
+                {
+                  this.isPlaying(song) ? (
+                    <button className="pause-button"
+                            onClick={() => this.props.onPause()}>
+                      <i className="fa fa-pause"/>
+                    </button>
+                  ) : (
+                    <button className="play-button"
+                            onClick={() => this.props.onSongSelected(song)}>
+                      <i className="fa fa-play"/>
+                    </button>
+                  )
+                }
+              </div>
+              <div className="title-col">
+                { song.title }
+              </div>
+              <div className="genre-col">
+                { song.genre }
+              </div>
+              <div className="artist-col">
+                { song.artist }
+              </div>
+              <div className="album-col">
+                { song.album }
+              </div>
+              <div className="duration-col">
+                { this.renderDuration(song.duration) }
+              </div>
+              <div className="rating-col">
+                { this.renderRating(song.rating) }
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
