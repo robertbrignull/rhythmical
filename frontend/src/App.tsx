@@ -2,13 +2,9 @@ import * as React from 'react';
 import {SongList} from "./SongList";
 import {Header} from "./Header";
 import {RefObject} from "react";
-import Api from "./api";
-import {Footer} from "./Footer";
 import {defaultPlaylist, Playlists} from "./Playlists";
 
 interface AppState {
-  allSongs?: Song[];
-  filteredSongs?: Song[];
   currentSong?: Song;
   playing: boolean;
   currentPlaylist: Playlist;
@@ -33,15 +29,6 @@ class App extends React.Component<{}, AppState> {
       playing: false,
       currentPlaylist: defaultPlaylist,
     };
-  }
-
-  public componentDidMount() {
-    Api.songs.getAll().then((songs: Song[]) => {
-      this.setState({
-        allSongs: songs,
-        filteredSongs: songs.slice().filter(this.state.currentPlaylist.predicate),
-      });
-    });
   }
 
   private onSongSelected(song: Song) {
@@ -72,17 +59,13 @@ class App extends React.Component<{}, AppState> {
   }
 
   private onPlaylistSelected(playlist: Playlist) {
-    this.setState((state) => {
-      return {
-        currentPlaylist: playlist,
-        filteredSongs: state.allSongs !== undefined
-          ? state.allSongs.slice().filter(playlist.predicate) : undefined
-      };
+    this.setState( {
+      currentPlaylist: playlist,
     });
   }
 
   public render() {
-    return this.state.filteredSongs !== undefined ? (
+    return (
       <div className="app">
         <div className="header-container">
             <Header ref={this.header}
@@ -95,19 +78,11 @@ class App extends React.Component<{}, AppState> {
                      onPlaylistSelected={this.onPlaylistSelected}/>
         </div>
         <div className="song-list-container">
-          <SongList allSongs={this.state.filteredSongs}
-                    currentSong={this.state.currentSong}
+          <SongList currentPlaylist={this.state.currentPlaylist}
                     playing={this.state.playing}
                     onSongSelected={this.onSongSelected}
                     onPause={this.onPause}/>
         </div>
-        <div className="footer-container">
-          <Footer songs={this.state.filteredSongs}/>
-        </div>
-      </div>
-    ) : (
-      <div className="loading-message">
-        Loading...
       </div>
     );
   }

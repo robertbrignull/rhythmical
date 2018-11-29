@@ -1,4 +1,6 @@
 import * as React from "react";
+import Api from "./api";
+import {Footer} from "./Footer";
 
 type SortMode = 'title' | 'genre' | 'artist' | 'album' | 'duration' | 'rating';
 type SortDirection = 'ascending' | 'descending';
@@ -25,8 +27,18 @@ function sortSongs(songs: Song[], sortMode: SortMode, sortDirection: SortDirecti
     ? cmp : (a: Song, b: Song) => cmp(b, a));
 }
 
+function filterAndSortSongs(allSongs: Song[] | undefined, playlist: Playlist, sortMode: SortMode, sortDirection: SortDirection): Song[] | undefined {
+  if (allSongs === undefined) {
+    return undefined;
+  }
+
+  const filteredSongs = allSongs.slice().filter(playlist.predicate);
+  sortSongs(filteredSongs, sortMode, sortDirection);
+  return filteredSongs;
+}
+
 interface SongListProps {
-  allSongs: Song[];
+  currentPlaylist: Playlist;
   currentSong?: Song;
   playing: boolean;
   onSongSelected: (song: Song) => void;
@@ -34,7 +46,8 @@ interface SongListProps {
 }
 
 interface SongListState {
-  sortedSongs: Song[];
+  allSongs?: Song[];
+  songs?: Song[];
   sortMode: SortMode;
   sortDirection: SortDirection;
 }
@@ -45,16 +58,35 @@ export class SongList extends React.Component<SongListProps, SongListState> {
 
     let sortMode: SortMode = 'artist';
     let sortDirection: SortDirection = 'ascending';
-    let sortedSongs = props.allSongs;
-    sortSongs(sortedSongs, sortMode, sortDirection);
-    this.state = { sortedSongs, sortMode, sortDirection };
+    this.state = { sortMode, sortDirection };
+  }
+
+  public componentDidMount() {
+    Api.songs.getAll().then((songs: Song[]) => {
+      this.setState({
+        allSongs: songs,
+        songs: filterAndSortSongs(
+          songs,
+          this.props.currentPlaylist,
+          this.state.sortMode,
+          this.state.sortDirection),
+      });
+    });
   }
 
   public componentWillReceiveProps(nextProps: Readonly<SongListProps>) {
+    if (nextProps.currentPlaylist.name === this.props.currentPlaylist.name) {
+      return;
+    }
+
     this.setState((state, props) => {
-      let sortedSongs = props.allSongs.slice();
-      sortSongs(sortedSongs, this.state.sortMode, this.state.sortDirection);
-      return { sortedSongs };
+      return {
+        songs: filterAndSortSongs(
+          state.allSongs,
+          props.currentPlaylist,
+          state.sortMode,
+          state.sortDirection)
+      };
     });
   }
 
@@ -67,13 +99,17 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   private renderSortIcon(key: SortMode) {
     let onClick = () => {
       this.setState((state, props) => {
-        let sortedSongs = props.allSongs.slice();
-        let sortMode = key;
-        let sortDirection: SortDirection =
-          state.sortMode === key && state.sortDirection === 'ascending'
-            ? 'descending' : 'ascending';
-        sortSongs(sortedSongs, sortMode, sortDirection);
-        return { sortedSongs, sortMode, sortDirection };
+        return {
+          songs: filterAndSortSongs(
+            state.allSongs,
+            props.currentPlaylist,
+            state.sortMode,
+            state.sortDirection),
+          sortMode: key,
+          sortDirection:
+            state.sortMode === key && state.sortDirection === 'ascending'
+              ? 'descending' : 'ascending'
+        };
       });
     };
 
@@ -109,6 +145,14 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   }
 
   public render() {
+    if (this.state.songs === undefined) {
+      return (
+        <div className="loading-message">
+          Loading...
+        </div>
+      );
+    }
+
     return (
       <div className="song-list">
         <div className="songs-table-header">
@@ -139,7 +183,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
           </div>
         </div>
         <div className="songs-table-body">
-          {... this.state.sortedSongs.map(song =>
+          {... this.state.songs.map(song =>
             <div key={song.id} className="song-row">
               <div className="play-col">
                 {
@@ -176,6 +220,9 @@ export class SongList extends React.Component<SongListProps, SongListState> {
               </div>
             </div>
           )}
+        </div>
+        <div className="footer-container">
+          <Footer songs={this.state.songs}/>
         </div>
       </div>
     );

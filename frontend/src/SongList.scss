@@ -1,11 +1,17 @@
 $tableHeaderHeight: 35px;
 $scrollBarWidth: 15px;
 $songRowHeight: 31px;
+$footerHeight: 38px;
 
 $playColWidth: 45px;
 $genreColWidth: 175px;
 $durationColWidth: 100px;
 $ratingColWidth: 85px;
+
+.loading-message {
+  margin-top: 64px;
+  text-align: center;
+}
 
 .song-list {
   position: relative;
@@ -33,7 +39,7 @@ $ratingColWidth: 85px;
     position: absolute;
     width: 100%;
     top: $tableHeaderHeight;
-    bottom: 0;
+    bottom: $footerHeight;
     overflow-y: scroll;
 
     .song-row {
@@ -111,5 +117,12 @@ $ratingColWidth: 85px;
         font-size: 12px;
       }
     }
+  }
+
+  .footer-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: $footerHeight;
   }
 }
