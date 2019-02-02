@@ -1,5 +1,6 @@
 $headerHeight: 64px;
 $playlistsWidth: 200px;
+$footerHeight: 38px;
 
 .app {
   position: relative;
@@ -16,7 +17,7 @@ $playlistsWidth: 200px;
 .playlists-container {
   position: absolute;
   top: $headerHeight;
-  bottom: 0;
+  bottom: $footerHeight;
   left: 0;
   width: $playlistsWidth;
 }
@@ -24,7 +25,14 @@ $playlistsWidth: 200px;
 .song-list-container {
   position: absolute;
   top: $headerHeight;
-  bottom: 0;
+  bottom: $footerHeight;
   left: $playlistsWidth;
   right: 0;
+}
+
+.footer-container {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: $footerHeight;
 }

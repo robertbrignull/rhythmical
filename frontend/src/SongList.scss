@@ -1,7 +1,6 @@
 $tableHeaderHeight: 35px;
 $scrollBarWidth: 15px;
 $songRowHeight: 31px;
-$footerHeight: 38px;
 
 $playColWidth: 45px;
 $genreColWidth: 175px;
@@ -39,7 +38,7 @@ $ratingColWidth: 85px;
     position: absolute;
     width: 100%;
     top: $tableHeaderHeight;
-    bottom: $footerHeight;
+    bottom: 0;
     overflow-y: scroll;
 
     .song-row {
@@ -117,12 +116,5 @@ $ratingColWidth: 85px;
         font-size: 12px;
       }
     }
-  }
-
-  .footer-container {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: $footerHeight;
   }
 }
