@@ -39,7 +39,7 @@ pub struct ParseRhythmDbArgs {
 }
 
 const USAGE_MESSAGE: &str = "Incorrect arguments. Usage:
-  serve rhythmical project-name private-key
+  serve project-name private-key
   parse-rhythm-db input-file output-file library-location-prefix";
 
 lazy_static! {
