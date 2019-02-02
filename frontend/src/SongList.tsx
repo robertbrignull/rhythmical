@@ -1,9 +1,19 @@
 import * as React from "react";
 
-type SortMode = 'title' | 'genre' | 'artist' | 'album' | 'duration' | 'rating';
-type SortDirection = 'ascending' | 'descending';
+import 'react-virtualized/styles.css';
+import {AutoSizer} from 'react-virtualized/dist/es/AutoSizer';
+import {WindowScroller} from 'react-virtualized/dist/es/WindowScroller';
+import {Table, Column, TableCellProps, TableHeaderProps, SortIndicator, SortDirectionType} from 'react-virtualized/dist/es/Table';
+import {Index} from "react-virtualized";
 
-function sortSongs(songs: Song[], sortMode: SortMode, sortDirection: SortDirection) {
+type SortMode = 'title' | 'genre' | 'artist' | 'album' | 'duration' | 'rating';
+
+function filterAndSortSongs(allSongs: Song[],
+                            playlist: Playlist,
+                            sortMode: SortMode,
+                            sortDirection: SortDirectionType): Song[] {
+  const songs = allSongs.slice().filter(playlist.predicate);
+
   let cmp: (a: Song, b: Song) => number;
   if (sortMode === 'title') {
     cmp = (a, b) => a.title.localeCompare(b.title);
@@ -21,17 +31,10 @@ function sortSongs(songs: Song[], sortMode: SortMode, sortDirection: SortDirecti
     cmp = () => 0;
   }
 
-  songs.sort(sortDirection === 'ascending'
+  songs.sort(sortDirection === 'ASC'
     ? cmp : (a: Song, b: Song) => cmp(b, a));
-}
 
-function filterAndSortSongs(allSongs: Song[],
-                            playlist: Playlist,
-                            sortMode: SortMode,
-                            sortDirection: SortDirection): Song[] {
-  const filteredSongs = allSongs.slice().filter(playlist.predicate);
-  sortSongs(filteredSongs, sortMode, sortDirection);
-  return filteredSongs;
+  return songs;
 }
 
 interface SongListProps {
@@ -46,7 +49,7 @@ interface SongListProps {
 interface SongListState {
   filteredSongs: Song[];
   sortMode: SortMode;
-  sortDirection: SortDirection;
+  sortDirection: SortDirectionType;
 }
 
 export class SongList extends React.Component<SongListProps, SongListState> {
@@ -54,7 +57,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
     super(props);
 
     let sortMode: SortMode = 'artist';
-    let sortDirection: SortDirection = 'ascending';
+    let sortDirection: SortDirectionType = 'ASC';
     this.state = {
       filteredSongs: filterAndSortSongs(
         props.allSongs,
@@ -63,6 +66,12 @@ export class SongList extends React.Component<SongListProps, SongListState> {
         sortDirection),
       sortMode,
       sortDirection };
+
+    this.sortList = this.sortList.bind(this);
+    this.rowGetter = this.rowGetter.bind(this);
+    this.playCellRenderer = this.playCellRenderer.bind(this);
+    this.durationCellRenderer = this.durationCellRenderer.bind(this);
+    this.ratingCellRenderer = this.ratingCellRenderer.bind(this);
   }
 
   public componentWillReceiveProps(nextProps: Readonly<SongListProps>) {
@@ -87,39 +96,56 @@ export class SongList extends React.Component<SongListProps, SongListState> {
       this.props.currentSong.id === song.id;
   }
 
-  private renderSortIcon(key: SortMode) {
-    let onClick = () => {
-      this.setState((state, props) => {
-        return {
-          filteredSongs: filterAndSortSongs(
-            props.allSongs,
-            props.currentPlaylist,
-            state.sortMode,
-            state.sortDirection),
-          sortMode: key,
-          sortDirection:
-            state.sortMode === key && state.sortDirection === 'ascending'
-              ? 'descending' : 'ascending'
-        };
-      });
-    };
-
-    if (this.state.sortMode === key) {
-      if (this.state.sortDirection === 'ascending') {
-        return <i className="fa fa-fw fa-sort-up selected-sort"
-                  onClick={onClick}/>;
-      } else {
-        return <i className="fa fa-fw fa-sort-down selected-sort"
-                  onClick={onClick}/>;
-      }
-    }
-    return <i className="fa fa-fw fa-sort"
-              onClick={onClick}/>;
+  private headerRenderer(label: string, disableSort?: boolean) {
+      return (props: TableHeaderProps) => {
+        return (
+          <div>
+            { label }
+            { !disableSort && props.sortBy === props.dataKey &&
+              <SortIndicator sortDirection={props.sortDirection } /> }
+          </div>
+        );
+      };
   }
 
-  private renderDuration(duration: number) {
-    const minutes = Math.floor(duration / 60);
-    const seconds = duration % 60;
+  private sortList(info: { sortBy: string; sortDirection: SortDirectionType }) {
+    this.setState((state, props) => {
+      const sortMode = info.sortBy as SortMode;
+      return {
+        filteredSongs: filterAndSortSongs(
+          props.allSongs,
+          props.currentPlaylist,
+          sortMode,
+          info.sortDirection),
+        sortMode,
+        sortDirection: info.sortDirection
+      };
+    })
+  }
+
+  private rowGetter(index: Index) {
+    return this.state.filteredSongs[index.index];
+  }
+
+  private playCellRenderer(props: TableCellProps) {
+    const song: Song = props.rowData;
+    return this.isPlaying(song) ? (
+      <button className="pause-button"
+              onClick={() => this.props.onPause()}>
+        <i className="fa fa-pause"/>
+      </button>
+    ) : (
+      <button className="play-button"
+              onClick={() => this.props.onSongSelected(song)}>
+        <i className="fa fa-play"/>
+      </button>
+    );
+  }
+
+  private durationCellRenderer(props: TableCellProps) {
+    const song: Song = props.rowData;
+    const minutes = Math.floor(song.duration / 60);
+    const seconds = song.duration % 60;
     if (minutes < 1) {
       return seconds + "s";
     } else {
@@ -127,9 +153,10 @@ export class SongList extends React.Component<SongListProps, SongListState> {
     }
   }
 
-  private renderRating(rating: number) {
+  private ratingCellRenderer(props: TableCellProps) {
+    const song: Song = props.rowData;
     let stars = [];
-    for (let i = 0; i < Math.min(rating, 5); i++) {
+    for (let i = 0; i < Math.min(song.rating, 5); i++) {
       stars.push(<i key={i} className="fas fa-star"/>);
     }
     return <span className="stars">{... stars}</span>;
@@ -138,72 +165,59 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   public render() {
     return (
       <div className="song-list">
-        <div className="songs-table-header">
-          <div className="play-col"/>
-          <div className="title-col">
-            Title
-            { this.renderSortIcon('title') }
-          </div>
-          <div className="genre-col">
-            Genre
-            { this.renderSortIcon('genre') }
-          </div>
-          <div className="artist-col">
-            Artist
-            { this.renderSortIcon('artist') }
-          </div>
-          <div className="album-col">
-            Album
-            { this.renderSortIcon('album') }
-          </div>
-          <div className="duration-col">
-            Duration
-            { this.renderSortIcon('duration') }
-          </div>
-          <div className="rating-col">
-            Rating
-            { this.renderSortIcon('rating') }
-          </div>
-        </div>
-        <div className="songs-table-body">
-          {... this.state.filteredSongs.map(song =>
-            <div key={song.id} className="song-row">
-              <div className="play-col">
-                {
-                  this.isPlaying(song) ? (
-                    <button className="pause-button"
-                            onClick={() => this.props.onPause()}>
-                      <i className="fa fa-pause"/>
-                    </button>
-                  ) : (
-                    <button className="play-button"
-                            onClick={() => this.props.onSongSelected(song)}>
-                      <i className="fa fa-play"/>
-                    </button>
-                  )
-                }
-              </div>
-              <div className="title-col">
-                { song.title }
-              </div>
-              <div className="genre-col">
-                { song.genre }
-              </div>
-              <div className="artist-col">
-                { song.artist }
-              </div>
-              <div className="album-col">
-                { song.album }
-              </div>
-              <div className="duration-col">
-                { this.renderDuration(song.duration) }
-              </div>
-              <div className="rating-col">
-                { this.renderRating(song.rating) }
-              </div>
-            </div>
+        <WindowScroller>
+          {({height, isScrolling, onChildScroll, scrollTop}) => (
+            <AutoSizer disableHeight>
+              {({width}) => (
+                <Table
+                  autoHeight
+                  isScrolling={isScrolling}
+                  onScroll={onChildScroll}
+                  scrollTop={scrollTop}
+                  headerHeight={40}
+                  height={height}
+                  rowHeight={30}
+                  rowGetter={this.rowGetter}
+                  rowCount={this.state.filteredSongs.length}
+                  sort={this.sortList}
+                  sortBy={this.state.sortMode}
+                  sortDirection={this.state.sortDirection}
+                  width={width}>
+                  <Column dataKey={'play'}
+                          className={'play-col'}
+                          headerRenderer={this.headerRenderer('Play', true)}
+                          cellRenderer={this.playCellRenderer}
+                          disableSort={true}
+                          width={45}/>
+                  <Column dataKey={'title'}
+                          headerRenderer={this.headerRenderer('Title')}
+                          width={200}
+                          flexGrow={1}/>
+                  <Column dataKey={'genre'}
+                          headerRenderer={this.headerRenderer('Genre')}
+                          width={175}/>
+                  <Column dataKey={'artist'}
+                          headerRenderer={this.headerRenderer('Artist')}
+                          width={200}
+                          flexGrow={1}/>
+                  <Column dataKey={'album'}
+                          headerRenderer={this.headerRenderer('Album')}
+                          width={200}
+                          flexGrow={1}/>
+                  <Column dataKey={'duration'}
+                          headerRenderer={this.headerRenderer('Duration')}
+                          cellRenderer={this.durationCellRenderer}
+                          width={100}/>
+                  <Column dataKey={'rating'}
+                          className={'rating-col'}
+                          headerRenderer={this.headerRenderer('Rating')}
+                          cellRenderer={this.ratingCellRenderer}
+                          width={90}/>
+                </Table>
+              )}
+            </AutoSizer>
           )}
-        </div>
+        </WindowScroller>
       </div>
     );
   }

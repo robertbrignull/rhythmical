@@ -2,11 +2,6 @@ $tableHeaderHeight: 35px;
 $scrollBarWidth: 15px;
 $songRowHeight: 31px;
 
-$playColWidth: 45px;
-$genreColWidth: 175px;
-$durationColWidth: 100px;
-$ratingColWidth: 85px;
-
 .loading-message {
   margin-top: 64px;
   text-align: center;
@@ -77,7 +72,6 @@ $ratingColWidth: 85px;
     }
 
     .play-col {
-      width: $playColWidth;
       text-align: center;
       overflow: hidden;
 
@@ -89,32 +83,8 @@ $ratingColWidth: 85px;
       }
     }
 
-    .title-col {
-      width: calc((100% - #{$playColWidth} - #{$genreColWidth} - #{$durationColWidth} - #{$ratingColWidth}) / 3);
-    }
-
-    .genre-col {
-      width: $genreColWidth;
-    }
-
-    .artist-col {
-      width: calc((100% - #{$playColWidth} - #{$genreColWidth} - #{$durationColWidth} - #{$ratingColWidth}) / 3);
-    }
-
-    .album-col {
-      width: calc((100% - #{$playColWidth} - #{$genreColWidth} - #{$durationColWidth} - #{$ratingColWidth}) / 3);
-    }
-
-    .duration-col {
-      width: $durationColWidth;
-    }
-
-    .rating-col {
-      width: $ratingColWidth;
-
-      .stars {
-        font-size: 12px;
-      }
+    .rating-col .stars {
+      font-size: 12px;
     }
   }
 }
