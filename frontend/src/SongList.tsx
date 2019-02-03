@@ -71,7 +71,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   }
 
   public componentWillReceiveProps(nextProps: Readonly<SongListProps>) {
-    const songsChanged = nextProps.songs === this.props.songs;
+    const songsChanged = nextProps.songs !== this.props.songs;
     const currentSongChanged = nextProps.currentSong !== undefined &&
       (this.props.currentSong === undefined ||
         nextProps.currentSong.id !== this.props.currentSong.id);
@@ -80,9 +80,9 @@ export class SongList extends React.Component<SongListProps, SongListState> {
       return;
     }
 
-    this.setState((state, props) => {
+    this.setState(state => {
       const sortedSongs = songsChanged
-        ? sortSongs(props.songs, state.sortMode, state.sortDirection)
+        ? sortSongs(nextProps.songs, state.sortMode, state.sortDirection)
         : state.sortedSongs;
 
       let scrollToIndex = undefined;
