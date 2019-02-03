@@ -100,6 +100,7 @@ class App extends React.Component<{}, AppState> {
         <div className="song-list-container">
           <SongList allSongs={this.state.allSongs}
                     currentPlaylist={this.state.currentPlaylist}
+                    currentSong={this.state.currentSong}
                     playing={this.state.playing}
                     onSongSelected={this.onSongSelected}/>
         </div>
