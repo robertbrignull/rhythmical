@@ -7,11 +7,9 @@ import {Index} from "react-virtualized";
 
 type SortMode = 'title' | 'genre' | 'artist' | 'album' | 'duration' | 'rating';
 
-function filterAndSortSongs(allSongs: Song[],
-                            playlist: Playlist,
-                            sortMode: SortMode,
-                            sortDirection: SortDirectionType): Song[] {
-  const songs = allSongs.slice().filter(playlist.predicate);
+function sortSongs(songs: Song[],
+                   sortMode: SortMode,
+                   sortDirection: SortDirectionType): Song[] {
 
   let cmp: (a: Song, b: Song) => number;
   if (sortMode === 'title') {
@@ -30,22 +28,22 @@ function filterAndSortSongs(allSongs: Song[],
     cmp = () => 0;
   }
 
-  songs.sort(sortDirection === 'ASC'
+  let sortedSongs = songs.slice();
+  sortedSongs.sort(sortDirection === 'ASC'
     ? cmp : (a: Song, b: Song) => cmp(b, a));
 
-  return songs;
+  return sortedSongs;
 }
 
 interface SongListProps {
-  allSongs: Song[];
-  currentPlaylist: Playlist;
+  songs: Song[];
   currentSong?: Song;
   playing: boolean;
   onSongSelected: (song: Song) => void;
 }
 
 interface SongListState {
-  filteredSongs: Song[];
+  sortedSongs: Song[];
   sortMode: SortMode;
   sortDirection: SortDirectionType;
 }
@@ -57,13 +55,10 @@ export class SongList extends React.Component<SongListProps, SongListState> {
     let sortMode: SortMode = 'artist';
     let sortDirection: SortDirectionType = 'ASC';
     this.state = {
-      filteredSongs: filterAndSortSongs(
-        props.allSongs,
-        props.currentPlaylist,
-        sortMode,
-        sortDirection),
+      sortedSongs: sortSongs(props.songs, sortMode, sortDirection),
       sortMode,
-      sortDirection };
+      sortDirection
+    };
 
     this.sortList = this.sortList.bind(this);
     this.rowGetter = this.rowGetter.bind(this);
@@ -74,17 +69,13 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   }
 
   public componentWillReceiveProps(nextProps: Readonly<SongListProps>) {
-    if (nextProps.currentPlaylist.name === this.props.currentPlaylist.name) {
+    if (nextProps.songs === this.props.songs) {
       return;
     }
 
     this.setState((state, props) => {
       return {
-        filteredSongs: filterAndSortSongs(
-          props.allSongs,
-          props.currentPlaylist,
-          state.sortMode,
-          state.sortDirection)
+        sortedSongs: sortSongs(props.songs, state.sortMode, state.sortDirection)
       };
     });
   }
@@ -105,11 +96,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
     this.setState((state, props) => {
       const sortMode = info.sortBy as SortMode;
       return {
-        filteredSongs: filterAndSortSongs(
-          props.allSongs,
-          props.currentPlaylist,
-          sortMode,
-          info.sortDirection),
+        sortedSongs: sortSongs(props.songs, sortMode, info.sortDirection),
         sortMode,
         sortDirection: info.sortDirection
       };
@@ -117,12 +104,12 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   }
 
   private onRowDoubleClick(info: RowMouseEventHandlerParams) {
-    const song = this.state.filteredSongs[info.index];
+    const song = this.state.sortedSongs[info.index];
     this.props.onSongSelected(song);
   }
 
   private rowGetter(index: Index) {
-    return this.state.filteredSongs[index.index];
+    return this.state.sortedSongs[index.index];
   }
 
   private durationCellRenderer(props: TableCellProps) {
@@ -146,7 +133,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   }
 
   private rowClassName(info: Index) {
-    const song = this.state.filteredSongs[info.index];
+    const song = this.state.sortedSongs[info.index];
     if (song && this.props.currentSong && song.id === this.props.currentSong.id) {
       return "song-row selected";
     } else {
@@ -164,7 +151,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
               height={height}
               rowHeight={31}
               rowGetter={this.rowGetter}
-              rowCount={this.state.filteredSongs.length}
+              rowCount={this.state.sortedSongs.length}
               sort={this.sortList}
               sortBy={this.state.sortMode}
               sortDirection={this.state.sortDirection}

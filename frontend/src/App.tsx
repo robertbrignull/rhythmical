@@ -8,6 +8,7 @@ import {Footer} from "./Footer";
 
 interface AppState {
   allSongs?: Song[];
+  filteredSongs?: Song[];
   currentSong?: Song;
   playing: boolean;
   currentPlaylist: Playlist;
@@ -29,6 +30,7 @@ class App extends React.Component<{}, AppState> {
 
     this.state = {
       allSongs: undefined,
+      filteredSongs: undefined,
       currentSong: undefined,
       playing: false,
       currentPlaylist: defaultPlaylist,
@@ -39,6 +41,7 @@ class App extends React.Component<{}, AppState> {
     Api.songs.getAll().then((songs: Song[]) => {
       this.setState({
         allSongs: songs,
+        filteredSongs: songs.filter(this.state.currentPlaylist.predicate)
       });
     });
   }
@@ -71,13 +74,17 @@ class App extends React.Component<{}, AppState> {
   }
 
   private onPlaylistSelected(playlist: Playlist) {
-    this.setState( {
-      currentPlaylist: playlist,
+    this.setState((state) => {
+      return {
+        filteredSongs: state.allSongs === undefined
+          ? undefined : state.allSongs.filter(playlist.predicate),
+        currentPlaylist: playlist,
+      };
     });
   }
 
   public render() {
-    if (this.state.allSongs === undefined) {
+    if (this.state.filteredSongs === undefined) {
       return (
         <div className="loading-message">
           Loading...
@@ -98,15 +105,13 @@ class App extends React.Component<{}, AppState> {
                      onPlaylistSelected={this.onPlaylistSelected}/>
         </div>
         <div className="song-list-container">
-          <SongList allSongs={this.state.allSongs}
-                    currentPlaylist={this.state.currentPlaylist}
+          <SongList songs={this.state.filteredSongs}
                     currentSong={this.state.currentSong}
                     playing={this.state.playing}
                     onSongSelected={this.onSongSelected}/>
         </div>
         <div className="footer-container">
-          <Footer allSongs={this.state.allSongs}
-                  currentPlaylist={this.state.currentPlaylist}/>
+          <Footer songs={this.state.filteredSongs}/>
         </div>
       </div>
     );
