@@ -6,6 +6,7 @@ interface HeaderProps {
   currentSong?: Song;
   onPlay: () => void;
   onPause: () => void;
+  onEnded: () => void;
 }
 
 interface HeaderState {
@@ -70,7 +71,8 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
       <audio controls ref={this.audio}
              className="audio-controls"
              onPlay={this.props.onPlay}
-             onPause={this.props.onPause}>
+             onPause={this.props.onPause}
+             onEnded={this.props.onEnded}>
         { this.state.currentSongSrc
           ? <source src={this.state.currentSongSrc} />
           : null }

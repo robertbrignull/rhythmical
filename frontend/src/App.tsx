@@ -24,6 +24,7 @@ class App extends React.Component<{}, AppState> {
     this.onSongSelected = this.onSongSelected.bind(this);
     this.onPlay = this.onPlay.bind(this);
     this.onPause = this.onPause.bind(this);
+    this.onEnded = this.onEnded.bind(this);
     this.onPlaylistSelected = this.onPlaylistSelected.bind(this);
 
     this.header = React.createRef();
@@ -73,6 +74,20 @@ class App extends React.Component<{}, AppState> {
     });
   }
 
+  private onEnded() {
+    if (this.state.filteredSongs != undefined) {
+      const index = Math.floor(Math.random() * this.state.filteredSongs.length);
+      const song = this.state.filteredSongs[index];
+      this.setState({
+        currentSong: song
+      });
+    } else {
+      this.setState({
+        currentSong: undefined
+      });
+    }
+  }
+
   private onPlaylistSelected(playlist: Playlist) {
     this.setState((state) => {
       return {
@@ -98,7 +113,8 @@ class App extends React.Component<{}, AppState> {
             <Header ref={this.header}
                     currentSong={this.state.currentSong}
                     onPlay={this.onPlay}
-                    onPause={this.onPause}/>
+                    onPause={this.onPause}
+                    onEnded={this.onEnded}/>
         </div>
         <div className="playlists-container">
           <Playlists currentPlaylist={this.state.currentPlaylist.name}
