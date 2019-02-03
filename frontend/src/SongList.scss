@@ -29,6 +29,10 @@ $songRowHeight: 31px;
     }
   }
 
+  .selected-row {
+    background-color: #dee2e6;
+  }
+
   .songs-table-body {
     position: absolute;
     width: 100%;

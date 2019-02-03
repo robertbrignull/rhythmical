@@ -70,6 +70,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
     this.onRowDoubleClick = this.onRowDoubleClick.bind(this);
     this.durationCellRenderer = this.durationCellRenderer.bind(this);
     this.ratingCellRenderer = this.ratingCellRenderer.bind(this);
+    this.rowClassName = this.rowClassName.bind(this);
   }
 
   public componentWillReceiveProps(nextProps: Readonly<SongListProps>) {
@@ -144,6 +145,15 @@ export class SongList extends React.Component<SongListProps, SongListState> {
     return <span className="stars">{... stars}</span>;
   }
 
+  private rowClassName(info: Index) {
+    const song = this.state.filteredSongs[info.index];
+    if (song && this.props.currentSong && song.id === this.props.currentSong.id) {
+      return "selected-row";
+    } else {
+      return "";
+    }
+  }
+
   public render() {
     return (
       <div className="song-list">
@@ -159,6 +169,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
               sortBy={this.state.sortMode}
               sortDirection={this.state.sortDirection}
               onRowDoubleClick={this.onRowDoubleClick}
+              rowClassName={this.rowClassName}
               width={width}>
               <Column dataKey={'title'}
                       headerRenderer={this.headerRenderer('Title')}
