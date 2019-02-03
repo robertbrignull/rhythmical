@@ -1,7 +1,3 @@
-$tableHeaderHeight: 35px;
-$scrollBarWidth: 15px;
-$songRowHeight: 31px;
-
 .loading-message {
   margin-top: 64px;
   text-align: center;
@@ -11,84 +7,11 @@ $songRowHeight: 31px;
   position: relative;
   height: 100%;
 
-  .songs-table-header {
-    position: absolute;
-    top: 0;
-    height: $tableHeaderHeight;
-    right: $scrollBarWidth;
-    width: calc(100% - #{$scrollBarWidth});
-    border-top: 2px solid #dee2e6;
-    border-bottom: 2px solid #dee2e6;
-
-    > * {
-      height: $tableHeaderHeight;
-
-      .selected-sort {
-        color: #6565ff;
-      }
-    }
-  }
-
   .selected-row {
     background-color: #dee2e6;
   }
 
-  .songs-table-body {
-    position: absolute;
-    width: 100%;
-    top: $tableHeaderHeight;
-    bottom: 0;
-    overflow-y: scroll;
-
-    .song-row {
-      width: 100%;
-      border-top: 1px solid #dee2e6;
-      height: $songRowHeight;
-
-      &:hover {
-        background-color: #e5e5ff;
-      }
-
-      > * {
-        height: $songRowHeight;
-      }
-    }
-  }
-
-  .songs-table-header,
-  .songs-table-body .song-row {
-    > * {
-      display: inline-block;
-      border-right: 1px solid #dee2e6;
-
-      &:last-child {
-        border-right: 0;
-      }
-    }
-
-    > *:not(.play-col) {
-      text-align: left;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 25px;
-      padding: 2px 6px;
-    }
-
-    .play-col {
-      text-align: center;
-      overflow: hidden;
-
-      .pause-button, .play-button {
-        font-size: 12px;
-        cursor: pointer;
-        vertical-align: top;
-        margin-top: 3px;
-      }
-    }
-
-    .rating-col .stars {
-      font-size: 12px;
-    }
+  .rating-col .stars {
+    font-size: 12px;
   }
 }

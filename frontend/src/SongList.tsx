@@ -162,7 +162,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
             <Table
               headerHeight={40}
               height={height}
-              rowHeight={30}
+              rowHeight={31}
               rowGetter={this.rowGetter}
               rowCount={this.state.filteredSongs.length}
               sort={this.sortList}
@@ -194,7 +194,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
                       className={'rating-col'}
                       headerRenderer={this.headerRenderer('Rating')}
                       cellRenderer={this.ratingCellRenderer}
-                      width={100}/>
+                      width={90}/>
             </Table>
           )}
         </AutoSizer>
