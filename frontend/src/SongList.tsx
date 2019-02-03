@@ -2,7 +2,6 @@ import * as React from "react";
 
 import 'react-virtualized/styles.css';
 import {AutoSizer} from 'react-virtualized/dist/es/AutoSizer';
-import {WindowScroller} from 'react-virtualized/dist/es/WindowScroller';
 import {Table, Column, TableCellProps, TableHeaderProps, SortIndicator, SortDirectionType} from 'react-virtualized/dist/es/Table';
 import {Index} from "react-virtualized";
 
@@ -165,59 +164,51 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   public render() {
     return (
       <div className="song-list">
-        <WindowScroller>
-          {({height, isScrolling, onChildScroll, scrollTop}) => (
-            <AutoSizer disableHeight>
-              {({width}) => (
-                <Table
-                  autoHeight
-                  isScrolling={isScrolling}
-                  onScroll={onChildScroll}
-                  scrollTop={scrollTop}
-                  headerHeight={40}
-                  height={height}
-                  rowHeight={30}
-                  rowGetter={this.rowGetter}
-                  rowCount={this.state.filteredSongs.length}
-                  sort={this.sortList}
-                  sortBy={this.state.sortMode}
-                  sortDirection={this.state.sortDirection}
-                  width={width}>
-                  <Column dataKey={'play'}
-                          className={'play-col'}
-                          headerRenderer={this.headerRenderer('Play', true)}
-                          cellRenderer={this.playCellRenderer}
-                          disableSort={true}
-                          width={45}/>
-                  <Column dataKey={'title'}
-                          headerRenderer={this.headerRenderer('Title')}
-                          width={200}
-                          flexGrow={1}/>
-                  <Column dataKey={'genre'}
-                          headerRenderer={this.headerRenderer('Genre')}
-                          width={175}/>
-                  <Column dataKey={'artist'}
-                          headerRenderer={this.headerRenderer('Artist')}
-                          width={200}
-                          flexGrow={1}/>
-                  <Column dataKey={'album'}
-                          headerRenderer={this.headerRenderer('Album')}
-                          width={200}
-                          flexGrow={1}/>
-                  <Column dataKey={'duration'}
-                          headerRenderer={this.headerRenderer('Duration')}
-                          cellRenderer={this.durationCellRenderer}
-                          width={100}/>
-                  <Column dataKey={'rating'}
-                          className={'rating-col'}
-                          headerRenderer={this.headerRenderer('Rating')}
-                          cellRenderer={this.ratingCellRenderer}
-                          width={90}/>
-                </Table>
-              )}
-            </AutoSizer>
+        <AutoSizer>
+          {({width, height}) => (
+            <Table
+              headerHeight={40}
+              height={height}
+              rowHeight={30}
+              rowGetter={this.rowGetter}
+              rowCount={this.state.filteredSongs.length}
+              sort={this.sortList}
+              sortBy={this.state.sortMode}
+              sortDirection={this.state.sortDirection}
+              width={width}>
+              <Column dataKey={'play'}
+                      className={'play-col'}
+                      headerRenderer={this.headerRenderer('Play', true)}
+                      cellRenderer={this.playCellRenderer}
+                      disableSort={true}
+                      width={45}/>
+              <Column dataKey={'title'}
+                      headerRenderer={this.headerRenderer('Title')}
+                      width={200}
+                      flexGrow={1}/>
+              <Column dataKey={'genre'}
+                      headerRenderer={this.headerRenderer('Genre')}
+                      width={175}/>
+              <Column dataKey={'artist'}
+                      headerRenderer={this.headerRenderer('Artist')}
+                      width={200}
+                      flexGrow={1}/>
+              <Column dataKey={'album'}
+                      headerRenderer={this.headerRenderer('Album')}
+                      width={200}
+                      flexGrow={1}/>
+              <Column dataKey={'duration'}
+                      headerRenderer={this.headerRenderer('Duration')}
+                      cellRenderer={this.durationCellRenderer}
+                      width={100}/>
+              <Column dataKey={'rating'}
+                      className={'rating-col'}
+                      headerRenderer={this.headerRenderer('Rating')}
+                      cellRenderer={this.ratingCellRenderer}
+                      width={100}/>
+            </Table>
           )}
-        </WindowScroller>
+        </AutoSizer>
       </div>
     );
   }
