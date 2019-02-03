@@ -101,8 +101,7 @@ class App extends React.Component<{}, AppState> {
           <SongList allSongs={this.state.allSongs}
                     currentPlaylist={this.state.currentPlaylist}
                     playing={this.state.playing}
-                    onSongSelected={this.onSongSelected}
-                    onPause={this.onPause}/>
+                    onSongSelected={this.onSongSelected}/>
         </div>
         <div className="footer-container">
           <Footer allSongs={this.state.allSongs}

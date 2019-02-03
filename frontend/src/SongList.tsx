@@ -2,7 +2,7 @@ import * as React from "react";
 
 import 'react-virtualized/styles.css';
 import {AutoSizer} from 'react-virtualized/dist/es/AutoSizer';
-import {Table, Column, TableCellProps, TableHeaderProps, SortIndicator, SortDirectionType} from 'react-virtualized/dist/es/Table';
+import {Table, Column, TableCellProps, TableHeaderProps, SortIndicator, SortDirectionType, RowMouseEventHandlerParams} from 'react-virtualized/dist/es/Table';
 import {Index} from "react-virtualized";
 
 type SortMode = 'title' | 'genre' | 'artist' | 'album' | 'duration' | 'rating';
@@ -42,7 +42,6 @@ interface SongListProps {
   currentSong?: Song;
   playing: boolean;
   onSongSelected: (song: Song) => void;
-  onPause: () => void;
 }
 
 interface SongListState {
@@ -68,7 +67,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
 
     this.sortList = this.sortList.bind(this);
     this.rowGetter = this.rowGetter.bind(this);
-    this.playCellRenderer = this.playCellRenderer.bind(this);
+    this.onRowDoubleClick = this.onRowDoubleClick.bind(this);
     this.durationCellRenderer = this.durationCellRenderer.bind(this);
     this.ratingCellRenderer = this.ratingCellRenderer.bind(this);
   }
@@ -87,12 +86,6 @@ export class SongList extends React.Component<SongListProps, SongListState> {
           state.sortDirection)
       };
     });
-  }
-
-  private isPlaying(song: Song): boolean {
-    return this.props.playing &&
-      this.props.currentSong !== undefined &&
-      this.props.currentSong.id === song.id;
   }
 
   private headerRenderer(label: string | undefined, disableSort?: boolean) {
@@ -122,23 +115,13 @@ export class SongList extends React.Component<SongListProps, SongListState> {
     })
   }
 
-  private rowGetter(index: Index) {
-    return this.state.filteredSongs[index.index];
+  private onRowDoubleClick(info: RowMouseEventHandlerParams) {
+    const song = this.state.filteredSongs[info.index];
+    this.props.onSongSelected(song);
   }
 
-  private playCellRenderer(props: TableCellProps) {
-    const song: Song = props.rowData;
-    return this.isPlaying(song) ? (
-      <button className="pause-button"
-              onClick={() => this.props.onPause()}>
-        <i className="fa fa-pause"/>
-      </button>
-    ) : (
-      <button className="play-button"
-              onClick={() => this.props.onSongSelected(song)}>
-        <i className="fa fa-play"/>
-      </button>
-    );
+  private rowGetter(index: Index) {
+    return this.state.filteredSongs[index.index];
   }
 
   private durationCellRenderer(props: TableCellProps) {
@@ -175,13 +158,8 @@ export class SongList extends React.Component<SongListProps, SongListState> {
               sort={this.sortList}
               sortBy={this.state.sortMode}
               sortDirection={this.state.sortDirection}
+              onRowDoubleClick={this.onRowDoubleClick}
               width={width}>
-              <Column dataKey={'play'}
-                      className={'play-col'}
-                      headerRenderer={this.headerRenderer(undefined, true)}
-                      cellRenderer={this.playCellRenderer}
-                      disableSort={true}
-                      width={45}/>
               <Column dataKey={'title'}
                       headerRenderer={this.headerRenderer('Title')}
                       width={200}
