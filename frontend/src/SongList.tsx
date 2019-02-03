@@ -46,6 +46,7 @@ interface SongListState {
   sortedSongs: Song[];
   sortMode: SortMode;
   sortDirection: SortDirectionType;
+  scrollToIndex: number | undefined;
 }
 
 export class SongList extends React.Component<SongListProps, SongListState> {
@@ -57,7 +58,8 @@ export class SongList extends React.Component<SongListProps, SongListState> {
     this.state = {
       sortedSongs: sortSongs(props.songs, sortMode, sortDirection),
       sortMode,
-      sortDirection
+      sortDirection,
+      scrollToIndex: undefined
     };
 
     this.sortList = this.sortList.bind(this);
@@ -69,13 +71,30 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   }
 
   public componentWillReceiveProps(nextProps: Readonly<SongListProps>) {
-    if (nextProps.songs === this.props.songs) {
+    const songsChanged = nextProps.songs === this.props.songs;
+    const currentSongChanged = nextProps.currentSong !== undefined &&
+      (this.props.currentSong === undefined ||
+        nextProps.currentSong.id !== this.props.currentSong.id);
+
+    if (!songsChanged && !currentSongChanged) {
       return;
     }
 
     this.setState((state, props) => {
+      const sortedSongs = songsChanged
+        ? sortSongs(props.songs, state.sortMode, state.sortDirection)
+        : state.sortedSongs;
+
+      let scrollToIndex = undefined;
+      if (currentSongChanged) {
+        scrollToIndex = sortedSongs.findIndex(song =>
+          nextProps.currentSong !== undefined &&
+          nextProps.currentSong.id === song.id);
+      }
+
       return {
-        sortedSongs: sortSongs(props.songs, state.sortMode, state.sortDirection)
+        sortedSongs,
+        scrollToIndex
       };
     });
   }
@@ -157,6 +176,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
               sortDirection={this.state.sortDirection}
               onRowDoubleClick={this.onRowDoubleClick}
               rowClassName={this.rowClassName}
+              scrollToIndex={this.state.scrollToIndex}
               width={width}>
               <Column dataKey={'title'}
                       headerRenderer={this.headerRenderer('Title')}
