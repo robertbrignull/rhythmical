@@ -7,11 +7,15 @@
   position: relative;
   height: 100%;
 
-  .selected-row {
-    background-color: #dee2e6;
-  }
+  .song-row {
+    user-select: none;
 
-  .rating-col .stars {
-    font-size: 12px;
+    &.selected {
+      background-color: #dee2e6;
+    }
+
+    .rating-col .stars {
+      font-size: 12px;
+    }
   }
 }

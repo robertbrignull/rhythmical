@@ -148,9 +148,9 @@ export class SongList extends React.Component<SongListProps, SongListState> {
   private rowClassName(info: Index) {
     const song = this.state.filteredSongs[info.index];
     if (song && this.props.currentSong && song.id === this.props.currentSong.id) {
-      return "selected-row";
+      return "song-row selected";
     } else {
-      return "";
+      return "song-row";
     }
   }
 
