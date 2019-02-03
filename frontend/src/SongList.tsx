@@ -95,7 +95,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
       this.props.currentSong.id === song.id;
   }
 
-  private headerRenderer(label: string, disableSort?: boolean) {
+  private headerRenderer(label: string | undefined, disableSort?: boolean) {
       return (props: TableHeaderProps) => {
         return (
           <div>
@@ -178,7 +178,7 @@ export class SongList extends React.Component<SongListProps, SongListState> {
               width={width}>
               <Column dataKey={'play'}
                       className={'play-col'}
-                      headerRenderer={this.headerRenderer('Play', true)}
+                      headerRenderer={this.headerRenderer(undefined, true)}
                       cellRenderer={this.playCellRenderer}
                       disableSort={true}
                       width={45}/>
