@@ -8,7 +8,7 @@ interface Song {
   rating: number,
 }
 
-interface Playlist {
-  name: string;
+interface SongFilter {
+  key: string;
   predicate: (s: Song) => boolean;
 }

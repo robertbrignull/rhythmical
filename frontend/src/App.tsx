@@ -2,7 +2,7 @@ import * as React from 'react';
 import {SongList} from "./SongList";
 import {Header} from "./Header";
 import {RefObject} from "react";
-import {defaultPlaylist, Playlists} from "./Playlists";
+import {Filters} from "./Filters";
 import Api from "./api";
 import {Footer} from "./Footer";
 
@@ -11,7 +11,7 @@ interface AppState {
   filteredSongs?: Song[];
   currentSong?: Song;
   playing: boolean;
-  currentPlaylist: Playlist;
+  currentFilter: SongFilter;
 }
 
 class App extends React.Component<{}, AppState> {
@@ -25,7 +25,7 @@ class App extends React.Component<{}, AppState> {
     this.onPlay = this.onPlay.bind(this);
     this.onPause = this.onPause.bind(this);
     this.onEnded = this.onEnded.bind(this);
-    this.onPlaylistSelected = this.onPlaylistSelected.bind(this);
+    this.onFilterChanged = this.onFilterChanged.bind(this);
 
     this.header = React.createRef();
 
@@ -34,7 +34,7 @@ class App extends React.Component<{}, AppState> {
       filteredSongs: undefined,
       currentSong: undefined,
       playing: false,
-      currentPlaylist: defaultPlaylist,
+      currentFilter: { key: "", predicate: () => true },
     };
   }
 
@@ -42,7 +42,7 @@ class App extends React.Component<{}, AppState> {
     Api.songs.getAll().then((songs: Song[]) => {
       this.setState({
         allSongs: songs,
-        filteredSongs: songs.filter(this.state.currentPlaylist.predicate)
+        filteredSongs: songs.filter(this.state.currentFilter.predicate)
       });
     });
   }
@@ -88,14 +88,16 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
-  private onPlaylistSelected(playlist: Playlist) {
-    this.setState((state) => {
-      return {
-        filteredSongs: state.allSongs === undefined
-          ? undefined : state.allSongs.filter(playlist.predicate),
-        currentPlaylist: playlist,
-      };
-    });
+  private onFilterChanged(filter: SongFilter) {
+    if (filter.key !== this.state.currentFilter.key) {
+      this.setState((state) => {
+        return {
+          filteredSongs: state.allSongs === undefined
+            ? undefined : state.allSongs.filter(filter.predicate),
+          currentFilter: filter,
+        };
+      });
+    }
   }
 
   public render() {
@@ -117,8 +119,7 @@ class App extends React.Component<{}, AppState> {
                     onEnded={this.onEnded}/>
         </div>
         <div className="playlists-container">
-          <Playlists currentPlaylist={this.state.currentPlaylist.name}
-                     onPlaylistSelected={this.onPlaylistSelected}/>
+          <Filters onFilterChanged={this.onFilterChanged}/>
         </div>
         <div className="song-list-container">
           <SongList songs={this.state.filteredSongs}

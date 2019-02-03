@@ -1,7 +1,16 @@
-.playlists {
+.filters {
   height: 100%;
   border-top: 1px solid #dee2e6;
   border-right: 2px solid #dee2e6;
+
+  .search-wrapper {
+    margin: 6px;
+
+    .search-input {
+      width: 100%;
+      padding: 0 4px;
+    }
+  }
 
   .playlist {
     padding: 4px 10px;
