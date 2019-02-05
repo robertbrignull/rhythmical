@@ -1,14 +1,19 @@
-extern crate rocket;
-extern crate rocket_contrib;
 extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
+extern crate lazy_static;
+extern crate regex;
 
-use rocket::Route;
-use rocket_contrib::Json;
+use rouille::{Request, Response};
+use regex::Regex;
 
 use library::Library;
 use gsutil;
+
+lazy_static! {
+    static ref SONG_CONTENTS_REGEX: Regex =
+       Regex::new(r"/api/songs/(\d+)/contents").unwrap();
+}
 
 #[derive(Serialize)]
 struct ApiSong {
@@ -21,8 +26,7 @@ struct ApiSong {
     rating: u32,
 }
 
-#[get("/songs")]
-fn songs() -> Json<Vec<ApiSong>> {
+fn songs() -> Response {
     let mut songs: Vec<ApiSong> = Vec::new();
     for song in Library::get().songs.values() {
         songs.push(ApiSong {
@@ -35,16 +39,32 @@ fn songs() -> Json<Vec<ApiSong>> {
             rating: song.rating,
         });
     }
-    return Json(songs);
+    return Response::json(&songs);
 }
 
-#[get("/songs/<id>/contents")]
-fn song_contents(id: u32) -> Option<String> {
-    return Library::get().songs.get(&id).map(|song| {
-        return gsutil::sign(&format!("/Music{}", song.file_location));
-    });
+fn song_contents(id: u32) -> Response {
+    return match Library::get().songs.get(&id) {
+        Some(song) => {
+            let signed_url = gsutil::sign(&format!("/Music{}", song.file_location));
+            return Response::text(signed_url);
+        },
+        None => Response::empty_404()
+    };
 }
 
-pub fn get_api_routes() -> Vec<Route> {
-    return routes![songs, song_contents];
+pub fn route_api(request: &Request) -> Response {
+    if request.url().eq("/api/songs")  {
+        return songs();
+    }
+
+    let url = request.url();
+    let cap = SONG_CONTENTS_REGEX.captures(url.as_str());
+    if cap.is_some() {
+        let id = cap.unwrap()[1].parse::<u32>();
+        if id.is_ok() {
+            return song_contents(id.unwrap());
+        }
+    }
+
+    return Response::empty_404();
 }
