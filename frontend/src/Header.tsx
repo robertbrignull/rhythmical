@@ -2,6 +2,15 @@ import * as React from "react";
 import {RefObject} from "react";
 import Api from "./api";
 
+function formatDuration(duration: number) {
+  let mins = "" + Math.floor(duration / 60);
+  let secs = "" + Math.floor(duration % 60);
+  if (secs.length === 1) {
+    secs = "0" + secs;
+  }
+  return mins + ":" + secs;
+}
+
 interface HeaderProps {
   currentSong?: Song;
   playing: boolean;
@@ -12,6 +21,7 @@ interface HeaderProps {
 
 interface HeaderState {
   currentSongSrc?: string;
+  currentSongPosition?: number;
 }
 
 export class Header extends React.Component<HeaderProps, HeaderState> {
@@ -23,26 +33,39 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
 
     this.state = {
       currentSongSrc: undefined,
+      currentSongPosition: undefined,
     };
 
     this.audio = React.createRef();
 
+    this.onTimeUpdate = this.onTimeUpdate.bind(this);
     this.backwardClicked = this.backwardClicked.bind(this);
     this.playPauseClicked = this.playPauseClicked.bind(this);
     this.forwardClicked = this.forwardClicked.bind(this);
   }
 
   public componentDidUpdate(prevProps: HeaderProps) {
-    if (this.audio.current) {
-      if (!this.props.currentSong) {
-        this.audio.current.pause();
+    const oldSong = prevProps.currentSong;
+    const nextSong = this.props.currentSong;
+    if (!nextSong) {
+      this.setState({
+        currentSongSrc: undefined,
+        currentSongPosition: undefined,
+      }, () => {
+        if (this.audio.current) {
+          this.audio.current.pause();
+        }
+      });
 
-      } else if (!prevProps.currentSong ||
-        this.props.currentSong.id != prevProps.currentSong.id) {
+    } else if (!oldSong || nextSong.id != oldSong.id) {
+      this.setState({
+        currentSongPosition: 0,
+      }, () => {
+        if (this.audio.current) {
+          this.audio.current.pause();
+        }
 
-        this.audio.current.pause();
-        this.props.onPause();
-        Api.songs.getSrc(this.props.currentSong).then(songSrc => {
+        Api.songs.getSrc(nextSong).then(songSrc => {
           this.setState({
             currentSongSrc: songSrc,
           }, () => {
@@ -55,13 +78,16 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
         }, error => {
           console.error("Unable to get song src: ", error)
         });
-      }
+      });
     }
   }
 
   public restartSong() {
     if (this.audio.current && this.state.currentSongSrc !== undefined) {
       this.audio.current.currentTime = 0;
+      this.setState({
+        currentSongPosition: 0
+      });
       this.play();
     }
   }
@@ -75,6 +101,14 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   public pause() {
     if (this.audio.current) {
       this.audio.current.pause();
+    }
+  }
+
+  private onTimeUpdate() {
+    if (this.audio.current) {
+      this.setState({
+        currentSongPosition: this.audio.current.currentTime
+      });
     }
   }
 
@@ -149,18 +183,31 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     }
   }
 
+  private renderPositionText() {
+    if (this.props.currentSong === undefined ||
+      this.state.currentSongPosition === undefined) {
+      return null;
+    }
+
+    const position = this.state.currentSongPosition;
+    const maxPosition = this.props.currentSong.duration;
+    return formatDuration(position) + " / " + formatDuration(maxPosition);
+  }
+
   public render() {
     return (
       <div className="header">
         <div className="controls">
           { this.renderButtonControls() }
           { this.renderCurrentSongName() }
+          { this.renderPositionText() }
         </div>
         <audio controls ref={this.audio}
                className="audio-controls"
                onPlay={this.props.onPlay}
                onPause={this.props.onPause}
-               onEnded={this.props.onEnded}>
+               onEnded={this.props.onEnded}
+               onTimeUpdate={this.onTimeUpdate}>
           { this.state.currentSongSrc
             ? <source src={this.state.currentSongSrc} />
             : null }
