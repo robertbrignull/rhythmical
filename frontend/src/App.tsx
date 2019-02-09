@@ -112,6 +112,7 @@ class App extends React.Component<{}, AppState> {
         <div className="header-container">
             <Header ref={this.header}
                     currentSong={this.state.currentSong}
+                    playing={this.state.playing}
                     onPlay={this.onPlay}
                     onPause={this.onPause}
                     onEnded={this.onEnded}/>

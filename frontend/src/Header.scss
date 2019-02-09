@@ -3,6 +3,12 @@
     height: 64px;
     display: flex;
     align-items: center;
+
+    .buttonControls {
+      i {
+        padding: 8px;
+      }
+    }
   }
 
   > audio.audio-controls {

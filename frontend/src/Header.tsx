@@ -4,6 +4,7 @@ import Api from "./api";
 
 interface HeaderProps {
   currentSong?: Song;
+  playing: boolean;
   onPlay: () => void;
   onPause: () => void;
   onEnded: () => void;
@@ -25,6 +26,8 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     };
 
     this.audio = React.createRef();
+
+    this.playPauseClicked = this.playPauseClicked.bind(this);
   }
 
   public componentDidUpdate(prevProps: HeaderProps) {
@@ -57,6 +60,12 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   public restartSong() {
     if (this.audio.current) {
       this.audio.current.currentTime = 0;
+      this.play();
+    }
+  }
+
+  public play() {
+    if (this.audio.current) {
       this.audio.current.play();
     }
   }
@@ -65,6 +74,34 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     if (this.audio.current) {
       this.audio.current.pause();
     }
+  }
+
+  private playPauseClicked() {
+    if (this.props.playing) {
+      this.pause();
+      this.props.onPause();
+    } else {
+      this.play();
+      this.props.onPlay();
+    }
+  }
+
+  private renderButtonControls() {
+    let playPauseIcon = this.props.playing ? (
+      <i className="fas fa-pause fa-2x"/>
+    ) : (
+      <i className="fas fa-play fa-2x"/>
+    );
+    let playPauseButton = (
+      <button onClick={this.playPauseClicked}>
+        { playPauseIcon }
+      </button>
+    );
+    return (
+      <div className={"buttonControls"}>
+        { playPauseButton }
+      </div>
+    );
   }
 
   private renderCurrentSongName() {
@@ -90,6 +127,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     return (
       <div className="header">
         <div className="controls">
+          { this.renderButtonControls() }
           { this.renderCurrentSongName() }
         </div>
         <audio controls ref={this.audio}
