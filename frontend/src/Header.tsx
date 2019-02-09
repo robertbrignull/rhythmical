@@ -1,5 +1,5 @@
 import * as React from "react";
-import {RefObject} from "react";
+import {ChangeEvent, RefObject} from "react";
 import Api from "./api";
 
 function formatDuration(duration: number) {
@@ -39,6 +39,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     this.audio = React.createRef();
 
     this.onTimeUpdate = this.onTimeUpdate.bind(this);
+    this.positionSliderChanged = this.positionSliderChanged.bind(this);
     this.backwardClicked = this.backwardClicked.bind(this);
     this.playPauseClicked = this.playPauseClicked.bind(this);
     this.forwardClicked = this.forwardClicked.bind(this);
@@ -109,6 +110,12 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
       this.setState({
         currentSongPosition: this.audio.current.currentTime
       });
+    }
+  }
+
+  private positionSliderChanged(event: ChangeEvent) {
+    if (this.audio.current) {
+      this.audio.current.currentTime = (event.target as any).value;
     }
   }
 
@@ -194,6 +201,24 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     return formatDuration(position) + " / " + formatDuration(maxPosition);
   }
 
+  private renderPositionSlider() {
+    if (this.props.currentSong === undefined ||
+      this.state.currentSongPosition === undefined) {
+      return null;
+    }
+
+    const position = this.state.currentSongPosition;
+    const maxPosition = this.props.currentSong.duration;
+    return (
+      <input type="range"
+             min={0}
+             max={Math.floor(maxPosition)}
+             value={Math.floor(position)}
+             step={1}
+             onChange={this.positionSliderChanged}/>
+    );
+  }
+
   public render() {
     return (
       <div className="header">
@@ -201,6 +226,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
           { this.renderButtonControls() }
           { this.renderCurrentSongName() }
           { this.renderPositionText() }
+          { this.renderPositionSlider() }
         </div>
         <audio controls ref={this.audio}
                className="audio-controls"
