@@ -67,17 +67,41 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     }
   }
 
+  private renderCurrentSongName() {
+    let song = this.props.currentSong;
+    if (song !== undefined) {
+      return (
+        <div>
+          {song.title}
+          <br/>
+          by {song.artist} from {song.album}
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          Not playing
+        </div>
+      );
+    }
+  }
+
   public render() {
     return (
-      <audio controls ref={this.audio}
-             className="audio-controls"
-             onPlay={this.props.onPlay}
-             onPause={this.props.onPause}
-             onEnded={this.props.onEnded}>
-        { this.state.currentSongSrc
-          ? <source src={this.state.currentSongSrc} />
-          : null }
-      </audio>
+      <div className="header">
+        <div className="controls">
+          { this.renderCurrentSongName() }
+        </div>
+        <audio controls ref={this.audio}
+               className="audio-controls"
+               onPlay={this.props.onPlay}
+               onPause={this.props.onPause}
+               onEnded={this.props.onEnded}>
+          { this.state.currentSongSrc
+            ? <source src={this.state.currentSongSrc} />
+            : null }
+        </audio>
+      </div>
     );
   }
 }

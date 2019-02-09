@@ -1,3 +1,11 @@
-audio.audio-controls {
-  width: 100%;
+.header {
+  > .controls {
+    height: 64px;
+    display: flex;
+    align-items: center;
+  }
+
+  > audio.audio-controls {
+    width: 100%;
+  }
 }
