@@ -3,9 +3,10 @@
     height: 64px;
     display: flex;
     align-items: center;
+    padding: 3px;
 
     .buttonControls {
-      padding: 3px;
+      flex-shrink: 0;
 
       i {
         padding: 8px;
@@ -13,7 +14,27 @@
     }
 
     .songTitle {
-      padding: 3px;
+      padding: 0 12px;
+      flex-grow: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .position-text {
+      flex-shrink: 0;
+      padding-right: 15px;
+    }
+
+    .position-slider {
+      padding-right: 15px;
+      flex-basis: 30%;
+      flex-grow: 0;
+      flex-shrink: 0;
+
+      input {
+        width: 100%;
+      }
     }
   }
 

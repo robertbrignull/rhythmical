@@ -198,7 +198,11 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
 
     const position = this.state.currentSongPosition;
     const maxPosition = this.props.currentSong.duration;
-    return formatDuration(position) + " / " + formatDuration(maxPosition);
+    return (
+      <div className="position-text">
+        { formatDuration(position) + " / " + formatDuration(maxPosition) }
+      </div>
+    );
   }
 
   private renderPositionSlider() {
@@ -210,12 +214,14 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     const position = this.state.currentSongPosition;
     const maxPosition = this.props.currentSong.duration;
     return (
-      <input type="range"
-             min={0}
-             max={Math.floor(maxPosition)}
-             value={Math.floor(position)}
-             step={1}
-             onChange={this.positionSliderChanged}/>
+      <div className="position-slider">
+        <input type="range"
+               min={0}
+               max={Math.floor(maxPosition)}
+               value={Math.floor(position)}
+               step={1}
+               onChange={this.positionSliderChanged}/>
+      </div>
     );
   }
 
