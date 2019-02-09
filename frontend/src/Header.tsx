@@ -57,6 +57,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   public restartSong() {
     if (this.audio.current) {
       this.audio.current.currentTime = 0;
+      this.audio.current.play();
     }
   }
 

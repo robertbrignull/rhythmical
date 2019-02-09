@@ -77,13 +77,11 @@ class App extends React.Component<{}, AppState> {
   private onEnded() {
     if (this.state.filteredSongs != undefined) {
       const index = Math.floor(Math.random() * this.state.filteredSongs.length);
-      const song = this.state.filteredSongs[index];
-      this.setState({
-        currentSong: song
-      });
+      this.onSongSelected(this.state.filteredSongs[index]);
     } else {
       this.setState({
-        currentSong: undefined
+        currentSong: undefined,
+        playing: false,
       });
     }
   }
