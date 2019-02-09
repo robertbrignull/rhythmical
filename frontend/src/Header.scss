@@ -36,6 +36,22 @@
         width: 100%;
       }
     }
+
+    .volume-controls {
+      padding-right: 9px;
+      flex-shrink: 0;
+
+      button {
+        border: 0;
+        background: none;
+        box-shadow: none;
+        border-radius: 0;
+
+        i {
+          padding: 8px;
+        }
+      }
+    }
   }
 
   > audio.audio-controls {

@@ -22,6 +22,7 @@ interface HeaderProps {
 interface HeaderState {
   currentSongSrc?: string;
   currentSongPosition?: number;
+  muted: boolean;
 }
 
 export class Header extends React.Component<HeaderProps, HeaderState> {
@@ -34,6 +35,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     this.state = {
       currentSongSrc: undefined,
       currentSongPosition: undefined,
+      muted: false,
     };
 
     this.audio = React.createRef();
@@ -43,6 +45,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     this.backwardClicked = this.backwardClicked.bind(this);
     this.playPauseClicked = this.playPauseClicked.bind(this);
     this.forwardClicked = this.forwardClicked.bind(this);
+    this.volumeClicked = this.volumeClicked.bind(this);
   }
 
   public componentDidUpdate(prevProps: HeaderProps) {
@@ -138,6 +141,21 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     this.props.onEnded();
   }
 
+  private volumeClicked() {
+    this.setState(state => {
+      if (this.audio.current) {
+        if (state.muted) {
+          this.audio.current.volume = 1;
+        } else {
+          this.audio.current.volume = 0;
+        }
+      }
+      return {
+        muted: !state.muted
+      };
+    });
+  }
+
   private renderButtonControls() {
     let backwardButton = (
       <button onClick={this.backwardClicked}>
@@ -225,6 +243,21 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     );
   }
 
+  private renderVolumeControls() {
+    let volumeIcon = this.state.muted ? (
+      <i className="fas fa-volume-mute fa-lg"/>
+    ) : (
+      <i className="fas fa-volume-up fa-lg"/>
+    );
+    return (
+      <div className="volume-controls">
+        <button onClick={this.volumeClicked}>
+          { volumeIcon }
+        </button>
+      </div>
+    );
+  }
+
   public render() {
     return (
       <div className="header">
@@ -233,6 +266,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
           { this.renderCurrentSongName() }
           { this.renderPositionText() }
           { this.renderPositionSlider() }
+          { this.renderVolumeControls() }
         </div>
         <audio controls ref={this.audio}
                className="audio-controls"
