@@ -134,7 +134,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     let song = this.props.currentSong;
     if (song !== undefined) {
       return (
-        <div>
+        <div className="songTitle">
           {song.title}
           <br/>
           by {song.artist} from {song.album}
@@ -142,7 +142,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
       );
     } else {
       return (
-        <div>
+        <div className="songTitle">
           Not playing
         </div>
       );

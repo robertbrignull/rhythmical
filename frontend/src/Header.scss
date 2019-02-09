@@ -5,9 +5,15 @@
     align-items: center;
 
     .buttonControls {
+      padding: 3px;
+
       i {
         padding: 8px;
       }
+    }
+
+    .songTitle {
+      padding: 3px;
     }
   }
 
