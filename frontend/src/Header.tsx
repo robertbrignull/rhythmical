@@ -268,7 +268,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
           { this.renderPositionSlider() }
           { this.renderVolumeControls() }
         </div>
-        <audio controls ref={this.audio}
+        <audio ref={this.audio}
                className="audio-controls"
                onPlay={this.props.onPlay}
                onPause={this.props.onPause}
