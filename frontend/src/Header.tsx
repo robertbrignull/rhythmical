@@ -27,6 +27,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
 
     this.audio = React.createRef();
 
+    this.backwardClicked = this.backwardClicked.bind(this);
     this.playPauseClicked = this.playPauseClicked.bind(this);
   }
 
@@ -58,7 +59,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   }
 
   public restartSong() {
-    if (this.audio.current) {
+    if (this.audio.current && this.state.currentSongSrc !== undefined) {
       this.audio.current.currentTime = 0;
       this.play();
     }
@@ -76,6 +77,11 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     }
   }
 
+  private backwardClicked() {
+    this.restartSong();
+    this.props.onPlay();
+  }
+
   private playPauseClicked() {
     if (this.props.playing) {
       this.pause();
@@ -87,6 +93,12 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   }
 
   private renderButtonControls() {
+    let backwardButton = (
+      <button onClick={this.backwardClicked}>
+        <i className="fas fa-backward fa-2x"/>
+      </button>
+    );
+
     let playPauseIcon = this.props.playing ? (
       <i className="fas fa-pause fa-2x"/>
     ) : (
@@ -97,8 +109,10 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
         { playPauseIcon }
       </button>
     );
+
     return (
       <div className={"buttonControls"}>
+        { backwardButton }
         { playPauseButton }
       </div>
     );
