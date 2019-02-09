@@ -29,6 +29,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
 
     this.backwardClicked = this.backwardClicked.bind(this);
     this.playPauseClicked = this.playPauseClicked.bind(this);
+    this.forwardClicked = this.forwardClicked.bind(this);
   }
 
   public componentDidUpdate(prevProps: HeaderProps) {
@@ -92,6 +93,10 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     }
   }
 
+  private forwardClicked() {
+    this.props.onEnded();
+  }
+
   private renderButtonControls() {
     let backwardButton = (
       <button onClick={this.backwardClicked}>
@@ -110,10 +115,17 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
       </button>
     );
 
+    let forwardButton = (
+      <button onClick={this.forwardClicked}>
+        <i className="fas fa-forward fa-2x"/>
+      </button>
+    );
+
     return (
       <div className={"buttonControls"}>
         { backwardButton }
         { playPauseButton }
+        { forwardButton }
       </div>
     );
   }
