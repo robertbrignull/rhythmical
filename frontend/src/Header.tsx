@@ -48,17 +48,17 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   public componentDidUpdate(prevProps: HeaderProps) {
     const oldSong = prevProps.currentSong;
     const nextSong = this.props.currentSong;
-    if (!nextSong) {
+    if (!nextSong && oldSong) {
       this.setState({
         currentSongSrc: undefined,
         currentSongPosition: undefined,
       }, () => {
-        if (this.audio.current) {
+        if (this.audio.current && this.audio.current) {
           this.audio.current.pause();
         }
       });
 
-    } else if (!oldSong || nextSong.id != oldSong.id) {
+    } else if (nextSong && (!oldSong || nextSong.id != oldSong.id)) {
       this.setState({
         currentSongPosition: 0,
       }, () => {
