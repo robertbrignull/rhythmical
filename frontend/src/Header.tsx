@@ -13,7 +13,6 @@ function formatDuration(duration: number) {
 
 interface HeaderProps {
   currentSong?: Song;
-  playing: boolean;
   onPlay: () => void;
   onPause: () => void;
   onBackwards: () => void;
@@ -21,6 +20,7 @@ interface HeaderProps {
 }
 
 interface HeaderState {
+  playing: boolean;
   currentSongSrc?: string;
   currentSongPosition?: number;
   muted: boolean;
@@ -34,6 +34,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     super(props);
 
     this.state = {
+      playing: false,
       currentSongSrc: undefined,
       currentSongPosition: undefined,
       muted: false,
@@ -57,9 +58,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
         currentSongSrc: undefined,
         currentSongPosition: undefined,
       }, () => {
-        if (this.audio.current && this.audio.current) {
-          this.audio.current.pause();
-        }
+        this.pause();
       });
 
     } else if (nextSong && (!oldSong || nextSong.id != oldSong.id)) {
@@ -76,10 +75,8 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
           }, () => {
             if (this.audio.current) {
               this.audio.current.load();
-              this.audio.current.play()
-                .catch(error => console.error("Unable to play: ", error));
-              this.props.onPlay();
             }
+            this.play();
           });
         }, error => {
           console.error("Unable to get song src: ", error)
@@ -102,12 +99,22 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
     if (this.audio.current) {
       this.audio.current.play();
     }
+    this.setState({
+      playing: true,
+    }, () => {
+      this.props.onPlay();
+    });
   }
 
   public pause() {
     if (this.audio.current) {
       this.audio.current.pause();
     }
+    this.setState({
+      playing: false,
+    }, () => {
+      this.props.onPause();
+    });
   }
 
   private onTimeUpdate() {
@@ -136,12 +143,10 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   }
 
   private playPauseClicked() {
-    if (this.props.playing) {
+    if (this.state.playing) {
       this.pause();
-      this.props.onPause();
     } else {
       this.play();
-      this.props.onPlay();
     }
   }
 
@@ -171,7 +176,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
       </button>
     );
 
-    let playPauseIcon = this.props.playing ? (
+    let playPauseIcon = this.state.playing ? (
       <i className="fas fa-pause fa-2x"/>
     ) : (
       <i className="fas fa-play fa-2x"/>

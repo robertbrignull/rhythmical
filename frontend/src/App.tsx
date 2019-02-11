@@ -69,9 +69,6 @@ class App extends React.Component<{}, AppState> {
   }
 
   private onPause() {
-    if (this.header.current) {
-      this.header.current.pause();
-    }
     this.setState({
       playing: false,
     });
@@ -107,7 +104,6 @@ class App extends React.Component<{}, AppState> {
     } else {
       this.setState({
         currentSong: undefined,
-        playing: false,
       });
     }
   }
@@ -138,7 +134,6 @@ class App extends React.Component<{}, AppState> {
         <div className="header-container">
             <Header ref={this.header}
                     currentSong={this.state.currentSong}
-                    playing={this.state.playing}
                     onPlay={this.onPlay}
                     onPause={this.onPause}
                     onBackwards={this.onBackwards}
