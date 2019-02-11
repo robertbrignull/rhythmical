@@ -12,6 +12,7 @@ interface AppState {
   currentSong?: Song;
   playing: boolean;
   currentFilter: SongFilter;
+  pastSongIds: number[];
 }
 
 class App extends React.Component<{}, AppState> {
@@ -24,6 +25,7 @@ class App extends React.Component<{}, AppState> {
     this.onSongSelected = this.onSongSelected.bind(this);
     this.onPlay = this.onPlay.bind(this);
     this.onPause = this.onPause.bind(this);
+    this.onBackwards = this.onBackwards.bind(this);
     this.onEnded = this.onEnded.bind(this);
     this.onFilterChanged = this.onFilterChanged.bind(this);
 
@@ -35,6 +37,7 @@ class App extends React.Component<{}, AppState> {
       currentSong: undefined,
       playing: false,
       currentFilter: { key: "", predicate: () => true },
+      pastSongIds: [],
     };
   }
 
@@ -74,7 +77,30 @@ class App extends React.Component<{}, AppState> {
     });
   }
 
+  private onBackwards() {
+    const ids = this.state.pastSongIds;
+    const allSongs = this.state.allSongs;
+    if (ids.length > 0 && allSongs !== undefined) {
+      const prevSongId = ids[ids.length - 1];
+      const prevSong = allSongs.find(s => s.id === prevSongId);
+      this.setState({
+        pastSongIds: ids.slice(0, ids.length - 1),
+        currentSong: prevSong,
+      });
+    }
+  }
+
   private onEnded() {
+    this.setState(state => {
+      const pastSongIds = state.pastSongIds.slice();
+      if (state.currentSong !== undefined && pastSongIds.length < 100) {
+        pastSongIds.push(state.currentSong.id);
+      }
+      return {
+        pastSongIds,
+      };
+    });
+
     if (this.state.filteredSongs != undefined) {
       const index = Math.floor(Math.random() * this.state.filteredSongs.length);
       this.onSongSelected(this.state.filteredSongs[index]);
@@ -115,6 +141,7 @@ class App extends React.Component<{}, AppState> {
                     playing={this.state.playing}
                     onPlay={this.onPlay}
                     onPause={this.onPause}
+                    onBackwards={this.onBackwards}
                     onEnded={this.onEnded}/>
         </div>
         <div className="playlists-container">

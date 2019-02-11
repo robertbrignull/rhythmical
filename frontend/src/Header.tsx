@@ -16,6 +16,7 @@ interface HeaderProps {
   playing: boolean;
   onPlay: () => void;
   onPause: () => void;
+  onBackwards: () => void;
   onEnded: () => void;
 }
 
@@ -77,6 +78,7 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
               this.audio.current.load();
               this.audio.current.play()
                 .catch(error => console.error("Unable to play: ", error));
+              this.props.onPlay();
             }
           });
         }, error => {
@@ -123,8 +125,14 @@ export class Header extends React.Component<HeaderProps, HeaderState> {
   }
 
   private backwardClicked() {
-    this.restartSong();
-    this.props.onPlay();
+    const pos = this.state.currentSongPosition;
+    if (pos !== undefined && pos < 3) {
+      this.pause();
+      this.props.onBackwards();
+    } else {
+      this.restartSong();
+      this.props.onPlay();
+    }
   }
 
   private playPauseClicked() {
