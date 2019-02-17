@@ -76,7 +76,9 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
             if (this.audio.current) {
               this.audio.current.load();
             }
-            this.play();
+            if (this.state.playing) {
+              this.play();
+            }
           });
         }, error => {
           console.error("Unable to get song src: ", error)
