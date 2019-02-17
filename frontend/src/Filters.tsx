@@ -68,6 +68,11 @@ export class Filters extends React.Component<PlaylistsProps, PlaylistsState> {
     this.onSearchBoxChange = this.onSearchBoxChange.bind(this);
   }
 
+  public shouldComponentUpdate(nextProps: PlaylistsProps, nextState: PlaylistsState) {
+    return nextState.currentPlaylist.name !== this.state.currentPlaylist.name ||
+      nextState.searchString !== this.state.searchString;
+  }
+
   private onPlaylistSelected(playlist: Playlist) {
     this.setState({
       currentPlaylist: playlist

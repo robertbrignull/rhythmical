@@ -4,7 +4,7 @@ interface FooterProps {
   songs: Song[];
 }
 
-export class Footer extends React.Component<FooterProps, {}> {
+export class Footer extends React.PureComponent<FooterProps, {}> {
   public render() {
     let numSongs = this.props.songs.length;
 

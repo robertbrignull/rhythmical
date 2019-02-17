@@ -49,7 +49,7 @@ interface SongListState {
   scrollToIndex: number | undefined;
 }
 
-export class SongList extends React.Component<SongListProps, SongListState> {
+export class SongList extends React.PureComponent<SongListProps, SongListState> {
   constructor(props: SongListProps) {
     super(props);
 

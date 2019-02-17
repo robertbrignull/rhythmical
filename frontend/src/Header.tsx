@@ -26,7 +26,7 @@ interface HeaderState {
   muted: boolean;
 }
 
-export class Header extends React.Component<HeaderProps, HeaderState> {
+export class Header extends React.PureComponent<HeaderProps, HeaderState> {
 
   private readonly audio: RefObject<HTMLAudioElement>;
 
