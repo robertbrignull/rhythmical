@@ -87,10 +87,11 @@ class App extends React.Component<{}, AppState> {
 
   private onEnded() {
     this.setState(state => {
-      const pastSongIds = state.pastSongIds.slice();
-      if (state.currentSong !== undefined && pastSongIds.length < 100) {
-        pastSongIds.push(state.currentSong.id);
+      if (state.currentSong === undefined || state.pastSongIds.length >= 100) {
+        return null;
       }
+      const pastSongIds = state.pastSongIds.slice();
+      pastSongIds.push(state.currentSong.id);
       return {
         pastSongIds,
       };
