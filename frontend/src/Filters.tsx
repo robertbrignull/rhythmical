@@ -73,25 +73,25 @@ export class Filters extends React.Component<PlaylistsProps, PlaylistsState> {
       nextState.searchString !== this.state.searchString;
   }
 
+  public componentDidUpdate(prevProps: PlaylistsProps, prevState: PlaylistsState) {
+    if (prevState.currentPlaylist.name !== this.state.currentPlaylist.name ||
+      prevState.searchString !== this.state.searchString) {
+      const filter = makeFilter(this.state.currentPlaylist, this.state.searchString);
+      this.props.onFilterChanged(filter);
+    }
+  }
+
   private onPlaylistSelected(playlist: Playlist) {
     this.setState({
       currentPlaylist: playlist
-    }, () => {
-      const filter = makeFilter(playlist, this.state.searchString);
-      this.props.onFilterChanged(filter);
     });
   }
 
   private onSearchBoxChange(e: ChangeEvent) {
     const searchString = (e.target as any).value;
-    if (searchString !== this.state.searchString) {
-      this.setState({
-        searchString
-      }, () => {
-        const filter = makeFilter(this.state.currentPlaylist, searchString);
-        this.props.onFilterChanged(filter);
-      });
-    }
+    this.setState(state => {
+      return searchString !== state.searchString ? { searchString } : null;
+    });
   }
 
   private renderSearchBox() {
