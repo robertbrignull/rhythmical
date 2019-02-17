@@ -61,11 +61,9 @@ class App extends React.Component<{}, AppState> {
   }
 
   private onPlay() {
-    if (this.state.currentSong !== undefined) {
-      this.setState({
-        playing: true,
-      });
-    }
+    this.setState({
+      playing: true,
+    });
   }
 
   private onPause() {
