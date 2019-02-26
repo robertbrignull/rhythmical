@@ -66,6 +66,8 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
         currentSongPosition: 0,
         playing: 'loading',
       }, () => {
+        document.title = nextSong.artist + " - " + nextSong.title;
+
         if (this.audio.current) {
           this.audio.current.pause();
         }
