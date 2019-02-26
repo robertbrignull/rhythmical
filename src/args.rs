@@ -46,13 +46,15 @@ lazy_static! {
     static ref ARGS: Args = {
         let args: Vec<String> = std::env::args().collect();
         if args.len() < 2 {
-            panic!(USAGE_MESSAGE);
+            println!("{}", USAGE_MESSAGE);
+            std::process::exit(1);
         }
 
         match Mode::parse(args[1].clone()) {
             Mode::Serve => {
                 if args.len() != 4 {
-                    panic!(USAGE_MESSAGE);
+                    println!("{}", USAGE_MESSAGE);
+                    std::process::exit(1);
                 }
                 Args {
                     mode: Mode::Serve,
@@ -65,7 +67,8 @@ lazy_static! {
             },
             Mode::ParseRhythmDb => {
                 if args.len() != 5 {
-                    panic!(USAGE_MESSAGE);
+                    println!("{}", USAGE_MESSAGE);
+                    std::process::exit(1);
                 }
                 Args {
                     mode: Mode::ParseRhythmDb,
