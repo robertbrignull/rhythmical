@@ -7,14 +7,14 @@ pub enum Mode {
 }
 
 impl Mode {
-    fn parse(val: String) -> Self {
+    fn parse(val: String) -> Option<Mode> {
         if val.eq("serve") {
-            return Mode::Serve;
+            return Option::Some(Mode::Serve);
         }
         if val.eq("parse-rhythm-db") {
-            return Mode::ParseRhythmDb;
+            return Option::Some(Mode::ParseRhythmDb);
         }
-        panic!(format!("Unknown mode '{}'", val));
+        return Option::None;
     }
 }
 
@@ -51,7 +51,7 @@ lazy_static! {
         }
 
         match Mode::parse(args[1].clone()) {
-            Mode::Serve => {
+            Some(Mode::Serve) => {
                 if args.len() != 4 {
                     println!("{}", USAGE_MESSAGE);
                     std::process::exit(1);
@@ -65,7 +65,7 @@ lazy_static! {
                     parse_rhythm_db: Option::None,
                 }
             },
-            Mode::ParseRhythmDb => {
+            Some(Mode::ParseRhythmDb) => {
                 if args.len() != 5 {
                     println!("{}", USAGE_MESSAGE);
                     std::process::exit(1);
@@ -79,6 +79,10 @@ lazy_static! {
                         library_location_prefix: args[4].clone(),
                     }),
                 }
+            },
+            None => {
+                println!("{}", USAGE_MESSAGE);
+                std::process::exit(1);
             },
         }
     };
