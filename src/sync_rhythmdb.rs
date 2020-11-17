@@ -59,6 +59,15 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     println!("Matched {} songs", matched_songs.len());
     println!("Found {} new songs", new_songs.len());
     println!("Found {} removed songs", removed_songs.len());
+
+    if args.dry_run {
+        println!("Aborting because this is a dry run");
+        return;
+    }
+
+    let new_library = Library::combine_libraries(matched_songs, new_songs);
+
+    println!("Constructed new library with {} songs", new_library.songs.len());
 }
 
 fn read_rhythmdb(rhythmdb_file: &String, library_location_prefix: &String) -> Library {
