@@ -28,9 +28,7 @@ enum Element {
     EOF,
 }
 
-pub fn parse_rhythm_db() {
-    let args = ParseRhythmDbArgs::get();
-
+pub fn parse_rhythm_db(args: ParseRhythmDbArgs) {
     let input_file = File::open(args.input_file)
         .expect("Input file not found");
     let mut output_file = File::create(args.output_file)
@@ -47,7 +45,7 @@ pub fn parse_rhythm_db() {
         songs: HashMap::new(),
     };
     loop {
-        match read_song(&mut reader) {
+        match read_song(&mut reader, &args.library_location_prefix) {
             Some(song) => {
                 let mut song = song.clone();
                 song.id = library.songs.len() as u32;
@@ -62,7 +60,7 @@ pub fn parse_rhythm_db() {
         .expect("Unable to write to output file");
 }
 
-fn read_song(input_file: &mut BufReader<File>) -> Option<Song> {
+fn read_song(input_file: &mut BufReader<File>, library_location_prefix: &String) -> Option<Song> {
     let mut element = read_element(input_file);
     while !element.eq(&Element::Entry) {
         if element.eq(&Element::EOF) {
@@ -103,7 +101,7 @@ fn read_song(input_file: &mut BufReader<File>) -> Option<Song> {
                 song.rating = rating;
             },
             Element::Location(location) => {
-                let prefix = format!("file://{}", ParseRhythmDbArgs::get().library_location_prefix);
+                let prefix = format!("file://{}", library_location_prefix);
                 if !location.starts_with(&prefix) {
                     panic!(format!("location {} does not start with {}", location, prefix));
                 }

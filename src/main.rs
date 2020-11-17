@@ -2,7 +2,6 @@
 extern crate serde;
 #[macro_use] extern crate serde_derive;
 extern crate serde_json;
-#[macro_use] extern crate lazy_static;
 extern crate percent_encoding;
 extern crate htmlescape;
 extern crate regex;
@@ -19,12 +18,13 @@ use server::start_server;
 use parse_rhythm_db::parse_rhythm_db;
 
 fn main() {
-    match Args::get_mode() {
+    let args = Args::get();
+    match args.mode {
         Mode::Serve => {
-            start_server();
+            start_server(args.serve.unwrap());
         }
         Mode::ParseRhythmDb => {
-            parse_rhythm_db();
+            parse_rhythm_db(args.parse_rhythm_db.unwrap());
         }
     }
 }

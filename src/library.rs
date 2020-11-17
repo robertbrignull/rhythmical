@@ -1,5 +1,4 @@
 extern crate serde_json;
-extern crate lazy_static;
 
 use std::collections::HashMap;
 
@@ -22,18 +21,12 @@ pub struct Library {
     pub songs: HashMap<u32, Song>,
 }
 
-lazy_static! {
-    static ref LIBRARY: Library = {
-        let data = gsutil::cat(&"/library.json".to_string());
-        match serde_json::from_slice(&data) {
+impl Library {
+    pub fn new(project_name: &String) -> Library {
+        let data = gsutil::cat(project_name, &"/library.json".to_string());
+        return match serde_json::from_slice(&data) {
             Ok(library) => library,
             Err(error) => panic!("Unable to parse library: {}", error)
-        }
-    };
-}
-
-impl Library {
-    pub fn get() -> &'static Library {
-        return &LIBRARY;
+        };
     }
 }

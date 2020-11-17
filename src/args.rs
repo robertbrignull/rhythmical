@@ -1,5 +1,3 @@
-extern crate lazy_static;
-
 #[derive(Clone)]
 pub enum Mode {
     Serve,
@@ -20,9 +18,9 @@ impl Mode {
 
 #[derive(Clone)]
 pub struct Args {
-    mode: Mode,
-    serve: Option<ServeArgs>,
-    parse_rhythm_db: Option<ParseRhythmDbArgs>,
+    pub mode: Mode,
+    pub serve: Option<ServeArgs>,
+    pub parse_rhythm_db: Option<ParseRhythmDbArgs>,
 }
 
 #[derive(Clone)]
@@ -42,15 +40,15 @@ const USAGE_MESSAGE: &str = "Incorrect arguments. Usage:
   serve project-name private-key
   parse-rhythm-db input-file output-file library-location-prefix";
 
-lazy_static! {
-    static ref ARGS: Args = {
+impl Args {
+    pub fn get() -> Args {
         let args: Vec<String> = std::env::args().collect();
         if args.len() < 2 {
             println!("{}", USAGE_MESSAGE);
             std::process::exit(1);
         }
 
-        match Mode::parse(args[1].clone()) {
+        return match Mode::parse(args[1].clone()) {
             Some(Mode::Serve) => {
                 if args.len() != 4 {
                     println!("{}", USAGE_MESSAGE);
@@ -84,24 +82,6 @@ lazy_static! {
                 println!("{}", USAGE_MESSAGE);
                 std::process::exit(1);
             },
-        }
-    };
-}
-
-impl Args {
-    pub fn get_mode() -> &'static Mode {
-        return &ARGS.mode;
-    }
-}
-
-impl ServeArgs {
-    pub fn get() -> ServeArgs {
-        return ARGS.clone().serve.unwrap();
-    }
-}
-
-impl ParseRhythmDbArgs {
-    pub fn get() -> ParseRhythmDbArgs {
-        return ARGS.clone().parse_rhythm_db.unwrap();
+        };
     }
 }

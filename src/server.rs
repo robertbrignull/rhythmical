@@ -5,7 +5,8 @@ use std::fs::File;
 use std::io::Read;
 use rouille::{Request, Response};
 
-use api::route_api;
+use api::Api;
+use args::ServeArgs;
 
 fn root() -> Response {
     let current_dir = env::current_dir().unwrap();
@@ -25,26 +26,27 @@ fn app_js() -> Response {
         out_js_contents);
 }
 
-fn route(request: &Request) -> Response {
-    println!("Processing request for {}", request.url());
-
-    if request.url().eq("/") {
-        return root();
-    }
-
-    if request.url().eq("/app.js") {
-        return app_js();
-    }
-
-    if request.url().starts_with("/api") {
-        return route_api(request);
-    }
-
-    return Response::empty_404();
-}
-
-pub fn start_server() {
+pub fn start_server(args: ServeArgs) {
     let address = "localhost:8000";
     println!("Serving at {}", address);
-    rouille::start_server(address, route);
+
+    let api = Api::new(args);
+
+    rouille::start_server(address, move |request: &Request| {
+        println!("Processing request for {}", request.url());
+
+        if request.url().eq("/") {
+            return root();
+        }
+
+        if request.url().eq("/app.js") {
+            return app_js();
+        }
+
+        if request.url().starts_with("/api") {
+            return api.route_api(request);
+        }
+
+        return Response::empty_404();
+    });
 }
