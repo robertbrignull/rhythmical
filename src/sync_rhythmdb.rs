@@ -3,13 +3,12 @@ extern crate percent_encoding;
 extern crate htmlescape;
 
 use std::fs::File;
-use std::io::Write;
 use std::io::BufReader;
 use std::io::BufRead;
 use percent_encoding::percent_decode;
 use std::collections::HashMap;
 
-use args::ParseRhythmDbArgs;
+use args::SyncRhythmdbArgs;
 use library::{Library, Song};
 use htmlescape::decode_html;
 
@@ -28,11 +27,43 @@ enum Element {
     EOF,
 }
 
-pub fn parse_rhythm_db(args: ParseRhythmDbArgs) {
-    let input_file = File::open(args.input_file)
-        .expect("Input file not found");
-    let mut output_file = File::create(args.output_file)
-        .expect("Output file could not be created");
+pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
+    let source_library = read_rhythmdb(&args.rhythmdb_file, &args.library_location_prefix);
+    let dest_library = Library::new(&args.project_name);
+    
+    let source_songs = LibraryHash::new(&source_library);
+    let dest_songs = LibraryHash::new(&dest_library);
+
+    let mut matched_songs: Vec<(Song, Song)> = Vec::new();
+    let mut new_songs: Vec<Song> = Vec::new();
+    let mut removed_songs: Vec<Song> = Vec::new();
+    for song in source_library.songs.values() {
+        match dest_songs.lookup(song) {
+            Some(matched_song) => {
+                matched_songs.push((song.clone(), matched_song));
+            },
+            None => {
+                new_songs.push(song.clone());
+            }
+        }
+    }
+    for song in dest_library.songs.values() {
+        match source_songs.lookup(song) {
+            None => {
+                removed_songs.push(song.clone());
+            },
+            _ => {} // Would have been matched in the other direction already
+        }
+    }
+
+    println!("Matched {} songs", matched_songs.len());
+    println!("Found {} new songs", new_songs.len());
+    println!("Found {} removed songs", removed_songs.len());
+}
+
+fn read_rhythmdb(rhythmdb_file: &String, library_location_prefix: &String) -> Library {
+    let input_file = File::open(rhythmdb_file)
+        .expect("rhythmdb file not found");
 
     let mut reader = BufReader::new(input_file);
 
@@ -45,7 +76,7 @@ pub fn parse_rhythm_db(args: ParseRhythmDbArgs) {
         songs: HashMap::new(),
     };
     loop {
-        match read_song(&mut reader, &args.library_location_prefix) {
+        match read_song(&mut reader, &library_location_prefix) {
             Some(song) => {
                 let mut song = song.clone();
                 song.id = library.songs.len() as u32;
@@ -55,9 +86,7 @@ pub fn parse_rhythm_db(args: ParseRhythmDbArgs) {
         }
     }
 
-    let data = serde_json::to_string_pretty(&library).unwrap();
-    output_file.write_all(data.as_bytes())
-        .expect("Unable to write to output file");
+    return library;
 }
 
 fn read_song(input_file: &mut BufReader<File>, library_location_prefix: &String) -> Option<Song> {
@@ -170,4 +199,42 @@ fn read_element(input_file: &mut BufReader<File>) -> Element {
         return Element::Location(line[14..line.len()-12].to_string());
     }
     return Element::Unknown;
+}
+
+struct LibraryHash {
+    songs: HashMap<String, Vec<Song>>,
+}
+
+impl LibraryHash {
+    fn new(library: &Library) -> LibraryHash {
+        let mut songs: HashMap<String, Vec<Song>> = HashMap::new();
+        for song in library.songs.values() {
+            match songs.get_mut(&song.title) {
+                Some(v) => {
+                    v.push(song.clone());
+                },
+                None => {
+                    songs.insert(song.title.clone(), vec!(song.clone()));
+                }
+            }
+        }
+
+        return LibraryHash {
+            songs
+        };
+    }
+
+    fn lookup(&self, target: &Song) -> Option<Song> {
+        match self.songs.get(&target.title) {
+            Some(songs) => {
+                for song in songs {
+                    if song.artist.eq(&target.artist) && song.album.eq(&target.album) && song.duration.eq(&target.duration) {
+                        return Some(song.clone());
+                    }
+                }
+                None
+            },
+            None => None
+        }
+    }
 }

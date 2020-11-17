@@ -1,7 +1,7 @@
 #[derive(Clone)]
 pub enum Mode {
     Serve,
-    ParseRhythmDb,
+    SyncRhythmdb,
 }
 
 impl Mode {
@@ -9,8 +9,8 @@ impl Mode {
         if val.eq("serve") {
             return Option::Some(Mode::Serve);
         }
-        if val.eq("parse-rhythm-db") {
-            return Option::Some(Mode::ParseRhythmDb);
+        if val.eq("sync-rhythmdb") {
+            return Option::Some(Mode::SyncRhythmdb);
         }
         return Option::None;
     }
@@ -20,7 +20,7 @@ impl Mode {
 pub struct Args {
     pub mode: Mode,
     pub serve: Option<ServeArgs>,
-    pub parse_rhythm_db: Option<ParseRhythmDbArgs>,
+    pub sync_rhythmdb: Option<SyncRhythmdbArgs>,
 }
 
 #[derive(Clone)]
@@ -30,15 +30,17 @@ pub struct ServeArgs {
 }
 
 #[derive(Clone)]
-pub struct ParseRhythmDbArgs {
-    pub input_file: String,
-    pub output_file: String,
+pub struct SyncRhythmdbArgs {
+    pub project_name: String,
+    pub private_key: String,
+    pub rhythmdb_file: String,
     pub library_location_prefix: String,
+    pub dry_run: bool,
 }
 
 const USAGE_MESSAGE: &str = "Incorrect arguments. Usage:
   serve project-name private-key
-  parse-rhythm-db input-file output-file library-location-prefix";
+  sync-rhythmdb project-name private-key rhythmdb-file library-location-prefix [--dry-run]";
 
 impl Args {
     pub fn get() -> Args {
@@ -60,21 +62,23 @@ impl Args {
                         project_name: args[2].clone(),
                         private_key: args[3].clone(),
                     }),
-                    parse_rhythm_db: Option::None,
+                    sync_rhythmdb: Option::None,
                 }
             },
-            Some(Mode::ParseRhythmDb) => {
-                if args.len() != 5 {
+            Some(Mode::SyncRhythmdb) => {
+                if (args.len() != 6 && args.len() != 7) || (args.len() == 7 && !args[6].eq("--dry-run")) {
                     println!("{}", USAGE_MESSAGE);
                     std::process::exit(1);
                 }
                 Args {
-                    mode: Mode::ParseRhythmDb,
+                    mode: Mode::SyncRhythmdb,
                     serve: Option::None,
-                    parse_rhythm_db: Option::Some(ParseRhythmDbArgs {
-                        input_file: args[2].clone(),
-                        output_file: args[3].clone(),
-                        library_location_prefix: args[4].clone(),
+                    sync_rhythmdb: Option::Some(SyncRhythmdbArgs {
+                        project_name: args[2].clone(),
+                        private_key: args[3].clone(),
+                        rhythmdb_file: args[4].clone(),
+                        library_location_prefix: args[5].clone(),
+                        dry_run: args.len() == 7
                     }),
                 }
             },

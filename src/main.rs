@@ -11,11 +11,11 @@ mod server;
 mod api;
 mod args;
 mod gsutil;
-mod parse_rhythm_db;
+mod sync_rhythmdb;
 
 use args::{Args, Mode};
 use server::start_server;
-use parse_rhythm_db::parse_rhythm_db;
+use sync_rhythmdb::sync_rhythmdb;
 
 fn main() {
     let args = Args::get();
@@ -23,8 +23,8 @@ fn main() {
         Mode::Serve => {
             start_server(args.serve.unwrap());
         }
-        Mode::ParseRhythmDb => {
-            parse_rhythm_db(args.parse_rhythm_db.unwrap());
+        Mode::SyncRhythmdb => {
+            sync_rhythmdb(args.sync_rhythmdb.unwrap());
         }
     }
 }
