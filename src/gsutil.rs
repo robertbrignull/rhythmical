@@ -27,11 +27,15 @@ pub fn sign(path: &String) -> String {
 }
 
 fn execute(mut cmd: Command) -> Vec<u8> {
-    let output = cmd.output().unwrap();
-    if !output.status.success() {
-        println!("stdout:\n{}", String::from_utf8(output.stdout).unwrap());
-        println!("stderr:\n{}", String::from_utf8(output.stderr).unwrap());
-        panic!("gsutil outputted {}", output.status.code().unwrap_or(-1));
-    }
-    return output.stdout;
+    return match cmd.output() {
+        Ok(output) => {
+            if !output.status.success() {
+                println!("stdout:\n{}", String::from_utf8(output.stdout).unwrap());
+                println!("stderr:\n{}", String::from_utf8(output.stderr).unwrap());
+                panic!("gsutil outputted {}", output.status.code().unwrap_or(-1));
+            }
+            output.stdout
+        },
+        Err(err) => panic!("Error running {:?}: {}", cmd, err)
+    };
 }

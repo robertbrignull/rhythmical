@@ -45,10 +45,11 @@ fn songs() -> Response {
 fn song_contents(id: u32) -> Response {
     return match Library::get().songs.get(&id) {
         Some(song) => {
-            let signed_url = gsutil::sign(&format!("/Music{}", song.file_location));
-            return Response::text(signed_url);
+            Response::text(gsutil::sign(&format!("/Music{}", song.file_location)))
         },
-        None => Response::empty_404()
+        None => {
+            Response::text(format!("Song with id {} not found", id)).with_status_code(404)
+        }
     };
 }
 
@@ -58,13 +59,13 @@ pub fn route_api(request: &Request) -> Response {
     }
 
     let url = request.url();
-    let cap = SONG_CONTENTS_REGEX.captures(url.as_str());
-    if cap.is_some() {
-        let id = cap.unwrap()[1].parse::<u32>();
-        if id.is_ok() {
-            return song_contents(id.unwrap());
-        }
+    return match SONG_CONTENTS_REGEX.captures(url.as_str()) {
+        Some(cap) => {
+            match cap[1].parse::<u32>() {
+                Ok(id) => song_contents(id),
+                Err(_) => Response::text("Song id is not an integer").with_status_code(400)
+            }
+        },
+        None => Response::empty_404()
     }
-
-    return Response::empty_404();
 }

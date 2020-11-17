@@ -26,6 +26,8 @@ fn app_js() -> Response {
 }
 
 fn route(request: &Request) -> Response {
+    println!("Processing request for {}", request.url());
+
     if request.url().eq("/") {
         return root();
     }
