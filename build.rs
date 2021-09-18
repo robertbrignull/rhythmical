@@ -8,8 +8,8 @@ fn main() {
     env::set_current_dir("frontend").unwrap();
 
     assert_success(
-        "yarn install",
-        Command::new("yarn").arg("install").status().unwrap(),
+        "npm ci",
+        Command::new("npm").arg("ci").status().unwrap(),
     );
 
     assert_success(

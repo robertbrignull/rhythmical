@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
-    "react-scripts-ts": "3.1.0",
-    "request": "2.82.0",
-    "axios": "0.17.0",
-    "react-virtualized": "9.21.0"
+    "axios": "0.21.4",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-scripts-ts": "^4.0.8",
+    "react-virtualized": "9.22.3",
+    "request": "2.88.2"
   },
   "scripts": {
     "start": "react-scripts-ts start",
@@ -16,19 +16,20 @@
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.5",
-    "@types/node": "^10.12.0",
-    "@types/react": "^16.4.18",
-    "@types/react-dom": "^16.0.9",
-    "@types/react-virtualized": "9.18.12",
-    "typescript": "^3.1.3",
-    "webpack": "^4.22.0",
-    "webpack-cli": "^3.1.2",
-    "awesome-typescript-loader": "^5.2.1",
-    "source-map-loader": "^0.2.4",
-    "css-loader": "^1.0.0",
-    "sass-loader": "^7.1.0",
-    "node-sass": "^4.10.0",
-    "style-loader": "^0.23.1"
+    "@types/jest": "27.0.1",
+    "@types/node": "16.9.2",
+    "@types/react": "17.0.21",
+    "@types/react-dom": "17.0.9",
+    "@types/react-virtualized": "9.21.13",
+    "css-loader": "6.2.0",
+    "node-sass": "6.0.1",
+    "sass-loader": "12.1.0",
+    "source-map-loader": "3.0.0",
+    "style-loader": "3.2.1",
+    "ts-loader": "9.2.5",
+    "typescript": "4.4.3",
+    "webpack": "5.53.0",
+    "webpack-cli": "4.8.0",
+    "webpack-dev-server": "4.2.1"
   }
 }
