@@ -10,7 +10,8 @@ pub fn cat(project_name: &String, path: &String) -> Vec<u8> {
 pub fn sign(project_name: &String, path: &String, private_key: &String) -> String {
     let mut cmd = Command::new("gsutil");
     cmd.arg("signurl")
-        .arg("-d").arg("60m")
+        .arg("-d")
+        .arg("60m")
         .arg(private_key)
         .arg(format!("gs://{}{}", project_name, path));
 
@@ -18,7 +19,10 @@ pub fn sign(project_name: &String, path: &String, private_key: &String) -> Strin
 
     return match output.find("https://storage.googleapis.com") {
         Some(i) => output.get(i..).unwrap().to_string(),
-        None => panic!(format!("gsutil signurl output did not contain url: {}", output))
+        None => panic!(format!(
+            "gsutil signurl output did not contain url: {}",
+            output
+        )),
     };
 }
 
@@ -31,7 +35,7 @@ fn execute(mut cmd: Command) -> Vec<u8> {
                 panic!("gsutil outputted {}", output.status.code().unwrap_or(-1));
             }
             output.stdout
-        },
-        Err(err) => panic!("Error running {:?}: {}", cmd, err)
+        }
+        Err(err) => panic!("Error running {:?}: {}", cmd, err),
     };
 }

@@ -1,16 +1,18 @@
-#[macro_use] extern crate rouille;
+#[macro_use]
+extern crate rouille;
 extern crate serde;
-#[macro_use] extern crate serde_derive;
-extern crate serde_json;
-extern crate percent_encoding;
+#[macro_use]
+extern crate serde_derive;
 extern crate htmlescape;
+extern crate percent_encoding;
 extern crate regex;
+extern crate serde_json;
 
-mod library;
-mod server;
 mod api;
 mod args;
 mod gsutil;
+mod library;
+mod server;
 mod sync_rhythmdb;
 
 use args::{Args, Mode};

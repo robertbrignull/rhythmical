@@ -26,29 +26,28 @@ impl Library {
         let data = gsutil::cat(project_name, &"/library.json".to_string());
         return match serde_json::from_slice(&data) {
             Ok(library) => library,
-            Err(error) => panic!("Unable to parse library: {}", error)
+            Err(error) => panic!("Unable to parse library: {}", error),
         };
     }
 
-    pub fn combine_libraries(
-        matched_songs: Vec<(Song, Song)>,
-        new_songs: Vec<Song>)
-        -> Library {
-    
+    pub fn combine_libraries(matched_songs: Vec<(Song, Song)>, new_songs: Vec<Song>) -> Library {
         let mut songs: HashMap<u32, Song> = HashMap::new();
 
         for (source_song, dest_song) in matched_songs {
             let id = songs.len() as u32;
-            songs.insert(id, Song {
+            songs.insert(
                 id,
-                title: dest_song.title,
-                genre: source_song.genre,
-                artist: dest_song.artist,
-                album: dest_song.album,
-                duration: dest_song.duration,
-                rating: source_song.rating,
-                file_location: dest_song.file_location,
-            });
+                Song {
+                    id,
+                    title: dest_song.title,
+                    genre: source_song.genre,
+                    artist: dest_song.artist,
+                    album: dest_song.album,
+                    duration: dest_song.duration,
+                    rating: source_song.rating,
+                    file_location: dest_song.file_location,
+                },
+            );
         }
 
         for song in new_songs {
@@ -58,8 +57,6 @@ impl Library {
             songs.insert(id, song);
         }
 
-        return Library {
-            songs
-        };
+        return Library { songs };
     }
 }

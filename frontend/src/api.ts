@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {AxiosPromise, AxiosResponse} from "axios";
+import { AxiosPromise, AxiosResponse } from "axios";
 
 function printAxiosError(error: any) {
   if (error.hasOwnProperty('response')) {

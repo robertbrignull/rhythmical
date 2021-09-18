@@ -14,10 +14,10 @@ export class Footer extends React.PureComponent<FooterProps, {}> {
     let totalMinutes = Math.floor(totalLengthSeconds / 60) % 60;
 
     return <div className="footer">
-      { numSongs + " songs, " }
-      { totalDays > 0 ? totalDays + " days, " : "" }
-      { totalDays > 0 || totalHours > 0 ? totalHours + " hours and " : "" }
-      { totalMinutes + " minutes" }
+      {numSongs + " songs, "}
+      {totalDays > 0 ? totalDays + " days, " : ""}
+      {totalDays > 0 || totalHours > 0 ? totalHours + " hours and " : ""}
+      {totalMinutes + " minutes"}
     </div>
   }
 }

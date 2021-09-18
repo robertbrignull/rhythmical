@@ -1,10 +1,10 @@
 import * as React from 'react';
-import {SongList} from "./SongList";
-import {Header} from "./Header";
-import {RefObject} from "react";
-import {Filters} from "./Filters";
+import { SongList } from "./SongList";
+import { Header } from "./Header";
+import { RefObject } from "react";
+import { Filters } from "./Filters";
 import Api from "./api";
-import {Footer} from "./Footer";
+import { Footer } from "./Footer";
 
 interface AppState {
   allSongs?: Song[];
@@ -52,7 +52,7 @@ class App extends React.Component<{}, AppState> {
 
   private onSongSelected(song: Song) {
     if (!this.state.currentSong || song.id !== this.state.currentSong.id) {
-      this.setState({currentSong: song});
+      this.setState({ currentSong: song });
     } else {
       if (this.header.current) {
         this.header.current.restartSong();
@@ -131,24 +131,24 @@ class App extends React.Component<{}, AppState> {
     return (
       <div className="app">
         <div className="header-container">
-            <Header ref={this.header}
-                    currentSong={this.state.currentSong}
-                    onPlay={this.onPlay}
-                    onPause={this.onPause}
-                    onBackwards={this.onBackwards}
-                    onEnded={this.onEnded}/>
+          <Header ref={this.header}
+            currentSong={this.state.currentSong}
+            onPlay={this.onPlay}
+            onPause={this.onPause}
+            onBackwards={this.onBackwards}
+            onEnded={this.onEnded} />
         </div>
         <div className="playlists-container">
-          <Filters onFilterChanged={this.onFilterChanged}/>
+          <Filters onFilterChanged={this.onFilterChanged} />
         </div>
         <div className="song-list-container">
           <SongList songs={this.state.filteredSongs}
-                    currentSong={this.state.currentSong}
-                    playing={this.state.playing}
-                    onSongSelected={this.onSongSelected}/>
+            currentSong={this.state.currentSong}
+            playing={this.state.playing}
+            onSongSelected={this.onSongSelected} />
         </div>
         <div className="footer-container">
-          <Footer songs={this.state.filteredSongs}/>
+          <Footer songs={this.state.filteredSongs} />
         </div>
       </div>
     );

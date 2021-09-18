@@ -1,15 +1,15 @@
 import * as React from "react";
 
 import 'react-virtualized/styles.css';
-import {AutoSizer} from 'react-virtualized/dist/es/AutoSizer';
-import {Table, Column, TableCellProps, TableHeaderProps, SortIndicator, SortDirectionType, RowMouseEventHandlerParams} from 'react-virtualized/dist/es/Table';
-import {Index} from "react-virtualized";
+import { AutoSizer } from 'react-virtualized/dist/es/AutoSizer';
+import { Table, Column, TableCellProps, TableHeaderProps, SortIndicator, SortDirectionType, RowMouseEventHandlerParams } from 'react-virtualized/dist/es/Table';
+import { Index } from "react-virtualized";
 
 type SortMode = 'title' | 'genre' | 'artist' | 'album' | 'duration' | 'rating';
 
 function sortSongs(songs: Song[],
-                   sortMode: SortMode,
-                   sortDirection: SortDirectionType): Song[] {
+  sortMode: SortMode,
+  sortDirection: SortDirectionType): Song[] {
 
   let cmp: (a: Song, b: Song) => number;
   if (sortMode === 'title') {
@@ -100,15 +100,15 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
   }
 
   private headerRenderer(label: string | undefined, disableSort?: boolean) {
-      return (props: TableHeaderProps) => {
-        return (
-          <div>
-            { label }
-            { !disableSort && props.sortBy === props.dataKey &&
-              <SortIndicator sortDirection={props.sortDirection } /> }
-          </div>
-        );
-      };
+    return (props: TableHeaderProps) => {
+      return (
+        <div>
+          {label}
+          {!disableSort && props.sortBy === props.dataKey &&
+            <SortIndicator sortDirection={props.sortDirection} />}
+        </div>
+      );
+    };
   }
 
   private sortList(info: { sortBy: string; sortDirection: SortDirectionType }) {
@@ -146,9 +146,9 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
     const song: Song = props.rowData;
     let stars = [];
     for (let i = 0; i < Math.min(song.rating, 5); i++) {
-      stars.push(<i key={i} className="fas fa-star"/>);
+      stars.push(<i key={i} className="fas fa-star" />);
     }
-    return <span className="stars">{... stars}</span>;
+    return <span className="stars">{...stars}</span>;
   }
 
   private rowClassName(info: Index) {
@@ -164,7 +164,7 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
     return (
       <div className="song-list">
         <AutoSizer>
-          {({width, height}) => (
+          {({ width, height }) => (
             <Table
               headerHeight={40}
               height={height}
@@ -179,29 +179,29 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
               scrollToIndex={this.state.scrollToIndex}
               width={width}>
               <Column dataKey={'title'}
-                      headerRenderer={this.headerRenderer('Title')}
-                      width={200}
-                      flexGrow={1}/>
+                headerRenderer={this.headerRenderer('Title')}
+                width={200}
+                flexGrow={1} />
               <Column dataKey={'genre'}
-                      headerRenderer={this.headerRenderer('Genre')}
-                      width={175}/>
+                headerRenderer={this.headerRenderer('Genre')}
+                width={175} />
               <Column dataKey={'artist'}
-                      headerRenderer={this.headerRenderer('Artist')}
-                      width={200}
-                      flexGrow={1}/>
+                headerRenderer={this.headerRenderer('Artist')}
+                width={200}
+                flexGrow={1} />
               <Column dataKey={'album'}
-                      headerRenderer={this.headerRenderer('Album')}
-                      width={200}
-                      flexGrow={1}/>
+                headerRenderer={this.headerRenderer('Album')}
+                width={200}
+                flexGrow={1} />
               <Column dataKey={'duration'}
-                      headerRenderer={this.headerRenderer('Duration')}
-                      cellRenderer={this.durationCellRenderer}
-                      width={100}/>
+                headerRenderer={this.headerRenderer('Duration')}
+                cellRenderer={this.durationCellRenderer}
+                width={100} />
               <Column dataKey={'rating'}
-                      className={'rating-col'}
-                      headerRenderer={this.headerRenderer('Rating')}
-                      cellRenderer={this.ratingCellRenderer}
-                      width={90}/>
+                className={'rating-col'}
+                headerRenderer={this.headerRenderer('Rating')}
+                cellRenderer={this.ratingCellRenderer}
+                width={90} />
             </Table>
           )}
         </AutoSizer>

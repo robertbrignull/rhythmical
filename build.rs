@@ -9,10 +9,8 @@ fn main() {
 
     assert_success(
         "yarn install",
-        Command::new("yarn")
-            .arg("install")
-            .status()
-            .unwrap());
+        Command::new("yarn").arg("install").status().unwrap(),
+    );
 
     assert_success(
         "webpack",
@@ -22,16 +20,20 @@ fn main() {
             .arg("--output-path")
             .arg(Path::new(&out_dir))
             .status()
-            .unwrap());
+            .unwrap(),
+    );
 }
 
 fn assert_success(command_name: &str, status: ExitStatus) {
     match status.code() {
         Some(code) => {
             if code != 0 {
-                panic!(format!("Command {} exited with status code {}", command_name, code));
+                panic!(format!(
+                    "Command {} exited with status code {}",
+                    command_name, code
+                ));
             }
-        },
+        }
         None => {
             panic!(format!("Command {} terminated by signal", command_name));
         }

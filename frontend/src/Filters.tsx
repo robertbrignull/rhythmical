@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ChangeEvent} from "react";
+import { ChangeEvent } from "react";
 
 interface Playlist {
   name: string;
@@ -98,26 +98,26 @@ export class Filters extends React.Component<PlaylistsProps, PlaylistsState> {
     return (
       <div className={'search-wrapper'}>
         <input key={'search'}
-               className={'search-input'}
-               onChange={this.onSearchBoxChange}
-               value={this.state.searchString}/>
+          className={'search-input'}
+          onChange={this.onSearchBoxChange}
+          value={this.state.searchString} />
       </div>
     );
   }
 
   public render() {
     return <div className="filters">
-      { this.renderSearchBox() }
+      {this.renderSearchBox()}
       {...
         allPlaylists.map(p => {
           let isSelected = p.name === this.state.currentPlaylist.name;
           let className = "playlist" + (isSelected ? " selected" : "");
           return (
             <div key={'playlist_' + p.name}
-                 className={className}
-                 onClick={() => this.onPlaylistSelected(p)}>
-              <i className="fas fa-search"/>
-              { isSelected ? <i className="fas fa-caret-right"/> : null}
+              className={className}
+              onClick={() => this.onPlaylistSelected(p)}>
+              <i className="fas fa-search" />
+              {isSelected ? <i className="fas fa-caret-right" /> : null}
               <span className="playlist-name">{p.name}</span>
             </div>
           );

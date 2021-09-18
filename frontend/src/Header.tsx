@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ChangeEvent, RefObject} from "react";
+import { ChangeEvent, RefObject } from "react";
 import Api from "./api";
 
 function formatDuration(duration: number) {
@@ -178,32 +178,32 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   private renderButtonControls() {
     let backwardButton = (
       <button onClick={this.backwardClicked}>
-        <i className="fas fa-backward fa-2x"/>
+        <i className="fas fa-backward fa-2x" />
       </button>
     );
 
     let playPauseIcon = this.state.playing === 'stopped' ? (
-      <i className="fas fa-play fa-2x"/>
+      <i className="fas fa-play fa-2x" />
     ) : (
-      <i className="fas fa-pause fa-2x"/>
+      <i className="fas fa-pause fa-2x" />
     );
     let playPauseButton = (
       <button onClick={this.playPauseClicked}>
-        { playPauseIcon }
+        {playPauseIcon}
       </button>
     );
 
     let forwardButton = (
       <button onClick={this.forwardClicked}>
-        <i className="fas fa-forward fa-2x"/>
+        <i className="fas fa-forward fa-2x" />
       </button>
     );
 
     return (
       <div className={"buttonControls"}>
-        { backwardButton }
-        { playPauseButton }
-        { forwardButton }
+        {backwardButton}
+        {playPauseButton}
+        {forwardButton}
       </div>
     );
   }
@@ -214,7 +214,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
       return (
         <div className="songTitle">
           {song.title}
-          <br/>
+          <br />
           by {song.artist} from {song.album}
         </div>
       );
@@ -237,7 +237,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
     const maxPosition = this.props.currentSong.duration;
     return (
       <div className="position-text">
-        { formatDuration(position) + " / " + formatDuration(maxPosition) }
+        {formatDuration(position) + " / " + formatDuration(maxPosition)}
       </div>
     );
   }
@@ -253,25 +253,25 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
     return (
       <div className="position-slider">
         <input type="range"
-               min={0}
-               max={Math.floor(maxPosition)}
-               value={Math.floor(position)}
-               step={1}
-               onChange={this.positionSliderChanged}/>
+          min={0}
+          max={Math.floor(maxPosition)}
+          value={Math.floor(position)}
+          step={1}
+          onChange={this.positionSliderChanged} />
       </div>
     );
   }
 
   private renderVolumeControls() {
     let volumeIcon = this.state.muted ? (
-      <i className="fas fa-volume-mute fa-lg"/>
+      <i className="fas fa-volume-mute fa-lg" />
     ) : (
-      <i className="fas fa-volume-up fa-lg"/>
+      <i className="fas fa-volume-up fa-lg" />
     );
     return (
       <div className="volume-controls">
         <button onClick={this.volumeClicked}>
-          { volumeIcon }
+          {volumeIcon}
         </button>
       </div>
     );
@@ -281,21 +281,21 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
     return (
       <div className="header">
         <div className="controls">
-          { this.renderButtonControls() }
-          { this.renderCurrentSongName() }
-          { this.renderPositionText() }
-          { this.renderPositionSlider() }
-          { this.renderVolumeControls() }
+          {this.renderButtonControls()}
+          {this.renderCurrentSongName()}
+          {this.renderPositionText()}
+          {this.renderPositionSlider()}
+          {this.renderVolumeControls()}
         </div>
         <audio ref={this.audio}
-               className="audio-controls"
-               onPlay={this.props.onPlay}
-               onPause={this.props.onPause}
-               onEnded={this.props.onEnded}
-               onTimeUpdate={this.onTimeUpdate}>
-          { this.state.currentSongSrc
+          className="audio-controls"
+          onPlay={this.props.onPlay}
+          onPause={this.props.onPause}
+          onEnded={this.props.onEnded}
+          onTimeUpdate={this.onTimeUpdate}>
+          {this.state.currentSongSrc
             ? <source src={this.state.currentSongSrc} />
-            : null }
+            : null}
         </audio>
       </div>
     );

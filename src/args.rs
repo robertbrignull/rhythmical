@@ -64,9 +64,11 @@ impl Args {
                     }),
                     sync_rhythmdb: Option::None,
                 }
-            },
+            }
             Some(Mode::SyncRhythmdb) => {
-                if (args.len() != 6 && args.len() != 7) || (args.len() == 7 && !args[6].eq("--dry-run")) {
+                if (args.len() != 6 && args.len() != 7)
+                    || (args.len() == 7 && !args[6].eq("--dry-run"))
+                {
                     println!("{}", USAGE_MESSAGE);
                     std::process::exit(1);
                 }
@@ -78,14 +80,14 @@ impl Args {
                         private_key: args[3].clone(),
                         rhythmdb_file: args[4].clone(),
                         library_location_prefix: args[5].clone(),
-                        dry_run: args.len() == 7
+                        dry_run: args.len() == 7,
                     }),
                 }
-            },
+            }
             None => {
                 println!("{}", USAGE_MESSAGE);
                 std::process::exit(1);
-            },
+            }
         };
     }
 }

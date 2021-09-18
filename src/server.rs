@@ -1,9 +1,9 @@
 extern crate rouille;
 
+use rouille::{Request, Response};
 use std::env;
 use std::fs::File;
 use std::io::Read;
-use rouille::{Request, Response};
 
 use api::Api;
 use args::ServeArgs;
@@ -21,9 +21,7 @@ fn app_js() -> Response {
     let mut out_js = File::open(concat!(env!("OUT_DIR"), "/app.js")).unwrap();
     let mut out_js_contents = String::new();
     out_js.read_to_string(&mut out_js_contents).unwrap();
-    return Response::from_data(
-        "application/javascript",
-        out_js_contents);
+    return Response::from_data("application/javascript", out_js_contents);
 }
 
 pub fn start_server(args: ServeArgs) {

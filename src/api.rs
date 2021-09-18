@@ -1,14 +1,14 @@
+extern crate regex;
 extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
-extern crate regex;
 
-use rouille::{Request, Response};
 use regex::Regex;
+use rouille::{Request, Response};
 
 use args::ServeArgs;
-use library::Library;
 use gsutil;
+use library::Library;
 
 #[derive(Serialize)]
 struct ApiSong {
@@ -56,29 +56,27 @@ impl Api {
 
     fn song_contents(&self, id: u32) -> Response {
         return match self.library.songs.get(&id) {
-            Some(song) => {
-                Response::text(gsutil::sign(&self.project_name, &format!("/Music{}", song.file_location), &self.private_key))
-            },
-            None => {
-                Response::text(format!("Song with id {} not found", id)).with_status_code(404)
-            }
+            Some(song) => Response::text(gsutil::sign(
+                &self.project_name,
+                &format!("/Music{}", song.file_location),
+                &self.private_key,
+            )),
+            None => Response::text(format!("Song with id {} not found", id)).with_status_code(404),
         };
     }
 
     pub fn route_api(&self, request: &Request) -> Response {
-        if request.url().eq("/api/songs")  {
+        if request.url().eq("/api/songs") {
             return self.songs();
         }
 
         let url = request.url();
         return match self.songs_contents_regex.captures(url.as_str()) {
-            Some(cap) => {
-                match cap[1].parse::<u32>() {
-                    Ok(id) => self.song_contents(id),
-                    Err(_) => Response::text("Song id is not an integer").with_status_code(400)
-                }
+            Some(cap) => match cap[1].parse::<u32>() {
+                Ok(id) => self.song_contents(id),
+                Err(_) => Response::text("Song id is not an integer").with_status_code(400),
             },
-            None => Response::empty_404()
-        }
+            None => Response::empty_404(),
+        };
     }
 }
