@@ -12,3 +12,6 @@ serde = "1.0.87"
 percent-encoding = "1.0.1"
 htmlescape = "0.3.1"
 regex = "1.1.0"
+
+[build-dependencies]
+walkdir = "2.3.2"
