@@ -28,7 +28,9 @@ enum Element {
 }
 
 pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
-    let source_library = read_rhythmdb(&args.rhythmdb_file, &args.library_location_prefix);
+    let library_location_prefix = sanitise_library_location_prefix(&args.library_location_prefix);
+
+    let source_library = read_rhythmdb(&args.rhythmdb_file, &library_location_prefix);
     let dest_library = Library::new(&args.project_name);
     let source_songs = LibraryHash::new(&source_library);
     let dest_songs = LibraryHash::new(&dest_library);
@@ -59,10 +61,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     println!("Found {} new songs", new_songs.len());
     println!("Found {} removed songs", removed_songs.len());
 
-    if args.dry_run {
-        println!("Aborting because this is a dry run");
-        return;
-    }
+    println!("{:?}", matched_songs.get(0));
 
     let new_library = Library::combine_libraries(matched_songs, new_songs);
 
@@ -70,9 +69,26 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
         "Constructed new library with {} songs",
         new_library.songs.len()
     );
+
+    if args.dry_run {
+        println!("Aborting because this is a dry run");
+        return;
+    }
 }
 
-fn read_rhythmdb(rhythmdb_file: &String, library_location_prefix: &String) -> Library {
+fn sanitise_library_location_prefix(prefix: &String) -> String {
+    let mut prefix = std::fs::canonicalize(prefix)
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_owned();
+    if prefix.ends_with("/") {
+        prefix.truncate(prefix.len() - 1);
+    }
+    return prefix;
+}
+
+fn read_rhythmdb(rhythmdb_file: &str, library_location_prefix: &str) -> Library {
     let input_file = File::open(rhythmdb_file).expect("rhythmdb file not found");
 
     let mut reader = BufReader::new(input_file);
@@ -99,7 +115,7 @@ fn read_rhythmdb(rhythmdb_file: &String, library_location_prefix: &String) -> Li
     return library;
 }
 
-fn read_song(input_file: &mut BufReader<File>, library_location_prefix: &String) -> Option<Song> {
+fn read_song(input_file: &mut BufReader<File>, library_location_prefix: &str) -> Option<Song> {
     let mut element = read_element(input_file);
     while !element.eq(&Element::Entry) {
         if element.eq(&Element::EOF) {
