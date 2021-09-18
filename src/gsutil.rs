@@ -19,10 +19,7 @@ pub fn sign(project_name: &String, path: &String, private_key: &String) -> Strin
 
     return match output.find("https://storage.googleapis.com") {
         Some(i) => output.get(i..).unwrap().to_string(),
-        None => panic!(format!(
-            "gsutil signurl output did not contain url: {}",
-            output
-        )),
+        None => panic!("gsutil signurl output did not contain url: {}", output),
     };
 }
 

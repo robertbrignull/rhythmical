@@ -140,10 +140,7 @@ fn read_song(input_file: &mut BufReader<File>, library_location_prefix: &String)
             Element::Location(location) => {
                 let prefix = format!("file://{}", library_location_prefix);
                 if !location.starts_with(&prefix) {
-                    panic!(format!(
-                        "location {} does not start with {}",
-                        location, prefix
-                    ));
+                    panic!("location {} does not start with {}", location, prefix);
                 }
                 song.file_location = decode(&location[prefix.len()..].to_string());
             }

@@ -28,14 +28,11 @@ fn assert_success(command_name: &str, status: ExitStatus) {
     match status.code() {
         Some(code) => {
             if code != 0 {
-                panic!(format!(
-                    "Command {} exited with status code {}",
-                    command_name, code
-                ));
+                panic!("Command {} exited with status code {}", command_name, code);
             }
         }
         None => {
-            panic!(format!("Command {} terminated by signal", command_name));
+            panic!("Command {} terminated by signal", command_name);
         }
     }
 }
