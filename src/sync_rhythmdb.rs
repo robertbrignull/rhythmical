@@ -205,42 +205,43 @@ fn read_element(input_file: &mut BufReader<File>) -> Element {
     if input_file.read_line(&mut line).unwrap() == 0 {
         return Element::EOF;
     }
-    if line.eq("  <entry type=\"song\">\n") {
+    let line = line.trim();
+    if line.eq("<entry type=\"song\">") {
         return Element::Entry;
     }
-    if line.eq("  </entry>\n") {
+    if line.eq("</entry>") {
         return Element::CloseEntry;
     }
-    if line.starts_with("    <title>") && line.ends_with("</title>\n") {
-        return Element::Title(line[11..line.len() - 9].to_string());
+    if line.starts_with("<title>") && line.ends_with("</title>") {
+        return Element::Title(line[7..line.len() - 8].to_string());
     }
-    if line.starts_with("    <genre>") && line.ends_with("</genre>\n") {
-        return Element::Genre(line[11..line.len() - 9].to_string());
+    if line.starts_with("<genre>") && line.ends_with("</genre>") {
+        return Element::Genre(line[7..line.len() - 8].to_string());
     }
-    if line.starts_with("    <artist>") && line.ends_with("</artist>\n") {
-        return Element::Artist(line[12..line.len() - 10].to_string());
+    if line.starts_with("<artist>") && line.ends_with("</artist>") {
+        return Element::Artist(line[8..line.len() - 9].to_string());
     }
-    if line.starts_with("    <album>") && line.ends_with("</album>\n") {
-        return Element::Album(line[11..line.len() - 9].to_string());
+    if line.starts_with("<album>") && line.ends_with("</album>") {
+        return Element::Album(line[7..line.len() - 8].to_string());
     }
-    if line.starts_with("    <duration>") && line.ends_with("</duration>\n") {
-        let contents = &line[14..line.len() - 12];
+    if line.starts_with("<duration>") && line.ends_with("</duration>") {
+        let contents = &line[10..line.len() - 11];
         if contents.len() == 0 {
             return Element::Duration(0);
         } else {
             return Element::Duration(contents.parse::<u32>().unwrap());
         }
     }
-    if line.starts_with("    <rating>") && line.ends_with("</rating>\n") {
-        let contents = &line[12..line.len() - 10];
+    if line.starts_with("<rating>") && line.ends_with("</rating>") {
+        let contents = &line[8..line.len() - 9];
         if contents.len() == 0 {
             return Element::Rating(0);
         } else {
             return Element::Rating(contents.parse::<u32>().unwrap());
         }
     }
-    if line.starts_with("    <location>") && line.ends_with("</location>\n") {
-        return Element::Location(line[14..line.len() - 12].to_string());
+    if line.starts_with("<location>") && line.ends_with("</location>") {
+        return Element::Location(line[10..line.len() - 11].to_string());
     }
     return Element::Unknown;
 }
