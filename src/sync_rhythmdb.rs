@@ -7,9 +7,11 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
+use std::path::Path;
 
 use args::SyncRhythmdbArgs;
 use htmlescape::decode_html;
+use gsutil;
 use library::{Library, Song};
 
 #[derive(PartialEq)]
@@ -65,9 +67,17 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     for song in &mut new_songs {
         let new_file_location = song.generate_file_location();
         if args.dry_run {
-            println!("Would upload {} to {}", song.file_location, new_file_location);
+            println!(
+                "Would upload {} to {}",
+                song.file_location, new_file_location
+            );
         } else {
             println!("Uploading {} to {}", song.file_location, new_file_location);
+            gsutil::upload(
+                &args.project_name,
+                &format!("{}{}", library_location_prefix, song.file_location),
+                &format!("/Music{}", new_file_location),
+            );
         }
         song.file_location = new_file_location;
     }
@@ -82,6 +92,17 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
         println!("Would upload new library");
     } else {
         println!("Uploading library");
+        let library_file = "/tmp/new_library.json";
+        if Path::new(library_file).exists() {
+            std::fs::remove_file(library_file).unwrap();
+        }
+        new_library.serialize(&library_file).expect("Unable to serialize library");
+        gsutil::upload(
+            &args.project_name,
+            &library_file.to_string(),
+            "/library.json",
+        );
+        std::fs::remove_file(library_file).unwrap();
     }
 
     // Delete all removed songs
@@ -90,6 +111,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
             println!("Would delete {}", song.file_location);
         } else {
             println!("Deleting {}", song.file_location);
+            gsutil::rm(&args.project_name, &format!("/Music{}", song.file_location));
         }
     }
 }

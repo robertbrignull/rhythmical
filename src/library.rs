@@ -4,6 +4,7 @@ extern crate regex;
 extern crate serde_json;
 
 use std::collections::HashMap;
+use std::io::Result;
 
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -45,7 +46,7 @@ impl Song {
             .to_string();
 
         let current_extension = self.file_extension();
-        return format!("{}{}", file_location, current_extension);
+        return format!("/{}{}", file_location, current_extension);
     }
 
     fn file_extension(&self) -> String {
@@ -68,6 +69,12 @@ impl Library {
             Ok(library) => library,
             Err(error) => panic!("Unable to parse library: {}", error),
         };
+    }
+
+    pub fn serialize(&self, output_file: &str) -> Result<()> {
+        let data = serde_json::to_string(self)?;
+        std::fs::write(output_file, data)?;
+        return Result::Ok(());
     }
 
     pub fn combine_libraries(matched_songs: &Vec<(Song, Song)>, new_songs: &Vec<Song>) -> Library {
