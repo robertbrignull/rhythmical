@@ -122,7 +122,11 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
             println!("Would delete {}", song.file_location);
         } else {
             println!("Deleting {}", song.file_location);
-            gsutil::rm(&args.project_name, &format!("/Music{}", song.file_location)).unwrap();
+            let removal_result =
+                gsutil::rm(&args.project_name, &format!("/Music{}", song.file_location));
+            if removal_result.is_err() {
+                println!("Failed to delete {}", song.file_location);
+            }
         }
     }
 }
