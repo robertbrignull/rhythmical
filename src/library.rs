@@ -64,10 +64,12 @@ pub struct Library {
 
 impl Library {
     pub fn new(project_name: &str) -> Library {
-        let data = gsutil::cat(project_name, &"/library.json".to_string());
-        return match serde_json::from_slice(&data) {
-            Ok(library) => library,
-            Err(error) => panic!("Unable to parse library: {}", error),
+        return match gsutil::cat(project_name, &"/library.json".to_string()) {
+            Ok(data) => match serde_json::from_slice(&data) {
+                Ok(library) => library,
+                Err(error) => panic!("Unable to parse library: {}", error),
+            },
+            Err(error) => panic!("Unable to load library: {}", error),
         };
     }
 

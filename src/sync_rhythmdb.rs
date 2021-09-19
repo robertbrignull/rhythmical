@@ -10,8 +10,8 @@ use std::io::BufReader;
 use std::path::Path;
 
 use args::SyncRhythmdbArgs;
-use htmlescape::decode_html;
 use gsutil;
+use htmlescape::decode_html;
 use library::{Library, Song};
 
 #[derive(PartialEq)]
@@ -64,6 +64,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     println!("Found {} removed songs", removed_songs.len());
 
     // Upload all new songs
+    let mut failed_new_song_ids: Vec<u32> = Vec::new();
     for song in &mut new_songs {
         let new_file_location = song.generate_file_location();
         if args.dry_run {
@@ -73,14 +74,21 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
             );
         } else {
             println!("Uploading {} to {}", song.file_location, new_file_location);
-            gsutil::upload(
+            let upload_result = gsutil::upload(
                 &args.project_name,
                 &format!("{}{}", library_location_prefix, song.file_location),
                 &format!("/Music{}", new_file_location),
             );
+            if upload_result.is_err() {
+                println!("Failed to upload {}", song.file_location);
+                failed_new_song_ids.push(song.id);
+            }
         }
         song.file_location = new_file_location;
     }
+
+    // Handle any songs that fail to upload
+    new_songs.retain(|song| !failed_new_song_ids.contains(&song.id));
 
     // Construct the new library and save it
     let new_library = Library::combine_libraries(&matched_songs, &new_songs);
@@ -96,12 +104,15 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
         if Path::new(library_file).exists() {
             std::fs::remove_file(library_file).unwrap();
         }
-        new_library.serialize(&library_file).expect("Unable to serialize library");
+        new_library
+            .serialize(&library_file)
+            .expect("Unable to serialize library");
         gsutil::upload(
             &args.project_name,
             &library_file.to_string(),
             "/library.json",
-        );
+        )
+        .unwrap();
         std::fs::remove_file(library_file).unwrap();
     }
 
@@ -111,7 +122,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
             println!("Would delete {}", song.file_location);
         } else {
             println!("Deleting {}", song.file_location);
-            gsutil::rm(&args.project_name, &format!("/Music{}", song.file_location));
+            gsutil::rm(&args.project_name, &format!("/Music{}", song.file_location)).unwrap();
         }
     }
 }

@@ -56,11 +56,16 @@ impl Api {
 
     fn song_contents(&self, id: u32) -> Response {
         return match self.library.songs.get(&id) {
-            Some(song) => Response::text(gsutil::sign(
-                &self.project_name,
-                &format!("/Music{}", song.file_location),
-                &self.private_key,
-            )),
+            Some(song) => {
+                return match gsutil::sign(
+                    &self.project_name,
+                    &format!("/Music{}", song.file_location),
+                    &self.private_key,
+                ) {
+                    Ok(signature) => Response::text(signature),
+                    Err(error) => Response::text(format!("Unable to compute signature: {}", error)),
+                }
+            }
             None => Response::text(format!("Song with id {} not found", id)).with_status_code(404),
         };
     }
