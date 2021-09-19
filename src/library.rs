@@ -62,7 +62,7 @@ pub struct Library {
 }
 
 impl Library {
-    pub fn new(project_name: &String) -> Library {
+    pub fn new(project_name: &str) -> Library {
         let data = gsutil::cat(project_name, &"/library.json".to_string());
         return match serde_json::from_slice(&data) {
             Ok(library) => library,

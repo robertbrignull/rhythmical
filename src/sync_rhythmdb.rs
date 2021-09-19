@@ -94,7 +94,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     }
 }
 
-fn sanitise_library_location_prefix(prefix: &String) -> String {
+fn sanitise_library_location_prefix(prefix: &str) -> String {
     let mut prefix = std::fs::canonicalize(prefix)
         .unwrap()
         .to_str()
@@ -192,7 +192,7 @@ fn read_song(input_file: &mut BufReader<File>, library_location_prefix: &str) ->
     }
 }
 
-fn decode(value: &String) -> String {
+fn decode(value: &str) -> String {
     let value = percent_decode(value.as_bytes())
         .decode_utf8()
         .unwrap()

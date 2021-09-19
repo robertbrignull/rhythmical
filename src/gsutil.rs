@@ -1,13 +1,13 @@
 use std::process::Command;
 
-pub fn cat(project_name: &String, path: &String) -> Vec<u8> {
+pub fn cat(project_name: &str, path: &str) -> Vec<u8> {
     let mut cmd = Command::new("gsutil");
     cmd.arg("cat");
     cmd.arg(format!("gs://{}{}", project_name, path));
     return execute(cmd);
 }
 
-pub fn sign(project_name: &String, path: &String, private_key: &String) -> String {
+pub fn sign(project_name: &str, path: &str, private_key: &str) -> String {
     let mut cmd = Command::new("gsutil");
     cmd.arg("signurl")
         .arg("-d")
