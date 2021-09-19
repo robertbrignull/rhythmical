@@ -5,12 +5,14 @@ authors = ["Robert Brignull <robertbrignull@gmail.com>"]
 build = "build.rs"
 
 [dependencies]
+lazy_static = "1.4.0"
 rouille = "3.0.0"
 serde_derive = "1.0.87"
 serde_json = "1.0.38"
 serde = "1.0.87"
 percent-encoding = "1.0.1"
 htmlescape = "0.3.1"
+rand = "0.8.4"
 regex = "1.1.0"
 
 [build-dependencies]

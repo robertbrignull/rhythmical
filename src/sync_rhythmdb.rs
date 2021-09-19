@@ -61,18 +61,36 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     println!("Found {} new songs", new_songs.len());
     println!("Found {} removed songs", removed_songs.len());
 
-    println!("{:?}", matched_songs.get(0));
+    // Upload all new songs
+    for song in &mut new_songs {
+        let new_file_location = song.generate_file_location();
+        if args.dry_run {
+            println!("Would upload {} to {}", song.file_location, new_file_location);
+        } else {
+            println!("Uploading {} to {}", song.file_location, new_file_location);
+        }
+        song.file_location = new_file_location;
+    }
 
-    let new_library = Library::combine_libraries(matched_songs, new_songs);
-
+    // Construct the new library and save it
+    let new_library = Library::combine_libraries(&matched_songs, &new_songs);
     println!(
         "Constructed new library with {} songs",
         new_library.songs.len()
     );
-
     if args.dry_run {
-        println!("Aborting because this is a dry run");
-        return;
+        println!("Would upload new library");
+    } else {
+        println!("Uploading library");
+    }
+
+    // Delete all removed songs
+    for song in removed_songs {
+        if args.dry_run {
+            println!("Would delete {}", song.file_location);
+        } else {
+            println!("Deleting {}", song.file_location);
+        }
     }
 }
 
@@ -228,6 +246,7 @@ fn read_element(input_file: &mut BufReader<File>) -> Element {
 }
 
 struct LibraryHash {
+    // Map from song titles to a list of songs with that title
     songs: HashMap<String, Vec<Song>>,
 }
 

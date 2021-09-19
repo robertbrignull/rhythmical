@@ -1,10 +1,13 @@
 #[macro_use]
+extern crate lazy_static;
+#[macro_use]
 extern crate rouille;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate htmlescape;
 extern crate percent_encoding;
+extern crate rand;
 extern crate regex;
 extern crate serde_json;
 
