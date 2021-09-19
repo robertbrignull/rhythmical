@@ -1,4 +1,5 @@
 use std::io::{Error, ErrorKind, Result};
+use std::path::Path;
 use std::process::Command;
 
 pub fn cat(project_name: &str, path: &str) -> Result<Vec<u8>> {
@@ -33,11 +34,21 @@ pub fn sign(project_name: &str, path: &str, private_key: &str) -> Result<String>
 }
 
 pub fn upload(project_name: &str, local_source_path: &str, remote_dest_path: &str) -> Result<()> {
+    // Copy the local file to a temp location which doesn't contain any special characters.
+    let temp_file = "/tmp/rhythmical_temp_upload";
+    if Path::new(temp_file).exists() {
+        std::fs::remove_file(temp_file)?;
+    }
+    std::fs::copy(local_source_path, temp_file)?;
+
     let mut cmd = Command::new("gsutil");
     cmd.arg("cp")
-        .arg(local_source_path)
+        .arg(temp_file)
         .arg(format!("gs://{}{}", project_name, remote_dest_path));
     execute(cmd)?;
+
+    std::fs::remove_file(temp_file)?;
+
     return Result::Ok(());
 }
 
