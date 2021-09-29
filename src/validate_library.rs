@@ -26,13 +26,15 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     }
     println!("Found {} paths to be deleted", unknown_paths.len());
 
+    let mut paths_to_delete: Vec<String> = Vec::new();
     for id in badly_located_songs {
         let song = library.songs.get(&id).unwrap();
         let new_file_location = song.generate_file_location();
+        paths_to_delete.push(song.file_location.clone());
         if args.dry_run {
-            println!("Would move {} to {}", song.file_location, new_file_location);
+            println!("Would copy {} to {}", song.file_location, new_file_location);
         } else {
-            println!("Moving {} to {}", song.file_location, new_file_location);
+            println!("Copying {} to {}", song.file_location, new_file_location);
         }
     }
 
@@ -41,6 +43,14 @@ pub fn validate_library(args: ValidateLibraryArgs) {
             println!("Would delete {}", path);
         } else {
             println!("Deleting {}", path);
+        }
+    }
+
+    for path in paths_to_delete {
+        if args.dry_run {
+            println!("Would clean up old file {}", path);
+        } else {
+            println!("Cleaning up old file {}", path);
         }
     }
 }
