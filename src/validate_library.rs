@@ -1,4 +1,8 @@
+use std::collections::HashSet;
+use std::iter::FromIterator;
+
 use args::ValidateLibraryArgs;
+use gsutil;
 use library::Library;
 
 pub fn validate_library(args: ValidateLibraryArgs) {
@@ -10,11 +14,17 @@ pub fn validate_library(args: ValidateLibraryArgs) {
             badly_located_songs.push(song.id);
         }
     }
-
     println!(
         "Found {} songs not at an expected file location",
         badly_located_songs.len()
     );
+
+    let all_paths = gsutil::ls(&args.project_name, "/Music").expect("Unable to list paths");
+    let mut unknown_paths: HashSet<String> = HashSet::from_iter(all_paths);
+    for song in library.songs.values() {
+        unknown_paths.remove(&song.file_location);
+    }
+    println!("Found {} paths to be deleted", unknown_paths.len());
 
     for id in badly_located_songs {
         let song = library.songs.get(&id).unwrap();
@@ -23,6 +33,14 @@ pub fn validate_library(args: ValidateLibraryArgs) {
             println!("Would move {} to {}", song.file_location, new_file_location);
         } else {
             println!("Moving {} to {}", song.file_location, new_file_location);
+        }
+    }
+
+    for path in unknown_paths {
+        if args.dry_run {
+            println!("Would delete {}", path);
+        } else {
+            println!("Deleting {}", path);
         }
     }
 }

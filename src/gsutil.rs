@@ -2,6 +2,34 @@ use std::io::{Error, ErrorKind, Result};
 use std::path::Path;
 use std::process::Command;
 
+pub fn ls(project_name: &str, mut path: &str) -> Result<Vec<String>> {
+    if path.ends_with("/") {
+        path = &path[0..path.len() - 1];
+    }
+
+    let mut cmd = Command::new("gsutil");
+    cmd.arg("ls")
+        .arg("-R")
+        .arg(format!("gs://{}{}", project_name, path));
+
+    return match String::from_utf8(execute(cmd)?) {
+        Ok(output) => {
+            let mut paths: Vec<String> = Vec::new();
+            let prefix = format!("gs://{}{}", project_name, path);
+            for line in output.lines() {
+                if line.starts_with(&prefix) && !line.ends_with("/:") {
+                    paths.push(line[prefix.len()..].to_string());
+                }
+            }
+            return Ok(paths);
+        }
+        Err(err) => Result::Err(Error::new(
+            ErrorKind::Other,
+            format!("Error decoding output: {}", err),
+        )),
+    };
+}
+
 pub fn cat(project_name: &str, path: &str) -> Result<Vec<u8>> {
     let mut cmd = Command::new("gsutil");
     cmd.arg("cat").arg(format!("gs://{}{}", project_name, path));
