@@ -30,23 +30,26 @@ pub struct Song {
 
 impl Song {
     pub fn generate_file_location(&self) -> String {
+        let prefix = self.file_prefix();
         let random_suffix: String = thread_rng()
             .sample_iter(&Alphanumeric)
             .take(16)
             .map(char::from)
             .collect();
-
-        let mut file_location = format!(
-            "{}-{}-{}-{}",
-            self.artist, self.album, self.title, random_suffix
-        );
-
-        file_location = INVALID_CHARACTERS_REGEX
-            .replace_all(&file_location, "-")
-            .to_string();
-
         let current_extension = self.file_extension();
-        return format!("/{}{}", file_location, current_extension);
+        return format!("/{}{}{}", prefix, random_suffix, current_extension);
+    }
+
+    pub fn has_valid_file_location(&self) -> bool {
+        let prefix = format!("/{}", self.file_prefix());
+        return self.file_location.starts_with(&prefix);
+    }
+
+    fn file_prefix(&self) -> String {
+        let prefix = format!("{}-{}-{}-", self.artist, self.album, self.title);
+        return INVALID_CHARACTERS_REGEX
+            .replace_all(&prefix, "-")
+            .to_string();
     }
 
     fn file_extension(&self) -> String {
