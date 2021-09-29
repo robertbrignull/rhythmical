@@ -17,10 +17,12 @@ mod gsutil;
 mod library;
 mod server;
 mod sync_rhythmdb;
+mod validate_library;
 
 use args::{Args, Mode};
 use server::start_server;
 use sync_rhythmdb::sync_rhythmdb;
+use validate_library::validate_library;
 
 fn main() {
     let args = Args::get();
@@ -30,6 +32,9 @@ fn main() {
         }
         Mode::SyncRhythmdb => {
             sync_rhythmdb(args.sync_rhythmdb.unwrap());
+        }
+        Mode::ValidateLibrary => {
+            validate_library(args.validate_library.unwrap());
         }
     }
 }
