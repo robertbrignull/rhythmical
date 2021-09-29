@@ -32,7 +32,6 @@ pub struct ServeArgs {
 #[derive(Clone)]
 pub struct SyncRhythmdbArgs {
     pub project_name: String,
-    pub private_key: String,
     pub rhythmdb_file: String,
     pub library_location_prefix: String,
     pub dry_run: bool,
@@ -40,7 +39,7 @@ pub struct SyncRhythmdbArgs {
 
 const USAGE_MESSAGE: &str = "Incorrect arguments. Usage:
   serve project-name private-key
-  sync-rhythmdb project-name private-key rhythmdb-file library-location-prefix [--dry-run]";
+  sync-rhythmdb project-name rhythmdb-file library-location-prefix [--dry-run]";
 
 impl Args {
     pub fn get() -> Args {
@@ -66,8 +65,8 @@ impl Args {
                 }
             }
             Some(Mode::SyncRhythmdb) => {
-                if (args.len() != 6 && args.len() != 7)
-                    || (args.len() == 7 && !args[6].eq("--dry-run"))
+                if (args.len() != 5 && args.len() != 6)
+                    || (args.len() == 6 && !args[5].eq("--dry-run"))
                 {
                     println!("{}", USAGE_MESSAGE);
                     std::process::exit(1);
@@ -77,10 +76,9 @@ impl Args {
                     serve: Option::None,
                     sync_rhythmdb: Option::Some(SyncRhythmdbArgs {
                         project_name: args[2].clone(),
-                        private_key: args[3].clone(),
-                        rhythmdb_file: args[4].clone(),
-                        library_location_prefix: args[5].clone(),
-                        dry_run: args.len() == 7,
+                        rhythmdb_file: args[3].clone(),
+                        library_location_prefix: args[4].clone(),
+                        dry_run: args.len() == 6,
                     }),
                 }
             }
