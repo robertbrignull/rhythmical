@@ -80,6 +80,15 @@ pub fn upload(project_name: &str, local_source_path: &str, remote_dest_path: &st
     return Result::Ok(());
 }
 
+pub fn cp(project_name: &str, src_path: &str, dest_path: &str) -> Result<()> {
+    let mut cmd = Command::new("gsutil");
+    cmd.arg("cp")
+        .arg(format!("gs://{}{}", project_name, src_path))
+        .arg(format!("gs://{}{}", project_name, dest_path));
+    execute(cmd)?;
+    return Result::Ok(());
+}
+
 pub fn rm(project_name: &str, path: &str) -> Result<()> {
     let mut cmd = Command::new("gsutil");
     cmd.arg("rm").arg(format!("gs://{}{}", project_name, path));

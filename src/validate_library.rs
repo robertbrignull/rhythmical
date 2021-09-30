@@ -35,6 +35,12 @@ pub fn validate_library(args: ValidateLibraryArgs) {
             println!("Would copy {} to {}", song.file_location, new_file_location);
         } else {
             println!("Copying {} to {}", song.file_location, new_file_location);
+            gsutil::cp(
+                &args.project_name,
+                &format!("/Music{}", song.file_location),
+                &format!("/Music{}", new_file_location),
+            )
+            .unwrap();
         }
     }
 
@@ -43,6 +49,12 @@ pub fn validate_library(args: ValidateLibraryArgs) {
             println!("Would delete {}", path);
         } else {
             println!("Deleting {}", path);
+            match gsutil::rm(&args.project_name, &format!("/Music{}", path)) {
+                Ok(()) => {}
+                Err(err) => {
+                    println!("Unable to delete path \"{}\": {}", path, err);
+                }
+            }
         }
     }
 
@@ -51,6 +63,12 @@ pub fn validate_library(args: ValidateLibraryArgs) {
             println!("Would clean up old file {}", path);
         } else {
             println!("Cleaning up old file {}", path);
+            match gsutil::rm(&args.project_name, &format!("/Music{}", path)) {
+                Ok(()) => {}
+                Err(err) => {
+                    println!("Unable to delete path \"{}\": {}", path, err);
+                }
+            }
         }
     }
 }
