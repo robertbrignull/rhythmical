@@ -32,9 +32,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
         let mut song = library.songs.get_mut(&id).unwrap();
         let new_file_location = song.generate_file_location();
         paths_to_delete.push(song.file_location.clone());
-        if args.dry_run {
-            println!("Would copy {} to {}", song.file_location, new_file_location);
-        } else {
+        if !args.dry_run {
             println!(
                 "Copying {} to {} ({} / {})",
                 song.file_location,
@@ -48,6 +46,8 @@ pub fn validate_library(args: ValidateLibraryArgs) {
                 &format!("/Music{}", new_file_location),
             )
             .unwrap();
+        } else if args.verbose {
+            println!("Would copy {} to {}", song.file_location, new_file_location);
         }
         song.file_location = new_file_location;
 
@@ -59,18 +59,16 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     }
 
     // Upload the updated library
-    if args.dry_run {
-        println!("Would upload new library");
-    } else {
+    if !args.dry_run {
         println!("Uploading library");
         library.save(&args.project_name).unwrap();
+    } else if args.verbose {
+        println!("Would upload new library");
     }
 
     // Delete the old files for songs that were just moved
     for (i, path) in paths_to_delete.iter().enumerate() {
-        if args.dry_run {
-            println!("Would clean up old file {}", path);
-        } else {
+        if !args.dry_run {
             println!(
                 "Cleaning up old file {} ({} / {})",
                 path,
@@ -83,14 +81,14 @@ pub fn validate_library(args: ValidateLibraryArgs) {
                     println!("Unable to delete path \"{}\": {}", path, err);
                 }
             }
+        } else if args.verbose {
+            println!("Would clean up old file {}", path);
         }
     }
 
     // Delete any files that we don't know about
     for (i, path) in unknown_paths.iter().enumerate() {
-        if args.dry_run {
-            println!("Would delete {}", path);
-        } else {
+        if !args.dry_run {
             println!("Deleting {} ({} / {})", path, i, unknown_paths.len());
             match gsutil::rm(&args.project_name, &format!("/Music{}", path)) {
                 Ok(()) => {}
@@ -98,6 +96,8 @@ pub fn validate_library(args: ValidateLibraryArgs) {
                     println!("Unable to delete path \"{}\": {}", path, err);
                 }
             }
+        } else if args.verbose {
+            println!("Would delete {}", path);
         }
     }
 }

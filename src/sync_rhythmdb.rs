@@ -67,12 +67,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     let num_new_songs = new_songs.len();
     for (i, song) in &mut new_songs.iter_mut().enumerate() {
         let new_file_location = song.generate_file_location();
-        if args.dry_run {
-            println!(
-                "Would upload {} to {}",
-                song.file_location, new_file_location
-            );
-        } else {
+        if !args.dry_run {
             println!(
                 "Uploading {} to {} ({} / {})",
                 song.file_location, new_file_location, i, num_new_songs
@@ -86,6 +81,11 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
                 println!("Failed to upload {}", song.file_location);
                 failed_new_song_ids.push(song.id);
             }
+        } else if args.verbose {
+            println!(
+                "Would upload {} to {}",
+                song.file_location, new_file_location
+            );
         }
         song.file_location = new_file_location;
     }
@@ -99,18 +99,16 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
         "Constructed new library with {} songs",
         new_library.songs.len()
     );
-    if args.dry_run {
-        println!("Would upload new library");
-    } else {
+    if !args.dry_run {
         println!("Uploading library");
         new_library.save(&args.project_name).unwrap();
+    } else if args.verbose {
+        println!("Would upload new library");
     }
 
     // Delete all removed songs
     for (i, song) in removed_songs.iter().enumerate() {
-        if args.dry_run {
-            println!("Would delete {}", song.file_location);
-        } else {
+        if !args.dry_run {
             println!(
                 "Deleting {} ({} / {})",
                 song.file_location,
@@ -122,6 +120,8 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
             if removal_result.is_err() {
                 println!("Failed to delete {}", song.file_location);
             }
+        } else if args.verbose {
+            println!("Would delete {}", song.file_location);
         }
     }
 }
