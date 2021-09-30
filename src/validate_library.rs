@@ -19,12 +19,21 @@ pub fn validate_library(args: ValidateLibraryArgs) {
         badly_located_songs.len()
     );
 
+    // All paths present in cloud storage
     let all_paths = gsutil::ls(&args.project_name, "/Music").expect("Unable to list paths");
+
+    // Paths that aren't associated to a song, and therefore should be deleted
     let mut unknown_paths: HashSet<String> = HashSet::from_iter(all_paths);
+    // Songs where the associated file is missing
+    let mut missing_songs: Vec<u32> = Vec::new();
+
     for song in library.songs.values() {
-        unknown_paths.remove(&song.file_location);
+        if !unknown_paths.remove(&song.file_location) {
+            missing_songs.push(song.id);
+        }
     }
     println!("Found {} paths to be deleted", unknown_paths.len());
+    println!("Found {} songs where the file is missing", missing_songs.len());
 
     // Copy any badly located songs to their new location
     let mut paths_to_delete: Vec<String> = Vec::new();
@@ -55,6 +64,17 @@ pub fn validate_library(args: ValidateLibraryArgs) {
         if i % 100 == 0 && !args.dry_run {
             println!("Uploading library");
             library.save(&args.project_name).unwrap();
+        }
+    }
+
+    // Remove from the library any songs where the file is missing
+    for id in missing_songs {
+        let song = library.songs.get(&id).unwrap();
+        if !args.dry_run {
+            println!("Removing {} from the library", song.file_location);
+            library.songs.remove(&id);
+        } else if args.verbose {
+            println!("Would remove {} from the library", song.file_location);
         }
     }
 
