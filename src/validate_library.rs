@@ -27,14 +27,20 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     println!("Found {} paths to be deleted", unknown_paths.len());
 
     let mut paths_to_delete: Vec<String> = Vec::new();
-    for id in badly_located_songs {
+    for (i, id) in badly_located_songs.iter().enumerate() {
         let song = library.songs.get(&id).unwrap();
         let new_file_location = song.generate_file_location();
         paths_to_delete.push(song.file_location.clone());
         if args.dry_run {
             println!("Would copy {} to {}", song.file_location, new_file_location);
         } else {
-            println!("Copying {} to {}", song.file_location, new_file_location);
+            println!(
+                "Copying {} to {} ({} / {})",
+                song.file_location,
+                new_file_location,
+                i,
+                badly_located_songs.len()
+            );
             gsutil::cp(
                 &args.project_name,
                 &format!("/Music{}", song.file_location),
@@ -44,11 +50,11 @@ pub fn validate_library(args: ValidateLibraryArgs) {
         }
     }
 
-    for path in unknown_paths {
+    for (i, path) in unknown_paths.iter().enumerate() {
         if args.dry_run {
             println!("Would delete {}", path);
         } else {
-            println!("Deleting {}", path);
+            println!("Deleting {} ({} / {})", path, i, unknown_paths.len());
             match gsutil::rm(&args.project_name, &format!("/Music{}", path)) {
                 Ok(()) => {}
                 Err(err) => {
@@ -58,11 +64,16 @@ pub fn validate_library(args: ValidateLibraryArgs) {
         }
     }
 
-    for path in paths_to_delete {
+    for (i, path) in paths_to_delete.iter().enumerate() {
         if args.dry_run {
             println!("Would clean up old file {}", path);
         } else {
-            println!("Cleaning up old file {}", path);
+            println!(
+                "Cleaning up old file {} ({} / {})",
+                path,
+                i,
+                paths_to_delete.len()
+            );
             match gsutil::rm(&args.project_name, &format!("/Music{}", path)) {
                 Ok(()) => {}
                 Err(err) => {

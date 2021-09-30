@@ -65,7 +65,8 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
 
     // Upload all new songs
     let mut failed_new_song_ids: Vec<u32> = Vec::new();
-    for song in &mut new_songs {
+    let num_new_songs = new_songs.len();
+    for (i, song) in &mut new_songs.iter_mut().enumerate() {
         let new_file_location = song.generate_file_location();
         if args.dry_run {
             println!(
@@ -73,7 +74,10 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
                 song.file_location, new_file_location
             );
         } else {
-            println!("Uploading {} to {}", song.file_location, new_file_location);
+            println!(
+                "Uploading {} to {} ({} / {})",
+                song.file_location, new_file_location, i, num_new_songs
+            );
             let upload_result = gsutil::upload(
                 &args.project_name,
                 &format!("{}{}", library_location_prefix, song.file_location),
@@ -117,11 +121,16 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     }
 
     // Delete all removed songs
-    for song in removed_songs {
+    for (i, song) in removed_songs.iter().enumerate() {
         if args.dry_run {
             println!("Would delete {}", song.file_location);
         } else {
-            println!("Deleting {}", song.file_location);
+            println!(
+                "Deleting {} ({} / {})",
+                song.file_location,
+                i,
+                removed_songs.len()
+            );
             let removal_result =
                 gsutil::rm(&args.project_name, &format!("/Music{}", song.file_location));
             if removal_result.is_err() {
