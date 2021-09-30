@@ -5,6 +5,7 @@ extern crate serde_json;
 
 use std::collections::HashMap;
 use std::io::Result;
+use std::path::Path;
 
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -74,6 +75,18 @@ impl Library {
             },
             Err(error) => panic!("Unable to load library: {}", error),
         };
+    }
+
+    pub fn save(&self, project_name: &str) -> Result<()> {
+        let temp_file = "/tmp/new_library.json";
+        if Path::new(temp_file).exists() {
+            std::fs::remove_file(temp_file)?;
+        }
+        self.serialize(&temp_file)
+            .expect("Unable to serialize library");
+        gsutil::upload(project_name, &temp_file.to_string(), "/library.json")?;
+        std::fs::remove_file(temp_file)?;
+        return Result::Ok(());
     }
 
     pub fn serialize(&self, output_file: &str) -> Result<()> {

@@ -7,7 +7,6 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::path::Path;
 
 use args::SyncRhythmdbArgs;
 use gsutil;
@@ -104,20 +103,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
         println!("Would upload new library");
     } else {
         println!("Uploading library");
-        let library_file = "/tmp/new_library.json";
-        if Path::new(library_file).exists() {
-            std::fs::remove_file(library_file).unwrap();
-        }
-        new_library
-            .serialize(&library_file)
-            .expect("Unable to serialize library");
-        gsutil::upload(
-            &args.project_name,
-            &library_file.to_string(),
-            "/library.json",
-        )
-        .unwrap();
-        std::fs::remove_file(library_file).unwrap();
+        new_library.save(&args.project_name).unwrap();
     }
 
     // Delete all removed songs
