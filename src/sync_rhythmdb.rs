@@ -31,8 +31,9 @@ enum Element {
 pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     let library_location_prefix = sanitise_library_location_prefix(&args.library_location_prefix);
 
-    let source_library = read_rhythmdb(&args.rhythmdb_file, &library_location_prefix);
     let dest_library = Library::new(&args.project_name);
+    let source_library =
+        read_rhythmdb(&args.rhythmdb_file, &library_location_prefix, &dest_library);
     let source_songs = LibraryHash::new(&source_library);
     let dest_songs = LibraryHash::new(&dest_library);
 
@@ -138,7 +139,11 @@ fn sanitise_library_location_prefix(prefix: &str) -> String {
     return prefix;
 }
 
-fn read_rhythmdb(rhythmdb_file: &str, library_location_prefix: &str) -> Library {
+fn read_rhythmdb(
+    rhythmdb_file: &str,
+    library_location_prefix: &str,
+    dest_library: &Library,
+) -> Library {
     let input_file = File::open(rhythmdb_file).expect("rhythmdb file not found");
 
     let mut reader = BufReader::new(input_file);
@@ -155,7 +160,7 @@ fn read_rhythmdb(rhythmdb_file: &str, library_location_prefix: &str) -> Library 
         match read_song(&mut reader, &library_location_prefix) {
             Some(song) => {
                 let mut song = song.clone();
-                song.id = library.new_song_id();
+                song.id = dest_library.new_song_id();
                 library.songs.insert(song.id.clone(), song);
             }
             None => break,
