@@ -1,5 +1,5 @@
 interface Song {
-  id: number,
+  id: string,
   title: string
   genre: string,
   artist: string,

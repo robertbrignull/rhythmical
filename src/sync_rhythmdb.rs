@@ -63,10 +63,10 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     println!("Found {} removed songs", removed_songs.len());
 
     // Upload all new songs
-    let mut failed_new_song_ids: Vec<u32> = Vec::new();
+    let mut failed_new_song_ids: Vec<String> = Vec::new();
     let num_new_songs = new_songs.len();
     for (i, song) in &mut new_songs.iter_mut().enumerate() {
-        let new_file_location = song.generate_file_location();
+        let new_file_location = song.correct_file_location();
         if !args.dry_run {
             println!(
                 "Uploading {} to {} ({} / {})",
@@ -79,7 +79,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
             );
             if upload_result.is_err() {
                 println!("Failed to upload {}", song.file_location);
-                failed_new_song_ids.push(song.id);
+                failed_new_song_ids.push(song.id.clone());
             }
         } else if args.verbose {
             println!(
@@ -155,8 +155,8 @@ fn read_rhythmdb(rhythmdb_file: &str, library_location_prefix: &str) -> Library 
         match read_song(&mut reader, &library_location_prefix) {
             Some(song) => {
                 let mut song = song.clone();
-                song.id = library.songs.len() as u32;
-                library.songs.insert(song.id, song);
+                song.id = library.new_song_id();
+                library.songs.insert(song.id.clone(), song);
             }
             None => break,
         }
@@ -175,7 +175,7 @@ fn read_song(input_file: &mut BufReader<File>, library_location_prefix: &str) ->
     }
 
     let mut song = Song {
-        id: 0,
+        id: String::new(),
         title: String::new(),
         genre: String::new(),
         artist: String::new(),
@@ -208,6 +208,8 @@ fn read_song(input_file: &mut BufReader<File>, library_location_prefix: &str) ->
                 if !location.starts_with(&prefix) {
                     panic!("location {} does not start with {}", location, prefix);
                 }
+                // File location is intentionally not of the correct format.
+                // For now we need it to contain the location of the file locally.
                 song.file_location = decode(&location[prefix.len()..].to_string());
             }
             _ => {

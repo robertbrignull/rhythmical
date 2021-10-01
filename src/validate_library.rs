@@ -8,10 +8,10 @@ use library::Library;
 pub fn validate_library(args: ValidateLibraryArgs) {
     let mut library = Library::new(&args.project_name);
 
-    let mut badly_located_songs: Vec<u32> = Vec::new();
+    let mut badly_located_songs: Vec<String> = Vec::new();
     for song in library.songs.values() {
-        if !song.has_valid_file_location() {
-            badly_located_songs.push(song.id);
+        if !song.has_correct_file_location() {
+            badly_located_songs.push(song.id.clone());
         }
     }
     println!(
@@ -25,21 +25,24 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     // Paths that aren't associated to a song, and therefore should be deleted
     let mut unknown_paths: HashSet<String> = HashSet::from_iter(all_paths);
     // Songs where the associated file is missing
-    let mut missing_songs: Vec<u32> = Vec::new();
+    let mut missing_songs: Vec<String> = Vec::new();
 
     for song in library.songs.values() {
         if !unknown_paths.remove(&song.file_location) {
-            missing_songs.push(song.id);
+            missing_songs.push(song.id.clone());
         }
     }
     println!("Found {} paths to be deleted", unknown_paths.len());
-    println!("Found {} songs where the file is missing", missing_songs.len());
+    println!(
+        "Found {} songs where the file is missing",
+        missing_songs.len()
+    );
 
     // Copy any badly located songs to their new location
     let mut paths_to_delete: Vec<String> = Vec::new();
     for (i, id) in badly_located_songs.iter().enumerate() {
-        let mut song = library.songs.get_mut(&id).unwrap();
-        let new_file_location = song.generate_file_location();
+        let mut song = library.songs.get_mut(id).unwrap();
+        let new_file_location = song.correct_file_location();
         paths_to_delete.push(song.file_location.clone());
         if !args.dry_run {
             println!(

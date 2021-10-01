@@ -12,7 +12,7 @@ interface AppState {
   currentSong?: Song;
   playing: boolean;
   currentFilter: SongFilter;
-  pastSongIds: number[];
+  pastSongIds: string[];
 }
 
 class App extends React.Component<{}, AppState> {

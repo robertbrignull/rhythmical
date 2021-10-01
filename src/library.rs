@@ -15,11 +15,12 @@ use gsutil;
 
 lazy_static! {
     static ref INVALID_CHARACTERS_REGEX: Regex = Regex::new(r"[^0-9a-zA-Z]+").unwrap();
+    static ref DOUBLE_DASHES_REGEX: Regex = Regex::new(r"-+").unwrap();
 }
 
 #[derive(PartialOrd, PartialEq, Ord, Eq, Hash, Clone, Serialize, Deserialize, Debug)]
 pub struct Song {
-    pub id: u32,
+    pub id: String,
     pub title: String,
     pub genre: String,
     pub artist: String,
@@ -30,40 +31,29 @@ pub struct Song {
 }
 
 impl Song {
-    pub fn generate_file_location(&self) -> String {
-        let prefix = self.file_prefix();
-        let random_suffix: String = thread_rng()
-            .sample_iter(&Alphanumeric)
-            .take(16)
-            .map(char::from)
-            .collect();
-        let current_extension = self.file_extension();
-        return format!("/{}{}{}", prefix, random_suffix, current_extension);
-    }
-
-    pub fn has_valid_file_location(&self) -> bool {
-        let prefix = format!("/{}", self.file_prefix());
-        return self.file_location.starts_with(&prefix);
-    }
-
-    fn file_prefix(&self) -> String {
-        let prefix = format!("{}-{}-{}-", self.artist, self.album, self.title);
-        return INVALID_CHARACTERS_REGEX
+    pub fn correct_file_location(&self) -> String {
+        let prefix = format!("{}-{}-{}-{}", self.artist, self.album, self.title, self.id);
+        let prefix = INVALID_CHARACTERS_REGEX
             .replace_all(&prefix, "-")
             .to_string();
-    }
+        let prefix = DOUBLE_DASHES_REGEX.replace_all(&prefix, "-").to_string();
 
-    fn file_extension(&self) -> String {
-        return match self.file_location.rfind('.') {
+        let current_extension = match self.file_location.rfind('.') {
             Some(last_dot_index) => self.file_location[last_dot_index..].to_string(),
             None => "".to_string(),
         };
+
+        return format!("/{}{}", prefix, current_extension);
+    }
+
+    pub fn has_correct_file_location(&self) -> bool {
+        return self.file_location.eq(&self.correct_file_location());
     }
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Library {
-    pub songs: HashMap<u32, Song>,
+    pub songs: HashMap<String, Song>,
 }
 
 impl Library {
@@ -96,14 +86,15 @@ impl Library {
     }
 
     pub fn combine_libraries(matched_songs: &Vec<(Song, Song)>, new_songs: &Vec<Song>) -> Library {
-        let mut songs: HashMap<u32, Song> = HashMap::new();
+        let mut songs: HashMap<String, Song> = HashMap::new();
 
+        // source_song is from the local library being uploaded
+        // dest_song is from the existing cloud library
         for (source_song, dest_song) in matched_songs {
-            let id = songs.len() as u32;
             songs.insert(
-                id,
+                dest_song.id.clone(),
                 Song {
-                    id,
+                    id: dest_song.id.clone(),
                     title: dest_song.title.clone(),
                     genre: source_song.genre.clone(),
                     artist: dest_song.artist.clone(),
@@ -116,12 +107,31 @@ impl Library {
         }
 
         for song in new_songs {
-            let id = songs.len() as u32;
-            let mut song = song.clone();
-            song.id = id;
-            songs.insert(id, song);
+            let mut new_song = song.clone();
+            if songs.contains_key(&song.id) {
+                let new_id = new_song_id(&songs);
+                new_song.id = new_id;
+            }
+            songs.insert(new_song.id.clone(), new_song);
         }
 
         return Library { songs };
+    }
+
+    pub fn new_song_id(&self) -> String {
+        return new_song_id(&self.songs);
+    }
+}
+
+fn new_song_id(songs: &HashMap<String, Song>) -> String {
+    loop {
+        let id: String = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(16)
+            .map(char::from)
+            .collect();
+        if !songs.contains_key(&id) {
+            return id;
+        }
     }
 }

@@ -12,7 +12,7 @@ use library::Library;
 
 #[derive(Serialize)]
 struct ApiSong {
-    id: u32,
+    id: String,
     title: String,
     genre: String,
     artist: String,
@@ -34,7 +34,7 @@ impl Api {
             project_name: args.project_name.clone(),
             private_key: args.private_key.clone(),
             library: Library::new(&args.project_name),
-            songs_contents_regex: Regex::new(r"/api/songs/(\d+)/contents").unwrap(),
+            songs_contents_regex: Regex::new(r"/api/songs/([a-zA-Z0-9]+)/contents").unwrap(),
         };
     }
 
@@ -42,7 +42,7 @@ impl Api {
         let mut songs: Vec<ApiSong> = Vec::new();
         for song in self.library.songs.values() {
             songs.push(ApiSong {
-                id: song.id,
+                id: song.id.clone(),
                 title: song.title.clone(),
                 genre: song.genre.clone(),
                 artist: song.artist.clone(),
@@ -54,7 +54,7 @@ impl Api {
         return Response::json(&songs);
     }
 
-    fn song_contents(&self, id: u32) -> Response {
+    fn song_contents(&self, id: String) -> Response {
         return match self.library.songs.get(&id) {
             Some(song) => {
                 return match gsutil::sign(
@@ -77,7 +77,7 @@ impl Api {
 
         let url = request.url();
         return match self.songs_contents_regex.captures(url.as_str()) {
-            Some(cap) => match cap[1].parse::<u32>() {
+            Some(cap) => match cap[1].parse::<String>() {
                 Ok(id) => self.song_contents(id),
                 Err(_) => Response::text("Song id is not an integer").with_status_code(400),
             },
