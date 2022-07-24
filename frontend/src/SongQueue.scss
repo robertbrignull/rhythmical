@@ -4,4 +4,12 @@
   display: inline-block;
   border-top: 2px solid #dee2e6;
   border-right: 2px solid #dee2e6;
+
+  .song-queue-item {
+    padding: 8px 10px;
+
+    .artist, .album {
+      font-size: 0.8rem;
+    }
+  }
 }
