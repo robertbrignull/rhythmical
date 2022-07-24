@@ -19,6 +19,7 @@ interface AppState {
 class App extends React.Component<{}, AppState> {
 
   private readonly header: RefObject<Header>;
+  private readonly songQueue: RefObject<SongQueue>;
 
   constructor(props: {}) {
     super(props);
@@ -31,6 +32,7 @@ class App extends React.Component<{}, AppState> {
     this.onFilterChanged = this.onFilterChanged.bind(this);
 
     this.header = React.createRef();
+    this.songQueue = React.createRef();
 
     this.state = {
       library: undefined,
@@ -98,9 +100,9 @@ class App extends React.Component<{}, AppState> {
       };
     });
 
-    if (this.state.filteredSongIds != undefined) {
-      const index = Math.floor(Math.random() * this.state.filteredSongIds.length);
-      this.onSongSelected(this.state.filteredSongIds[index]);
+    const nextSongId = this.songQueue.current?.getNextSongId();
+    if (nextSongId) {
+      this.onSongSelected(nextSongId);
     } else {
       this.setState({
         currentSongId: undefined,
@@ -144,6 +146,7 @@ class App extends React.Component<{}, AppState> {
         </div>
         <div className="song-queue-container">
           <SongQueue
+            ref={this.songQueue}
             library={this.state.library}
             songIds={this.state.filteredSongIds} />
         </div>

@@ -17,14 +17,34 @@ export class SongQueue extends React.PureComponent<SongQueueProps, SongQueueStat
   constructor(props: SongQueueProps) {
     super(props);
 
-    const songIdQueue: string[] = [];
-    for (let i = 0; i < INTERNAL_QUEUE_LENGTH; i++) {
-      songIdQueue.push(props.songIds[Math.floor(Math.random() * props.songIds.length)]);
+    this.state = {
+      songIdQueue: SongQueue.populateQueue(props.songIds, []),
+    };
+  }
+
+  private static populateQueue(songIds: string[], currentSongIdQueue: string[]): string[] {
+    if (currentSongIdQueue.length >= INTERNAL_QUEUE_LENGTH) {
+      return currentSongIdQueue;
     }
 
-    this.state = {
-      songIdQueue: songIdQueue,
-    };
+    const availableSongIds = songIds
+      .filter((x) => !currentSongIdQueue.includes(x))
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
+    return currentSongIdQueue.concat(availableSongIds.slice(0, INTERNAL_QUEUE_LENGTH - currentSongIdQueue.length));
+  }
+
+  public getNextSongId(): string | undefined {
+    let songIdQueue = this.state.songIdQueue.slice();
+    if (songIdQueue.length === 0) {
+      songIdQueue = SongQueue.populateQueue(this.props.songIds, songIdQueue);
+    }
+    const nextSong = songIdQueue.length === 0 ? undefined : songIdQueue.splice(0, 1)[0];
+    this.setState({
+      songIdQueue
+    });
+    return nextSong;
   }
   
   public render() {
