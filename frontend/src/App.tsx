@@ -3,11 +3,11 @@ import { SongList } from "./SongList";
 import { Header } from "./Header";
 import { RefObject } from "react";
 import { Filters } from "./Filters";
-import Api from "./api";
 import { Footer } from "./Footer";
+import { Library } from "./Library";
 
 interface AppState {
-  allSongs?: Song[];
+  library?: Library;
   filteredSongs?: Song[];
   currentSong?: Song;
   playing: boolean;
@@ -32,7 +32,7 @@ class App extends React.Component<{}, AppState> {
     this.header = React.createRef();
 
     this.state = {
-      allSongs: undefined,
+      library: undefined,
       filteredSongs: undefined,
       currentSong: undefined,
       playing: false,
@@ -41,12 +41,12 @@ class App extends React.Component<{}, AppState> {
     };
   }
 
-  public componentDidMount() {
-    Api.songs.getAll().then((songs: Song[]) => {
-      this.setState({
-        allSongs: songs,
-        filteredSongs: songs.filter(this.state.currentFilter.predicate)
-      });
+  public async componentDidMount() {
+    const library = await Library.new();
+    const filteredSongs = library.applyFilter(() => true);
+    this.setState({
+      library,
+      filteredSongs,
     });
   }
 
@@ -73,15 +73,16 @@ class App extends React.Component<{}, AppState> {
   }
 
   private onBackwards() {
+    let prevSongId: string | undefined = undefined;
     const ids = this.state.pastSongIds;
-    const allSongs = this.state.allSongs;
-    if (ids.length > 0 && allSongs !== undefined) {
-      const prevSongId = ids[ids.length - 1];
-      const prevSong = allSongs.find(s => s.id === prevSongId);
-      this.setState({
-        pastSongIds: ids.slice(0, ids.length - 1),
-        currentSong: prevSong,
-      });
+    while ((prevSongId = ids.pop()) !== undefined) {
+      const prevSong = this.state.library?.getSong(prevSongId);
+      if (prevSong !== undefined) {
+        this.setState({
+          pastSongIds: ids,
+          currentSong: prevSong,
+        });
+      }
     }
   }
 
@@ -111,8 +112,7 @@ class App extends React.Component<{}, AppState> {
     if (filter.key !== this.state.currentFilter.key) {
       this.setState((state) => {
         return {
-          filteredSongs: state.allSongs === undefined
-            ? undefined : state.allSongs.filter(filter.predicate),
+          filteredSongs: state.library?.applyFilter(filter.predicate),
           currentFilter: filter,
         };
       });
