@@ -8,8 +8,8 @@ import { Library } from "./Library";
 
 interface AppState {
   library?: Library;
-  filteredSongs?: Song[];
-  currentSong?: Song;
+  filteredSongIds?: string[];
+  currentSongId?: string;
   playing: boolean;
   currentFilter: SongFilter;
   pastSongIds: string[];
@@ -33,8 +33,8 @@ class App extends React.Component<{}, AppState> {
 
     this.state = {
       library: undefined,
-      filteredSongs: undefined,
-      currentSong: undefined,
+      filteredSongIds: undefined,
+      currentSongId: undefined,
       playing: false,
       currentFilter: { key: "", predicate: () => true },
       pastSongIds: [],
@@ -43,16 +43,16 @@ class App extends React.Component<{}, AppState> {
 
   public async componentDidMount() {
     const library = await Library.new();
-    const filteredSongs = library.applyFilter(() => true);
+    const filteredSongIds = library.applyFilter(() => true);
     this.setState({
       library,
-      filteredSongs,
+      filteredSongIds,
     });
   }
 
-  private onSongSelected(song: Song) {
-    if (!this.state.currentSong || song.id !== this.state.currentSong.id) {
-      this.setState({ currentSong: song });
+  private onSongSelected(songId: string) {
+    if (songId !== this.state.currentSongId) {
+      this.setState({ currentSongId: songId });
     } else {
       if (this.header.current) {
         this.header.current.restartSong();
@@ -76,11 +76,10 @@ class App extends React.Component<{}, AppState> {
     let prevSongId: string | undefined = undefined;
     const ids = this.state.pastSongIds;
     while ((prevSongId = ids.pop()) !== undefined) {
-      const prevSong = this.state.library?.getSong(prevSongId);
-      if (prevSong !== undefined) {
+      if (this.state.library?.getSong(prevSongId) !== undefined) {
         this.setState({
           pastSongIds: ids,
-          currentSong: prevSong,
+          currentSongId: prevSongId,
         });
       }
     }
@@ -88,22 +87,22 @@ class App extends React.Component<{}, AppState> {
 
   private onEnded() {
     this.setState(state => {
-      if (state.currentSong === undefined || state.pastSongIds.length >= 100) {
+      if (state.currentSongId === undefined || state.pastSongIds.length >= 100) {
         return null;
       }
       const pastSongIds = state.pastSongIds.slice();
-      pastSongIds.push(state.currentSong.id);
+      pastSongIds.push(state.currentSongId);
       return {
         pastSongIds,
       };
     });
 
-    if (this.state.filteredSongs != undefined) {
-      const index = Math.floor(Math.random() * this.state.filteredSongs.length);
-      this.onSongSelected(this.state.filteredSongs[index]);
+    if (this.state.filteredSongIds != undefined) {
+      const index = Math.floor(Math.random() * this.state.filteredSongIds.length);
+      this.onSongSelected(this.state.filteredSongIds[index]);
     } else {
       this.setState({
-        currentSong: undefined,
+        currentSongId: undefined,
       });
     }
   }
@@ -112,7 +111,7 @@ class App extends React.Component<{}, AppState> {
     if (filter.key !== this.state.currentFilter.key) {
       this.setState((state) => {
         return {
-          filteredSongs: state.library?.applyFilter(filter.predicate),
+          filteredSongIds: state.library?.applyFilter(filter.predicate),
           currentFilter: filter,
         };
       });
@@ -120,7 +119,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   public render() {
-    if (this.state.filteredSongs === undefined) {
+    if (this.state.library === undefined || this.state.filteredSongIds === undefined) {
       return (
         <div className="loading-message">
           Loading...
@@ -132,7 +131,8 @@ class App extends React.Component<{}, AppState> {
       <div className="app">
         <div className="header-container">
           <Header ref={this.header}
-            currentSong={this.state.currentSong}
+            library={this.state.library}
+            currentSongId={this.state.currentSongId}
             onPlay={this.onPlay}
             onPause={this.onPause}
             onBackwards={this.onBackwards}
@@ -142,13 +142,17 @@ class App extends React.Component<{}, AppState> {
           <Filters onFilterChanged={this.onFilterChanged} />
         </div>
         <div className="song-list-container">
-          <SongList songs={this.state.filteredSongs}
-            currentSong={this.state.currentSong}
+          <SongList
+            library={this.state.library}
+            songIds={this.state.filteredSongIds}
+            currentSongId={this.state.currentSongId}
             playing={this.state.playing}
             onSongSelected={this.onSongSelected} />
         </div>
         <div className="footer-container">
-          <Footer songs={this.state.filteredSongs} />
+          <Footer
+            library={this.state.library}
+            songIds={this.state.filteredSongIds} />
         </div>
       </div>
     );

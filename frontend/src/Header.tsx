@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ChangeEvent, RefObject } from "react";
 import Api from "./api";
+import { Library } from "./Library";
 
 function formatDuration(duration: number) {
   let mins = "" + Math.floor(duration / 60);
@@ -12,7 +13,8 @@ function formatDuration(duration: number) {
 }
 
 interface HeaderProps {
-  currentSong?: Song;
+  library: Library;
+  currentSongId?: string;
   onPlay: () => void;
   onPause: () => void;
   onBackwards: () => void;
@@ -51,17 +53,20 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   public componentDidUpdate(prevProps: HeaderProps) {
-    const oldSong = prevProps.currentSong;
-    const nextSong = this.props.currentSong;
-    if (!nextSong && oldSong) {
+    const oldSongId = prevProps.currentSongId;
+    const nextSongId = this.props.currentSongId;
+    if (!nextSongId && oldSongId) {
       this.setState({
         currentSongSrc: undefined,
         currentSongPosition: undefined,
       }, () => {
         this.pause();
       });
+      return;
+    }
 
-    } else if (nextSong && (!oldSong || nextSong.id != oldSong.id)) {
+    const nextSong = this.props.library.getSong(nextSongId);
+    if (nextSong && (!oldSongId || nextSongId != oldSongId)) {
       this.setState({
         currentSongPosition: 0,
         playing: 'loading',
@@ -209,7 +214,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   private renderCurrentSongName() {
-    let song = this.props.currentSong;
+    let song = this.getCurrentSong();
     if (song !== undefined) {
       return (
         <div className="songTitle">
@@ -228,13 +233,13 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   private renderPositionText() {
-    if (this.props.currentSong === undefined ||
-      this.state.currentSongPosition === undefined) {
+    let currentSong = this.getCurrentSong();
+    if (currentSong === undefined || this.state.currentSongPosition === undefined) {
       return null;
     }
 
     const position = this.state.currentSongPosition;
-    const maxPosition = this.props.currentSong.duration;
+    const maxPosition = currentSong.duration;
     return (
       <div className="position-text">
         {formatDuration(position) + " / " + formatDuration(maxPosition)}
@@ -243,13 +248,13 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   private renderPositionSlider() {
-    if (this.props.currentSong === undefined ||
-      this.state.currentSongPosition === undefined) {
+    let currentSong = this.getCurrentSong();
+    if (currentSong === undefined || this.state.currentSongPosition === undefined) {
       return null;
     }
 
     const position = this.state.currentSongPosition;
-    const maxPosition = this.props.currentSong.duration;
+    const maxPosition = currentSong.duration;
     return (
       <div className="position-slider">
         <input type="range"
@@ -275,6 +280,10 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
         </button>
       </div>
     );
+  }
+
+  private getCurrentSong() {
+    return this.props.library.getSong(this.props.currentSongId);
   }
 
   public render() {

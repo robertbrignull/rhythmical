@@ -19,17 +19,21 @@ export class Library {
         return new Library(songsMap);
     }
 
-    getSong(id: string): Song | undefined {
-        return this.songs.get(id);
+    getSong(id: string  | undefined): Song | undefined {
+        if (id) {
+            return this.songs.get(id);
+        } else {
+            return undefined;
+        }
     }
 
-    applyFilter(filter: (song: Song) => boolean): Song[] {
-        const filteredSongs: Song[] = []
+    applyFilter(filter: (song: Song) => boolean): string[] {
+        const filteredSongIds: string[] = []
         this.songs.forEach((song: Song) => {
             if (filter(song)) {
-                filteredSongs.push(song);
+                filteredSongIds.push(song.id);
             }
         })
-        return filteredSongs;
+        return filteredSongIds;
     }
 }

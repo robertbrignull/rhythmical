@@ -4,12 +4,15 @@ import 'react-virtualized/styles.css';
 import { AutoSizer } from 'react-virtualized/dist/es/AutoSizer';
 import { Table, Column, TableCellProps, TableHeaderProps, SortIndicator, SortDirectionType, RowMouseEventHandlerParams } from 'react-virtualized/dist/es/Table';
 import { Index } from "react-virtualized";
+import { Library } from "./Library";
 
 type SortMode = 'title' | 'genre' | 'artist' | 'album' | 'duration' | 'rating';
 
-function sortSongs(songs: Song[],
+function sortSongIds(
+  library: Library,
+  songIds: string[],
   sortMode: SortMode,
-  sortDirection: SortDirectionType): Song[] {
+  sortDirection: SortDirectionType): string[] {
 
   let cmp: (a: Song, b: Song) => number;
   if (sortMode === 'title') {
@@ -28,22 +31,30 @@ function sortSongs(songs: Song[],
     cmp = () => 0;
   }
 
-  let sortedSongs = songs.slice();
-  sortedSongs.sort(sortDirection === 'ASC'
-    ? cmp : (a: Song, b: Song) => cmp(b, a));
+  let sortedSongsWithIds = [];
+  for (const songId of songIds) {
+    const song = library.getSong(songId);
+    if (song) {
+      sortedSongsWithIds.push([songId, song]);
+    }
+  }
 
-  return sortedSongs;
+  const directedCmp = (sortDirection === 'ASC') ? cmp : (a: Song, b: Song) => cmp(b, a);
+  sortedSongsWithIds.sort((a: [string, Song], b: [string, Song]) => directedCmp(a[1], b[1]));
+
+  return sortedSongsWithIds.map((a: [string, Song]) => a[0]);
 }
 
 interface SongListProps {
-  songs: Song[];
-  currentSong?: Song;
+  library: Library;
+  songIds: string[];
+  currentSongId?: string;
   playing: boolean;
-  onSongSelected: (song: Song) => void;
+  onSongSelected: (songId: string) => void;
 }
 
 interface SongListState {
-  sortedSongs: Song[];
+  sortedSongIds: string[];
   sortMode: SortMode;
   sortDirection: SortDirectionType;
   scrollToIndex: number | undefined;
@@ -56,7 +67,7 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
     let sortMode: SortMode = 'artist';
     let sortDirection: SortDirectionType = 'ASC';
     this.state = {
-      sortedSongs: sortSongs(props.songs, sortMode, sortDirection),
+      sortedSongIds: sortSongIds(props.library, props.songIds, sortMode, sortDirection),
       sortMode,
       sortDirection,
       scrollToIndex: undefined
@@ -71,28 +82,28 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
   }
 
   public componentDidUpdate(prevProps: Readonly<SongListProps>) {
-    const songsChanged = prevProps.songs !== this.props.songs;
-    const currentSongChanged = this.props.currentSong !== undefined &&
-      prevProps.currentSong?.id !== this.props.currentSong.id;
+    const songsChanged = prevProps.songIds !== this.props.songIds;
+    const currentSongChanged = this.props.currentSongId !== undefined &&
+      prevProps.currentSongId !== this.props.currentSongId;
 
     if (!songsChanged && !currentSongChanged) {
       return;
     }
 
     this.setState(state => {
-      const sortedSongs = songsChanged
-        ? sortSongs(this.props.songs, state.sortMode, state.sortDirection)
-        : state.sortedSongs;
+      const sortedSongIds = songsChanged
+        ? sortSongIds(this.props.library, this.props.songIds, state.sortMode, state.sortDirection)
+        : state.sortedSongIds;
 
       let scrollToIndex = undefined;
       if (currentSongChanged) {
-        scrollToIndex = sortedSongs.findIndex(song =>
-          this.props.currentSong !== undefined &&
-          this.props.currentSong.id === song.id);
+        scrollToIndex = sortedSongIds.findIndex(songId =>
+          this.props.currentSongId !== undefined &&
+          this.props.currentSongId === songId);
       }
 
       return {
-        sortedSongs,
+        sortedSongIds,
         scrollToIndex
       };
     });
@@ -114,7 +125,7 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
     this.setState((state, props) => {
       const sortMode = info.sortBy as SortMode;
       return {
-        sortedSongs: sortSongs(props.songs, sortMode, info.sortDirection),
+        sortedSongIds: sortSongIds(props.library, props.songIds, sortMode, info.sortDirection),
         sortMode,
         sortDirection: info.sortDirection
       };
@@ -122,15 +133,15 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
   }
 
   private onRowDoubleClick(info: RowMouseEventHandlerParams) {
-    const song = this.state.sortedSongs[info.index];
-    this.props.onSongSelected(song);
+    const songId = this.state.sortedSongIds[info.index];
+    this.props.onSongSelected(songId);
   }
 
-  private rowGetter(index: Index) {
-    return this.state.sortedSongs[index.index];
+  private rowGetter(index: Index): Song  | undefined {
+    return this.props.library.getSong(this.state.sortedSongIds[index.index]);
   }
 
-  private durationCellRenderer(props: TableCellProps) {
+  private durationCellRenderer(props: TableCellProps): React.ReactFragment {
     const song: Song = props.rowData;
     const minutes = Math.floor(song.duration / 60);
     const seconds = song.duration % 60;
@@ -141,7 +152,7 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
     }
   }
 
-  private ratingCellRenderer(props: TableCellProps) {
+  private ratingCellRenderer(props: TableCellProps): React.ReactFragment {
     const song: Song = props.rowData;
     let stars = [];
     for (let i = 0; i < Math.min(song.rating, 5); i++) {
@@ -151,8 +162,9 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
   }
 
   private rowClassName(info: Index) {
-    const song = this.state.sortedSongs[info.index];
-    if (song && this.props.currentSong && song.id === this.props.currentSong.id) {
+    const songId = this.state.sortedSongIds[info.index];
+    const song = this.props.library.getSong(songId);
+    if (song && song.id === this.props.currentSongId) {
       return "song-row selected";
     } else {
       return "song-row";
@@ -169,7 +181,7 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
               height={height}
               rowHeight={31}
               rowGetter={this.rowGetter}
-              rowCount={this.state.sortedSongs.length}
+              rowCount={this.state.sortedSongIds.length}
               sort={this.sortList}
               sortBy={this.state.sortMode}
               sortDirection={this.state.sortDirection}
