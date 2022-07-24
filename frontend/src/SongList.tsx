@@ -70,11 +70,10 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
     this.rowClassName = this.rowClassName.bind(this);
   }
 
-  public componentWillReceiveProps(nextProps: Readonly<SongListProps>) {
-    const songsChanged = nextProps.songs !== this.props.songs;
-    const currentSongChanged = nextProps.currentSong !== undefined &&
-      (this.props.currentSong === undefined ||
-        nextProps.currentSong.id !== this.props.currentSong.id);
+  public componentDidUpdate(prevProps: Readonly<SongListProps>) {
+    const songsChanged = prevProps.songs !== this.props.songs;
+    const currentSongChanged = this.props.currentSong !== undefined &&
+      prevProps.currentSong?.id !== this.props.currentSong.id;
 
     if (!songsChanged && !currentSongChanged) {
       return;
@@ -82,14 +81,14 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
 
     this.setState(state => {
       const sortedSongs = songsChanged
-        ? sortSongs(nextProps.songs, state.sortMode, state.sortDirection)
+        ? sortSongs(this.props.songs, state.sortMode, state.sortDirection)
         : state.sortedSongs;
 
       let scrollToIndex = undefined;
       if (currentSongChanged) {
         scrollToIndex = sortedSongs.findIndex(song =>
-          nextProps.currentSong !== undefined &&
-          nextProps.currentSong.id === song.id);
+          this.props.currentSong !== undefined &&
+          this.props.currentSong.id === song.id);
       }
 
       return {
