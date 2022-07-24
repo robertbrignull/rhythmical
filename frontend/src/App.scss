@@ -17,6 +17,14 @@ $footerHeight: 38px;
 .playlists-container {
   position: absolute;
   top: $headerHeight;
+  bottom: 50%;
+  left: 0;
+  width: $playlistsWidth;
+}
+
+.song-queue-container {
+  position: absolute;
+  top: 50%;
   bottom: $footerHeight;
   left: 0;
   width: $playlistsWidth;

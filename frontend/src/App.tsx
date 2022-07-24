@@ -5,6 +5,7 @@ import { RefObject } from "react";
 import { Filters } from "./Filters";
 import { Footer } from "./Footer";
 import { Library } from "./Library";
+import { SongQueue } from "./SongQueue";
 
 interface AppState {
   library?: Library;
@@ -140,6 +141,11 @@ class App extends React.Component<{}, AppState> {
         </div>
         <div className="playlists-container">
           <Filters onFilterChanged={this.onFilterChanged} />
+        </div>
+        <div className="song-queue-container">
+          <SongQueue
+            library={this.state.library}
+            songIds={this.state.filteredSongIds} />
         </div>
         <div className="song-list-container">
           <SongList
