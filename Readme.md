@@ -22,13 +22,13 @@ Although I have used the frontend technologies before, I am completely new to Ru
 ## Requirements
 
 The backend builds with a stable version of Rust.
-At time of writing it is confirmed working with 1.55.0.
+At time of writing it is confirmed working with 1.75.0.
 
 The frontend requires nodejs and npm to be installed.
-At time of writing it is confirmed working with npm version 6.14.15 and node version 12.22.6.
+At time of writing it is confirmed working with npm version 9.6.7 and node version 18.17.1.
 
 Communication to Google Cloud Storage is done by delegating to gcloud and this must be installed.
-At time of writing it is confirmed working with Google Cloud SDK 357.0.0 and gsutil 4.67.
+At time of writing it is confirmed working with Google Cloud SDK 461.0.0 and gsutil 5.27.
 
 ## Building
 
