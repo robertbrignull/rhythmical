@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ChangeEvent, RefObject } from "react";
-import Api from "./api";
-import { Library } from "./Library";
+import Api from "../api";
+import { Library } from "../state/Library";
 
 function formatDuration(duration: number) {
   let mins = "" + Math.floor(duration / 60);

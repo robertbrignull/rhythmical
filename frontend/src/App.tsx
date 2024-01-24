@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { SongList } from "./SongList";
-import { Header } from "./Header";
+import { SongList } from "./view/SongList";
+import { Header } from "./view/Header";
 import { RefObject } from "react";
-import { Filters } from "./Filters";
-import { Footer } from "./Footer";
-import { Library } from "./Library";
-import { SongQueue } from "./SongQueue";
+import { Filters } from "./view/Filters";
+import { Footer } from "./view/Footer";
+import { Library } from "./state/Library";
+import { SongQueue } from "./view/SongQueue";
 
 interface AppState {
   library?: Library;

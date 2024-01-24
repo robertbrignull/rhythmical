@@ -4,7 +4,7 @@ import 'react-virtualized/styles.css';
 import { AutoSizer } from 'react-virtualized/dist/es/AutoSizer';
 import { Table, Column, TableCellProps, TableHeaderProps, SortIndicator, SortDirectionType, RowMouseEventHandlerParams } from 'react-virtualized/dist/es/Table';
 import { Index } from "react-virtualized";
-import { Library } from "./Library";
+import { Library } from "../state/Library";
 
 type SortMode = 'title' | 'genre' | 'artist' | 'album' | 'duration' | 'rating';
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Library } from "./Library";
+import { Library } from "../state/Library";
 
 interface SongQueueProps {
   library: Library;
