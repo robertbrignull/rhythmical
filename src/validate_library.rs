@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::iter::FromIterator;
 
 use args::ValidateLibraryArgs;
-use gsutil;
+use storage;
 use library::Library;
 
 pub fn validate_library(args: ValidateLibraryArgs) {
@@ -20,7 +20,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     );
 
     // All paths present in cloud storage
-    let all_paths = gsutil::ls(&args.project_name, "/Music").expect("Unable to list paths");
+    let all_paths = storage::ls(&args.project_name, "/Music").expect("Unable to list paths");
 
     // Paths that aren't associated to a song, and therefore should be deleted
     let mut unknown_paths: HashSet<String> = HashSet::from_iter(all_paths);
@@ -52,7 +52,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
                 i,
                 badly_located_songs.len()
             );
-            gsutil::cp(
+            storage::cp(
                 &args.project_name,
                 &format!("/Music{}", song.file_location),
                 &format!("/Music{}", new_file_location),
@@ -98,7 +98,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
                 i,
                 paths_to_delete.len()
             );
-            match gsutil::rm(&args.project_name, &format!("/Music{}", path)) {
+            match storage::rm(&args.project_name, &format!("/Music{}", path)) {
                 Ok(()) => {}
                 Err(err) => {
                     println!("Unable to delete path \"{}\": {}", path, err);
@@ -113,7 +113,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     for (i, path) in unknown_paths.iter().enumerate() {
         if !args.dry_run {
             println!("Deleting {} ({} / {})", path, i, unknown_paths.len());
-            match gsutil::rm(&args.project_name, &format!("/Music{}", path)) {
+            match storage::rm(&args.project_name, &format!("/Music{}", path)) {
                 Ok(()) => {}
                 Err(err) => {
                     println!("Unable to delete path \"{}\": {}", path, err);

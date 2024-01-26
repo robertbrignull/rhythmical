@@ -7,7 +7,7 @@ use regex::Regex;
 use rouille::{Request, Response};
 
 use args::ServeArgs;
-use gsutil;
+use storage;
 use library::Library;
 
 #[derive(Serialize)]
@@ -57,7 +57,7 @@ impl Api {
     fn song_contents(&self, id: String) -> Response {
         return match self.library.songs.get(&id) {
             Some(song) => {
-                return match gsutil::sign(
+                return match storage::sign(
                     &self.project_name,
                     &format!("/Music{}", song.file_location),
                     &self.private_key,

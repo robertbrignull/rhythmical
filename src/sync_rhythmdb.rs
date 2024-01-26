@@ -9,7 +9,7 @@ use std::io::BufRead;
 use std::io::BufReader;
 
 use args::SyncRhythmdbArgs;
-use gsutil;
+use storage;
 use htmlescape::decode_html;
 use library::{Library, Song};
 
@@ -73,7 +73,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
                 "Uploading {} to {} ({} / {})",
                 song.file_location, new_file_location, i, num_new_songs
             );
-            let upload_result = gsutil::upload(
+            let upload_result = storage::upload(
                 &args.project_name,
                 &format!("{}{}", library_location_prefix, song.file_location),
                 &format!("/Music{}", new_file_location),
@@ -117,7 +117,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
                 removed_songs.len()
             );
             let removal_result =
-                gsutil::rm(&args.project_name, &format!("/Music{}", song.file_location));
+              storage::rm(&args.project_name, &format!("/Music{}", song.file_location));
             if removal_result.is_err() {
                 println!("Failed to delete {}", song.file_location);
             }

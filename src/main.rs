@@ -13,7 +13,7 @@ extern crate serde_json;
 
 mod api;
 mod args;
-mod gsutil;
+mod storage;
 mod library;
 mod server;
 mod sync_rhythmdb;

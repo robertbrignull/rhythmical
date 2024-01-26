@@ -11,7 +11,7 @@ use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use regex::Regex;
 
-use gsutil;
+use storage;
 
 lazy_static! {
     static ref INVALID_CHARACTERS_REGEX: Regex = Regex::new(r"[^0-9a-zA-Z]+").unwrap();
@@ -58,7 +58,7 @@ pub struct Library {
 
 impl Library {
     pub fn new(project_name: &str) -> Library {
-        return match gsutil::cat(project_name, &"/library.json".to_string()) {
+        return match storage::cat(project_name, &"/library.json".to_string()) {
             Ok(data) => match serde_json::from_slice(&data) {
                 Ok(library) => library,
                 Err(error) => panic!("Unable to parse library: {}", error),
@@ -74,7 +74,7 @@ impl Library {
         }
         self.serialize(&temp_file)
             .expect("Unable to serialize library");
-        gsutil::upload(project_name, &temp_file.to_string(), "/library.json")?;
+        storage::upload(project_name, &temp_file.to_string(), "/library.json")?;
         std::fs::remove_file(temp_file)?;
         return Result::Ok(());
     }
