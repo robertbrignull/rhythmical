@@ -41,7 +41,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     // Copy any badly located songs to their new location
     let mut paths_to_delete: Vec<String> = Vec::new();
     for (i, id) in badly_located_songs.iter().enumerate() {
-        let mut song = library.songs.get_mut(id).unwrap();
+        let song = library.songs.get(id).unwrap();
         let new_file_location = song.correct_file_location();
         paths_to_delete.push(song.file_location.clone());
         if !args.dry_run {
@@ -58,10 +58,13 @@ pub fn validate_library(args: ValidateLibraryArgs) {
                 &format!("/Music{}", new_file_location),
             )
             .unwrap();
+
+            let mut updated_song = song.clone();
+            updated_song.file_location = new_file_location;
+            library.songs.insert(id.clone(), updated_song);
         } else if args.verbose {
             println!("Would copy {} to {}", song.file_location, new_file_location);
         }
-        song.file_location = new_file_location;
 
         // Do a checkpoint of our progress so far
         if i % 100 == 0 && !args.dry_run {
