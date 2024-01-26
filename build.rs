@@ -64,6 +64,10 @@ fn assert_success(command_name: &str, status: ExitStatus) {
 fn should_run_npm() -> Result<bool> {
     let package_json_modified = metadata(Path::new("package.json"))?.modified()?;
     let package_lock_modified = metadata(Path::new("package-lock.json"))?.modified()?;
+
+    if !Path::new("node_modules").exists() {
+      return Result::Ok(true);
+    }
     let node_modules_modified = metadata(Path::new("node_modules"))?.modified()?;
 
     return Result::Ok(
