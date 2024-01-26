@@ -3,6 +3,7 @@ pub enum Mode {
     Serve,
     SyncRhythmdb,
     ValidateLibrary,
+    TestAzure,
 }
 
 impl Mode {
@@ -15,6 +16,9 @@ impl Mode {
         }
         if val.eq("validate-library") {
             return Option::Some(Mode::ValidateLibrary);
+        }
+        if val.eq("test-azure") {
+            return Option::Some(Mode::TestAzure);
         }
         return Option::None;
     }
@@ -136,6 +140,14 @@ impl Args {
                         verbose: verbose,
                     }),
                 }
+            }
+            Some(Mode::TestAzure) => {
+              Args {
+                mode: Mode::TestAzure,
+                serve: Option::None,
+                sync_rhythmdb: Option::None,
+                validate_library: Option::None,
+              }
             }
             None => {
                 println!("{}", USAGE_MESSAGE);

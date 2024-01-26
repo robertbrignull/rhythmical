@@ -1,6 +1,34 @@
+use std::env;
 use std::io::{Error, ErrorKind, Result};
 use std::path::Path;
 use std::process::Command;
+use azure_storage::prelude::*;
+use azure_storage_blobs::prelude::*;
+use futures::stream::StreamExt;
+
+fn read_env_var(name: &str) -> String {
+  return env::var(name).expect(&format!("Unable to read environment variable: {}", name));
+}
+
+fn get_client_builder() -> ClientBuilder {
+  let account_name = read_env_var("AZURE_ACCOUNT_NAME");
+  let access_key = read_env_var("AZURE_ACCESS_KEY");
+
+  let storage_credentials = StorageCredentials::access_key(account_name.clone(), access_key);
+  return ClientBuilder::new(account_name, storage_credentials);
+}
+
+pub async fn make_test_azure_request() {
+  let client = get_client_builder().blob_client("music", "library.json");
+
+  let mut stream = client.get().into_stream();
+  while let Some(value) = stream.next().await {
+    let mut body = value.unwrap().data;
+    while let Some(value) = body.next().await {
+      println!("{}", std::str::from_utf8(&value.unwrap()).unwrap());
+    }
+  }
+}
 
 pub fn ls(project_name: &str, mut path: &str) -> Result<Vec<String>> {
     if path.ends_with("/") {

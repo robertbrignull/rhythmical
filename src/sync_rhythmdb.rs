@@ -7,11 +7,11 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-
-use args::SyncRhythmdbArgs;
-use storage;
 use htmlescape::decode_html;
-use library::{Library, Song};
+
+use crate::args::SyncRhythmdbArgs;
+use crate::storage;
+use crate::library::{Library, Song};
 
 #[derive(PartialEq)]
 enum Element {
