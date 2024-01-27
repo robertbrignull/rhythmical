@@ -28,7 +28,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     let mut missing_songs: Vec<String> = Vec::new();
 
     for song in library.songs.values() {
-        if !unknown_paths.remove(&song.file_location) {
+        if !unknown_paths.remove(&format!("Music{}", song.file_location)) {
             missing_songs.push(song.id.clone());
         }
     }
