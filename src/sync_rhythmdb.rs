@@ -74,7 +74,6 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
                 song.file_location, new_file_location, i, num_new_songs
             );
             let upload_result = storage::upload(
-                &args.project_name,
                 &format!("{}{}", library_location_prefix, song.file_location),
                 &format!("/Music{}", new_file_location),
             );
@@ -102,7 +101,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     );
     if !args.dry_run {
         println!("Uploading library");
-        new_library.save(&args.project_name).unwrap();
+        new_library.save().unwrap();
     } else if args.verbose {
         println!("Would upload new library");
     }

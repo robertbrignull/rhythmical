@@ -67,14 +67,14 @@ impl Library {
         };
     }
 
-    pub fn save(&self, project_name: &str) -> Result<()> {
+    pub fn save(&self) -> Result<()> {
         let temp_file = "/tmp/new_library.json";
         if Path::new(temp_file).exists() {
             std::fs::remove_file(temp_file)?;
         }
         self.serialize(&temp_file)
             .expect("Unable to serialize library");
-        storage::upload(project_name, &temp_file.to_string(), "/library.json")?;
+        storage::upload(&temp_file.to_string(), "/library.json")?;
         std::fs::remove_file(temp_file)?;
         return Result::Ok(());
     }

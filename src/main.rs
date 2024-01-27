@@ -26,12 +26,11 @@ mod sync_rhythmdb;
 mod validate_library;
 
 use args::{Args, Mode};
-use library::Library;
 use server::start_server;
 use sync_rhythmdb::sync_rhythmdb;
 use validate_library::validate_library;
 
-use crate::storage::sign;
+use crate::storage::{cat, upload};
 
 fn main() {
     let args = Args::get();
@@ -46,11 +45,9 @@ fn main() {
             validate_library(args.validate_library.unwrap());
         }
         Mode::TestAzure => {
-            let library = Library::new();
-            let song = library.songs.values().next().unwrap();
-            println!("{}", song.file_location);
+            upload("/home/robertbrignull/coding/rhythmical/test.txt", "test.txt").expect("Unable to upload test file");
 
-            println!("{}", sign(&format!("Music{}", song.file_location)).expect("Unable to sign url"));
+            println!("{}", String::from_utf8(cat("test.txt").expect("Unable to read test file")).expect("Unable to decode string"));
         }
     }
 }

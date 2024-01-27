@@ -69,7 +69,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
         // Do a checkpoint of our progress so far
         if i % 100 == 0 && !args.dry_run {
             println!("Uploading library");
-            library.save(&args.project_name).unwrap();
+            library.save().unwrap();
         }
     }
 
@@ -87,7 +87,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     // Upload the updated library
     if !args.dry_run {
         println!("Uploading library");
-        library.save(&args.project_name).unwrap();
+        library.save().unwrap();
     } else if args.verbose {
         println!("Would upload new library");
     }

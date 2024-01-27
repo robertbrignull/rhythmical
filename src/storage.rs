@@ -4,7 +4,6 @@ use azure_storage_blobs::prelude::*;
 use futures::stream::StreamExt;
 use std::env;
 use std::io::{Error, ErrorKind, Result};
-use std::path::Path;
 use std::process::Command;
 use tokio::runtime::Runtime;
 use time::{Duration, OffsetDateTime};
@@ -140,23 +139,24 @@ pub fn sign(path: &str) -> Result<String> {
     return Runtime::new().unwrap().block_on(sign_async(path));
 }
 
-pub fn upload(project_name: &str, local_source_path: &str, remote_dest_path: &str) -> Result<()> {
-    // Copy the local file to a temp location which doesn't contain any special characters.
-    let temp_file = "/tmp/rhythmical_temp_upload";
-    if Path::new(temp_file).exists() {
-        std::fs::remove_file(temp_file)?;
+pub async fn upload_async(local_source_path: &str, remote_dest_path: &str) -> Result<()> {
+    let body = std::fs::read(local_source_path)?;
+
+    let client = get_container_client()
+        .blob_client(remote_dest_path.to_string());
+
+    match client.put_block_blob(body).await {
+        Ok(_) => {
+            return Result::Ok(());
+        }
+        Err(err) => {
+            return Result::Err(azure_error(err));
+        }
     }
-    std::fs::copy(local_source_path, temp_file)?;
+}
 
-    let mut cmd = Command::new("gsutil");
-    cmd.arg("cp")
-        .arg(temp_file)
-        .arg(format!("gs://{}{}", project_name, remote_dest_path));
-    execute(cmd)?;
-
-    std::fs::remove_file(temp_file)?;
-
-    return Result::Ok(());
+pub fn upload(local_source_path: &str, remote_dest_path: &str) -> Result<()> {
+    return Runtime::new().unwrap().block_on(upload_async(local_source_path, remote_dest_path));
 }
 
 pub fn cp(project_name: &str, src_path: &str, dest_path: &str) -> Result<()> {
