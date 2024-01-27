@@ -46,9 +46,9 @@ pub struct ValidateLibraryArgs {
 }
 
 const USAGE_MESSAGE: &str = "Incorrect arguments. Usage:
-  serve project-name private-key
-  sync-rhythmdb project-name rhythmdb-file library-location-prefix [--dry-run] [--verbose]
-  validate-library project-name [--dry-run] [--verbose]";
+  serve
+  sync-rhythmdb rhythmdb-file library-location-prefix [--dry-run] [--verbose]
+  validate-library [--dry-run] [--verbose]";
 
 impl Args {
     pub fn get() -> Args {
@@ -60,7 +60,7 @@ impl Args {
 
         return match Mode::parse(args[1].clone()) {
             Some(Mode::Serve) => {
-                if args.len() != 4 {
+                if args.len() != 2 {
                     println!("{}", USAGE_MESSAGE);
                     std::process::exit(1);
                 }
@@ -71,13 +71,13 @@ impl Args {
                 }
             }
             Some(Mode::SyncRhythmdb) => {
-                if args.len() < 5 {
+                if args.len() < 4 {
                     println!("{}", USAGE_MESSAGE);
                     std::process::exit(1);
                 }
                 let mut dry_run = false;
                 let mut verbose = false;
-                for i in 5..args.len() {
+                for i in 4..args.len() {
                     if args[i] == "--dry-run" {
                         dry_run = true;
                     } else if args[i] == "--verbose" {
@@ -90,22 +90,22 @@ impl Args {
                 Args {
                     mode: Mode::SyncRhythmdb,
                     sync_rhythmdb: Option::Some(SyncRhythmdbArgs {
-                        rhythmdb_file: args[3].clone(),
-                        library_location_prefix: args[4].clone(),
-                        dry_run: dry_run,
-                        verbose: verbose,
+                        rhythmdb_file: args[2].clone(),
+                        library_location_prefix: args[3].clone(),
+                        dry_run,
+                        verbose,
                     }),
                     validate_library: Option::None,
                 }
             }
             Some(Mode::ValidateLibrary) => {
-                if args.len() < 3 {
+                if args.len() < 2 {
                     println!("{}", USAGE_MESSAGE);
                     std::process::exit(1);
                 }
                 let mut dry_run = false;
                 let mut verbose = false;
-                for i in 3..args.len() {
+                for i in 2..args.len() {
                     if args[i] == "--dry-run" {
                         dry_run = true;
                     } else if args[i] == "--verbose" {
@@ -119,8 +119,8 @@ impl Args {
                     mode: Mode::ValidateLibrary,
                     sync_rhythmdb: Option::None,
                     validate_library: Option::Some(ValidateLibraryArgs {
-                        dry_run: dry_run,
-                        verbose: verbose,
+                        dry_run,
+                        verbose,
                     }),
                 }
             }
