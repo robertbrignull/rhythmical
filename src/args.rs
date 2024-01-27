@@ -27,15 +27,8 @@ impl Mode {
 #[derive(Clone)]
 pub struct Args {
     pub mode: Mode,
-    pub serve: Option<ServeArgs>,
     pub sync_rhythmdb: Option<SyncRhythmdbArgs>,
     pub validate_library: Option<ValidateLibraryArgs>,
-}
-
-#[derive(Clone)]
-pub struct ServeArgs {
-    pub project_name: String,
-    pub private_key: String,
 }
 
 #[derive(Clone)]
@@ -75,10 +68,6 @@ impl Args {
                 }
                 Args {
                     mode: Mode::Serve,
-                    serve: Option::Some(ServeArgs {
-                        project_name: args[2].clone(),
-                        private_key: args[3].clone(),
-                    }),
                     sync_rhythmdb: Option::None,
                     validate_library: Option::None,
                 }
@@ -102,7 +91,6 @@ impl Args {
                 }
                 Args {
                     mode: Mode::SyncRhythmdb,
-                    serve: Option::None,
                     sync_rhythmdb: Option::Some(SyncRhythmdbArgs {
                         project_name: args[2].clone(),
                         rhythmdb_file: args[3].clone(),
@@ -132,7 +120,6 @@ impl Args {
                 }
                 Args {
                     mode: Mode::ValidateLibrary,
-                    serve: Option::None,
                     sync_rhythmdb: Option::None,
                     validate_library: Option::Some(ValidateLibraryArgs {
                         project_name: args[2].clone(),
@@ -143,7 +130,6 @@ impl Args {
             }
             Some(Mode::TestAzure) => Args {
                 mode: Mode::TestAzure,
-                serve: Option::None,
                 sync_rhythmdb: Option::None,
                 validate_library: Option::None,
             },

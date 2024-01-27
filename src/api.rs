@@ -6,7 +6,6 @@ extern crate serde_json;
 use regex::Regex;
 use rouille::{Request, Response};
 
-use crate::args::ServeArgs;
 use crate::library::Library;
 use crate::storage;
 
@@ -22,17 +21,13 @@ struct ApiSong {
 }
 
 pub struct Api {
-    project_name: String,
-    private_key: String,
     library: Library,
     songs_contents_regex: Regex,
 }
 
 impl Api {
-    pub fn new(args: ServeArgs) -> Api {
+    pub fn new() -> Api {
         return Api {
-            project_name: args.project_name.clone(),
-            private_key: args.private_key.clone(),
             library: Library::new(),
             songs_contents_regex: Regex::new(r"/api/songs/([a-zA-Z0-9]+)/contents").unwrap(),
         };
@@ -57,11 +52,7 @@ impl Api {
     fn song_contents(&self, id: String) -> Response {
         return match self.library.songs.get(&id) {
             Some(song) => {
-                return match storage::sign(
-                    &self.project_name,
-                    &format!("/Music{}", song.file_location),
-                    &self.private_key,
-                ) {
+                return match storage::sign(&format!("Music{}", song.file_location)) {
                     Ok(signature) => Response::text(signature),
                     Err(error) => Response::text(format!("Unable to compute signature: {}", error)),
                 }

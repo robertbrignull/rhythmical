@@ -15,6 +15,7 @@ extern crate rand;
 extern crate regex;
 extern crate serde_json;
 extern crate tokio;
+extern crate time;
 
 mod api;
 mod args;
@@ -30,11 +31,13 @@ use server::start_server;
 use sync_rhythmdb::sync_rhythmdb;
 use validate_library::validate_library;
 
+use crate::storage::sign;
+
 fn main() {
     let args = Args::get();
     match args.mode {
         Mode::Serve => {
-            start_server(args.serve.unwrap());
+            start_server();
         }
         Mode::SyncRhythmdb => {
             sync_rhythmdb(args.sync_rhythmdb.unwrap());
@@ -44,8 +47,10 @@ fn main() {
         }
         Mode::TestAzure => {
             let library = Library::new();
-            println!("{}", library.songs.len());
-            println!("{}", library.songs.values().next().unwrap().title);
+            let song = library.songs.values().next().unwrap();
+            println!("{}", song.file_location);
+
+            println!("{}", sign(&format!("Music{}", song.file_location)).expect("Unable to sign url"));
         }
     }
 }

@@ -7,6 +7,7 @@ use std::io::{Error, ErrorKind, Result};
 use std::path::Path;
 use std::process::Command;
 use tokio::runtime::Runtime;
+use time::{Duration, OffsetDateTime};
 
 fn read_env_var(name: &str) -> String {
     return env::var(name).expect(&format!("Unable to read environment variable: {}", name));
@@ -94,29 +95,49 @@ pub fn cat(path: &str) -> Result<Vec<u8>> {
     return Runtime::new().unwrap().block_on(cat_async(path));
 }
 
-pub fn sign(project_name: &str, path: &str, private_key: &str) -> Result<String> {
-    let mut cmd = Command::new("gsutil");
-    cmd.arg("signurl")
-        .arg("-d")
-        .arg("60m")
-        .arg(private_key)
-        .arg(format!("gs://{}{}", project_name, path));
-
-    return match String::from_utf8(execute(cmd)?) {
-        Ok(output) => {
-            return match output.find("https://storage.googleapis.com") {
-                Some(i) => Result::Ok(output.get(i..).unwrap().to_string()),
-                None => Result::Err(Error::new(
-                    ErrorKind::Other,
-                    format!("gsutil signurl output did not contain url: {}", output),
-                )),
-            };
-        }
-        Err(err) => Result::Err(Error::new(
-            ErrorKind::Other,
-            format!("Error decoding output: {}", err),
-        )),
+pub async fn sign_async(path: &str) -> Result<String> {
+    let permissions = BlobSasPermissions {
+        read: true,
+        add: false,
+        create: false,
+        write: false,
+        delete: false,
+        delete_version: false,
+        permanent_delete: false,
+        list: false,
+        tags: false,
+        move_: false,
+        execute: false,
+        ownership: false,
+        permissions: false,
     };
+    let expiry = OffsetDateTime::now_utc() + Duration::hours(1);
+    let client = get_container_client()
+        .blob_client(path.to_string());
+    let signature = client.shared_access_signature(permissions, expiry).await;
+
+    match signature {
+        Ok(signature) => {
+            match signature.token() {
+                Ok(token) => {
+                    let account_name = read_env_var("AZURE_ACCOUNT_NAME");
+                    let container_name = read_env_var("AZURE_CONTAINER_NAME");
+                    let url = format!("https://{}.blob.core.windows.net/{}/{}?{}", account_name, container_name, path, token);
+                    return Ok(url);
+                }
+                Err(err) => {
+                    return Result::Err(azure_error(err));
+                }
+            }
+        }
+        Err(err) => {
+            return Result::Err(azure_error(err));
+        }
+    }
+}
+
+pub fn sign(path: &str) -> Result<String> {
+    return Runtime::new().unwrap().block_on(sign_async(path));
 }
 
 pub fn upload(project_name: &str, local_source_path: &str, remote_dest_path: &str) -> Result<()> {

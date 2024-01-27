@@ -6,7 +6,6 @@ use std::fs::File;
 use std::io::Read;
 
 use crate::api::Api;
-use crate::args::ServeArgs;
 
 fn root() -> Response {
     let current_dir = env::current_dir().unwrap();
@@ -24,11 +23,11 @@ fn app_js() -> Response {
     return Response::from_data("application/javascript", out_js_contents);
 }
 
-pub fn start_server(args: ServeArgs) {
+pub fn start_server() {
     let address = "localhost:8000";
     println!("Serving at {}", address);
 
-    let api = Api::new(args);
+    let api = Api::new();
 
     rouille::start_server(address, move |request: &Request| {
         println!("Processing request for {}", request.url());
