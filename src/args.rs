@@ -33,7 +33,6 @@ pub struct Args {
 
 #[derive(Clone)]
 pub struct SyncRhythmdbArgs {
-    pub project_name: String,
     pub rhythmdb_file: String,
     pub library_location_prefix: String,
     pub dry_run: bool,
@@ -42,7 +41,6 @@ pub struct SyncRhythmdbArgs {
 
 #[derive(Clone)]
 pub struct ValidateLibraryArgs {
-    pub project_name: String,
     pub dry_run: bool,
     pub verbose: bool,
 }
@@ -92,7 +90,6 @@ impl Args {
                 Args {
                     mode: Mode::SyncRhythmdb,
                     sync_rhythmdb: Option::Some(SyncRhythmdbArgs {
-                        project_name: args[2].clone(),
                         rhythmdb_file: args[3].clone(),
                         library_location_prefix: args[4].clone(),
                         dry_run: dry_run,
@@ -122,7 +119,6 @@ impl Args {
                     mode: Mode::ValidateLibrary,
                     sync_rhythmdb: Option::None,
                     validate_library: Option::Some(ValidateLibraryArgs {
-                        project_name: args[2].clone(),
                         dry_run: dry_run,
                         verbose: verbose,
                     }),
