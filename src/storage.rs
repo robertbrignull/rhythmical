@@ -139,13 +139,11 @@ pub fn sign(path: &str) -> Result<String> {
     return Runtime::new().unwrap().block_on(sign_async(path));
 }
 
-pub async fn upload_async(local_source_path: &str, remote_dest_path: &str) -> Result<()> {
-    let body = std::fs::read(local_source_path)?;
-
+pub async fn put_async(path: &str, content: Vec<u8>) -> Result<()> {
     let client = get_container_client()
-        .blob_client(remote_dest_path.to_string());
+        .blob_client(path.to_string());
 
-    match client.put_block_blob(body).await {
+    match client.put_block_blob(content).await {
         Ok(_) => {
             return Result::Ok(());
         }
@@ -155,17 +153,22 @@ pub async fn upload_async(local_source_path: &str, remote_dest_path: &str) -> Re
     }
 }
 
+pub async fn upload_async(local_source_path: &str, remote_dest_path: &str) -> Result<()> {
+    let content = std::fs::read(local_source_path)?;
+    return put_async(remote_dest_path, content).await;
+}
+
 pub fn upload(local_source_path: &str, remote_dest_path: &str) -> Result<()> {
     return Runtime::new().unwrap().block_on(upload_async(local_source_path, remote_dest_path));
 }
 
-pub fn cp(project_name: &str, src_path: &str, dest_path: &str) -> Result<()> {
-    let mut cmd = Command::new("gsutil");
-    cmd.arg("cp")
-        .arg(format!("gs://{}{}", project_name, src_path))
-        .arg(format!("gs://{}{}", project_name, dest_path));
-    execute(cmd)?;
-    return Result::Ok(());
+pub async fn cp_async(src_path: &str, dest_path: &str) -> Result<()> {
+    let content = cat_async(src_path).await?;
+    return put_async(dest_path, content).await;
+}
+
+pub fn cp(src_path: &str, dest_path: &str) -> Result<()> {
+    return Runtime::new().unwrap().block_on(cp_async(src_path, dest_path));
 }
 
 pub fn rm(project_name: &str, path: &str) -> Result<()> {

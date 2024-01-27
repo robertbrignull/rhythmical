@@ -53,7 +53,6 @@ pub fn validate_library(args: ValidateLibraryArgs) {
                 badly_located_songs.len()
             );
             storage::cp(
-                &args.project_name,
                 &format!("/Music{}", song.file_location),
                 &format!("/Music{}", new_file_location),
             )

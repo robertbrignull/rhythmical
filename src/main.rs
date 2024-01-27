@@ -30,7 +30,7 @@ use server::start_server;
 use sync_rhythmdb::sync_rhythmdb;
 use validate_library::validate_library;
 
-use crate::storage::{cat, upload};
+use crate::storage::{cat, cp, upload};
 
 fn main() {
     let args = Args::get();
@@ -47,7 +47,9 @@ fn main() {
         Mode::TestAzure => {
             upload("/home/robertbrignull/coding/rhythmical/test.txt", "test.txt").expect("Unable to upload test file");
 
-            println!("{}", String::from_utf8(cat("test.txt").expect("Unable to read test file")).expect("Unable to decode string"));
+            cp("test.txt", "test2.txt").expect("Unable to copy file");
+
+            println!("{}", String::from_utf8(cat("test2.txt").expect("Unable to read test file")).expect("Unable to decode string"));
         }
     }
 }
