@@ -6,7 +6,7 @@ use crate::storage;
 use crate::library::Library;
 
 pub fn validate_library(args: ValidateLibraryArgs) {
-    let mut library = Library::new(&args.project_name);
+    let mut library = Library::new();
 
     let mut badly_located_songs: Vec<String> = Vec::new();
     for song in library.songs.values() {

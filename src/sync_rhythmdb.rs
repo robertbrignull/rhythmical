@@ -31,7 +31,7 @@ enum Element {
 pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
     let library_location_prefix = sanitise_library_location_prefix(&args.library_location_prefix);
 
-    let dest_library = Library::new(&args.project_name);
+    let dest_library = Library::new();
     let source_library =
         read_rhythmdb(&args.rhythmdb_file, &library_location_prefix, &dest_library);
     let source_songs = LibraryHash::new(&source_library);

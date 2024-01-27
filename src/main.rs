@@ -25,8 +25,8 @@ mod sync_rhythmdb;
 mod validate_library;
 
 use args::{Args, Mode};
+use library::Library;
 use server::start_server;
-use storage::ls;
 use sync_rhythmdb::sync_rhythmdb;
 use validate_library::validate_library;
 
@@ -43,10 +43,9 @@ fn main() {
             validate_library(args.validate_library.unwrap());
         }
         Mode::TestAzure => {
-          let blobs = ls("Music/").expect("Error listing blobs");
-          for blob in blobs {
-            println!("{}", blob);
-          }
+          let library = Library::new();
+          println!("{}", library.songs.len());
+          println!("{}", library.songs.values().next().unwrap().title);
         }
     }
 }

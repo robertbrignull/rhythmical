@@ -60,10 +60,38 @@ pub fn ls(path: &str) -> Result<Vec<String>> {
   return Runtime::new().unwrap().block_on(ls_async(path));
 }
 
-pub fn cat(project_name: &str, path: &str) -> Result<Vec<u8>> {
-    let mut cmd = Command::new("gsutil");
-    cmd.arg("cat").arg(format!("gs://{}{}", project_name, path));
-    return execute(cmd);
+pub async fn cat_async(path: &str) -> Result<Vec<u8>> {
+  let mut stream = get_container_client()
+      .blob_client(path.to_string())
+      .get()
+      .into_stream();
+
+  let mut data: Vec<u8> = Vec::new();
+  while let Some(value) = stream.next().await {
+    match value {
+      Ok(mut value) => {
+        while let Some(bytes) = value.data.next().await {
+          match bytes {
+            Ok(bytes) => {
+              data.extend(bytes);
+            }
+            Err(err) => {
+              return Result::Err(azure_error(err));
+            }
+          }
+        }
+      }
+      Err(err) => {
+        return Result::Err(azure_error(err));
+      }
+    }
+  }
+
+  return Ok(data);
+}
+
+pub fn cat(path: &str) -> Result<Vec<u8>> {
+  return Runtime::new().unwrap().block_on(cat_async(path));
 }
 
 pub fn sign(project_name: &str, path: &str, private_key: &str) -> Result<String> {

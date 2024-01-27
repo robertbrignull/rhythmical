@@ -33,7 +33,7 @@ impl Api {
         return Api {
             project_name: args.project_name.clone(),
             private_key: args.private_key.clone(),
-            library: Library::new(&args.project_name),
+            library: Library::new(),
             songs_contents_regex: Regex::new(r"/api/songs/([a-zA-Z0-9]+)/contents").unwrap(),
         };
     }

@@ -57,8 +57,8 @@ pub struct Library {
 }
 
 impl Library {
-    pub fn new(project_name: &str) -> Library {
-        return match storage::cat(project_name, &"/library.json".to_string()) {
+    pub fn new() -> Library {
+        return match storage::cat("library.json") {
             Ok(data) => match serde_json::from_slice(&data) {
                 Ok(library) => library,
                 Err(error) => panic!("Unable to parse library: {}", error),
