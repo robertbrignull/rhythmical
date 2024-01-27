@@ -11,8 +11,8 @@ The requirements are:
 - Be able to easily define playlists and filters.
 - Be able to rate songs and classify them in to multiple categories and genres.
 
-The solution I have come up combines Google Cloud Storage and a browser-based single-page application.
-Storing the media files and all metadata in the cloud ensures that they are available anywhere, and Google Cloud Storage is cheap enough that for 50GB of music the costs are at most $1 per month.
+The solution I have come up combines online blob storage (currently Azure) and a browser-based single-page application.
+Storing the media files and all metadata in the cloud ensures that they are available anywhere, and Azure blob storage is cheap enough that for 50GB of music the costs are at most $1 per month.
 Using the browser for the GUI avoids much of the work of finding a good native library and ensures that it works on all operating systems. 
 
 I am also using this project as a tool for teaching myself new languages and frameworks.
@@ -27,20 +27,27 @@ At time of writing it is confirmed working with 1.75.0.
 The frontend requires nodejs and npm to be installed.
 At time of writing it is confirmed working with npm version 9.6.7 and node version 18.17.1.
 
-Communication to Google Cloud Storage is done by delegating to gcloud and this must be installed.
-At time of writing it is confirmed working with Google Cloud SDK 461.0.0 and gsutil 5.27.
-
 ## Building
 
 Simply run `cargo build --release` to build the server and frontend code.
 
-## Running the server
+## Running
 
-Run `cargo run --release serve <GCS project name> <path to json private key>`.
+The following three environment variables must always be provided:
+- `AZURE_ACCOUNT_NAME`
+- `AZURE_ACCESS_KEY`
+- `AZURE_CONTAINER_NAME`
 
-The bucket must have a file called `library.json` at its root.
-The private key will be used when signing URLs.
+### Running the server
 
-## Syncing a rhythmdb file
+Run `cargo run --release serve`.
 
-Run `cargo run --release sync-rhythmdb <GCS project name> <path to json private key> <path to rhythmdb.xml> <library location prefix> [--dry-run]`
+The container must have a file called `library.json` at its root.
+
+### Syncing a rhythmdb file
+
+Run `cargo run --release sync-rhythmdb <path to rhythmdb.xml> <library location prefix> [--dry-run]`.
+
+### Validating library
+
+Run `cargo run --release validate-library [--dry-run] [--verbose]`.
