@@ -74,7 +74,7 @@ impl Library {
         }
         self.serialize(&temp_file)
             .expect("Unable to serialize library");
-        storage::upload(&temp_file.to_string(), "/library.json")?;
+        storage::upload(&temp_file.to_string(), "library.json")?;
         std::fs::remove_file(temp_file)?;
         return Result::Ok(());
     }

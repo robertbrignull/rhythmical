@@ -53,8 +53,8 @@ pub fn validate_library(args: ValidateLibraryArgs) {
                 badly_located_songs.len()
             );
             storage::cp(
-                &format!("/Music{}", song.file_location),
-                &format!("/Music{}", new_file_location),
+                &format!("Music{}", song.file_location),
+                &format!("Music{}", new_file_location),
             )
             .unwrap();
 
@@ -100,7 +100,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
                 i,
                 paths_to_delete.len()
             );
-            match storage::rm(&format!("/Music{}", path)) {
+            match storage::rm(&format!("Music{}", path)) {
                 Ok(()) => {}
                 Err(err) => {
                     println!("Unable to delete path \"{}\": {}", path, err);
@@ -115,7 +115,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     for (i, path) in unknown_paths.iter().enumerate() {
         if !args.dry_run {
             println!("Deleting {} ({} / {})", path, i, unknown_paths.len());
-            match storage::rm( &format!("/Music{}", path)) {
+            match storage::rm( &format!("Music{}", path)) {
                 Ok(()) => {}
                 Err(err) => {
                     println!("Unable to delete path \"{}\": {}", path, err);

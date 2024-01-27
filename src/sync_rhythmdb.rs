@@ -75,7 +75,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
             );
             let upload_result = storage::upload(
                 &format!("{}{}", library_location_prefix, song.file_location),
-                &format!("/Music{}", new_file_location),
+                &format!("Music{}", new_file_location),
             );
             if upload_result.is_err() {
                 println!("Failed to upload {}", song.file_location);
@@ -116,7 +116,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
                 removed_songs.len()
             );
             let removal_result =
-                storage::rm(&format!("/Music{}", song.file_location));
+                storage::rm(&format!("Music{}", song.file_location));
             if removal_result.is_err() {
                 println!("Failed to delete {}", song.file_location);
             }
