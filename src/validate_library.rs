@@ -20,7 +20,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     );
 
     // All paths present in cloud storage
-    let all_paths = storage::ls(&args.project_name, "/Music").expect("Unable to list paths");
+    let all_paths = storage::ls("Music/").expect("Unable to list paths");
 
     // Paths that aren't associated to a song, and therefore should be deleted
     let mut unknown_paths: HashSet<String> = HashSet::from_iter(all_paths);

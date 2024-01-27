@@ -26,10 +26,9 @@ mod validate_library;
 
 use args::{Args, Mode};
 use server::start_server;
-use storage::make_test_azure_request;
+use storage::ls;
 use sync_rhythmdb::sync_rhythmdb;
 use validate_library::validate_library;
-use tokio::runtime::Runtime;
 
 fn main() {
     let args = Args::get();
@@ -44,7 +43,10 @@ fn main() {
             validate_library(args.validate_library.unwrap());
         }
         Mode::TestAzure => {
-          Runtime::new().unwrap().block_on(make_test_azure_request());
+          let blobs = ls("Music/").expect("Error listing blobs");
+          for blob in blobs {
+            println!("{}", blob);
+          }
         }
     }
 }

@@ -3,59 +3,61 @@ use std::io::{Error, ErrorKind, Result};
 use std::path::Path;
 use std::process::Command;
 use azure_storage::prelude::*;
+use azure_storage_blobs::container::operations::BlobItem;
 use azure_storage_blobs::prelude::*;
 use futures::stream::StreamExt;
+use tokio::runtime::Runtime;
 
 fn read_env_var(name: &str) -> String {
   return env::var(name).expect(&format!("Unable to read environment variable: {}", name));
 }
 
-fn get_client_builder() -> ClientBuilder {
+fn azure_error(err: azure_storage::Error) -> Error {
+  return Error::new(
+    ErrorKind::Other,
+    format!("error accessing azure: {}", err.to_string()),
+  );
+}
+
+fn get_container_client() -> ContainerClient {
   let account_name = read_env_var("AZURE_ACCOUNT_NAME");
   let access_key = read_env_var("AZURE_ACCESS_KEY");
+  let container_name = read_env_var("AZURE_CONTAINER_NAME");
 
   let storage_credentials = StorageCredentials::access_key(account_name.clone(), access_key);
-  return ClientBuilder::new(account_name, storage_credentials);
+  return ClientBuilder::new(account_name, storage_credentials).container_client(container_name);
 }
 
-pub async fn make_test_azure_request() {
-  let client = get_client_builder().blob_client("music", "library.json");
+pub async fn ls_async(path: &str) -> Result<Vec<String>> {
+    let mut stream = get_container_client()
+      .list_blobs()
+      .prefix(path.to_string())
+      .into_stream();
 
-  let mut stream = client.get().into_stream();
-  while let Some(value) = stream.next().await {
-    let mut body = value.unwrap().data;
-    while let Some(value) = body.next().await {
-      println!("{}", std::str::from_utf8(&value.unwrap()).unwrap());
-    }
-  }
-}
-
-pub fn ls(project_name: &str, mut path: &str) -> Result<Vec<String>> {
-    if path.ends_with("/") {
-        path = &path[0..path.len() - 1];
-    }
-
-    let mut cmd = Command::new("gsutil");
-    cmd.arg("ls")
-        .arg("-R")
-        .arg(format!("gs://{}{}", project_name, path));
-
-    return match String::from_utf8(execute(cmd)?) {
-        Ok(output) => {
-            let mut paths: Vec<String> = Vec::new();
-            let prefix = format!("gs://{}{}", project_name, path);
-            for line in output.lines() {
-                if line.starts_with(&prefix) && !line.ends_with("/:") {
-                    paths.push(line[prefix.len()..].to_string());
-                }
+    let mut blobs: Vec<String> = Vec::new();
+    while let Some(value) = stream.next().await {
+      match value {
+        Ok(value) => {
+          for blob in value.blobs.items {
+            match blob {
+              BlobItem::Blob(blob) => {
+                blobs.push(blob.name);
+              }
+              BlobItem::BlobPrefix(_) => ()
             }
-            return Ok(paths);
+          }
         }
-        Err(err) => Result::Err(Error::new(
-            ErrorKind::Other,
-            format!("Error decoding output: {}", err),
-        )),
-    };
+        Err(err) => {
+          return Result::Err(azure_error(err));
+        }
+      }
+    }
+
+    return Ok(blobs);
+}
+
+pub fn ls(path: &str) -> Result<Vec<String>> {
+  return Runtime::new().unwrap().block_on(ls_async(path));
 }
 
 pub fn cat(project_name: &str, path: &str) -> Result<Vec<u8>> {
