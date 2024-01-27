@@ -100,7 +100,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
                 i,
                 paths_to_delete.len()
             );
-            match storage::rm(&args.project_name, &format!("/Music{}", path)) {
+            match storage::rm(&format!("/Music{}", path)) {
                 Ok(()) => {}
                 Err(err) => {
                     println!("Unable to delete path \"{}\": {}", path, err);
@@ -115,7 +115,7 @@ pub fn validate_library(args: ValidateLibraryArgs) {
     for (i, path) in unknown_paths.iter().enumerate() {
         if !args.dry_run {
             println!("Deleting {} ({} / {})", path, i, unknown_paths.len());
-            match storage::rm(&args.project_name, &format!("/Music{}", path)) {
+            match storage::rm( &format!("/Music{}", path)) {
                 Ok(()) => {}
                 Err(err) => {
                     println!("Unable to delete path \"{}\": {}", path, err);

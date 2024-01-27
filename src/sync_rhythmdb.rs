@@ -116,7 +116,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
                 removed_songs.len()
             );
             let removal_result =
-                storage::rm(&args.project_name, &format!("/Music{}", song.file_location));
+                storage::rm(&format!("/Music{}", song.file_location));
             if removal_result.is_err() {
                 println!("Failed to delete {}", song.file_location);
             }

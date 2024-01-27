@@ -27,10 +27,9 @@ mod validate_library;
 
 use args::{Args, Mode};
 use server::start_server;
+use storage::{cat, rm, upload};
 use sync_rhythmdb::sync_rhythmdb;
 use validate_library::validate_library;
-
-use crate::storage::{cat, cp, upload};
 
 fn main() {
     let args = Args::get();
@@ -47,9 +46,9 @@ fn main() {
         Mode::TestAzure => {
             upload("/home/robertbrignull/coding/rhythmical/test.txt", "test.txt").expect("Unable to upload test file");
 
-            cp("test.txt", "test2.txt").expect("Unable to copy file");
+            println!("{}", String::from_utf8(cat("test.txt").expect("Unable to read file")).unwrap());
 
-            println!("{}", String::from_utf8(cat("test2.txt").expect("Unable to read test file")).expect("Unable to decode string"));
+            rm("test.txt").expect("Unable to delete file");
         }
     }
 }

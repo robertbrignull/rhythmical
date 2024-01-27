@@ -4,7 +4,6 @@ use azure_storage_blobs::prelude::*;
 use futures::stream::StreamExt;
 use std::env;
 use std::io::{Error, ErrorKind, Result};
-use std::process::Command;
 use tokio::runtime::Runtime;
 use time::{Duration, OffsetDateTime};
 
@@ -171,29 +170,20 @@ pub fn cp(src_path: &str, dest_path: &str) -> Result<()> {
     return Runtime::new().unwrap().block_on(cp_async(src_path, dest_path));
 }
 
-pub fn rm(project_name: &str, path: &str) -> Result<()> {
-    let mut cmd = Command::new("gsutil");
-    cmd.arg("rm").arg(format!("gs://{}{}", project_name, path));
-    execute(cmd)?;
-    return Result::Ok(());
+pub async fn rm_async(path: &str) -> Result<()> {
+    let client = get_container_client()
+        .blob_client(path.to_string());
+
+    match client.delete().await {
+        Ok(_) => {
+            return Result::Ok(());
+        }
+        Err(err) => {
+            return Result::Err(azure_error(err));
+        }
+    }
 }
 
-fn execute(mut cmd: Command) -> Result<Vec<u8>> {
-    return match cmd.output() {
-        Ok(output) => {
-            if !output.status.success() {
-                println!("stdout:\n{}", String::from_utf8(output.stdout).unwrap());
-                println!("stderr:\n{}", String::from_utf8(output.stderr).unwrap());
-                return Result::Err(Error::new(
-                    ErrorKind::Other,
-                    format!("gsutil outputted {}", output.status.code().unwrap_or(-1)),
-                ));
-            }
-            return Result::Ok(output.stdout);
-        }
-        Err(err) => Result::Err(Error::new(
-            ErrorKind::Other,
-            format!("Error running {:?}: {}", cmd, err),
-        )),
-    };
+pub fn rm(path: &str) -> Result<()> {
+    return Runtime::new().unwrap().block_on(rm_async(path));
 }
