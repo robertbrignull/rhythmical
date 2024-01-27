@@ -1,97 +1,97 @@
-use std::env;
-use std::io::{Error, ErrorKind, Result};
-use std::path::Path;
-use std::process::Command;
 use azure_storage::prelude::*;
 use azure_storage_blobs::container::operations::BlobItem;
 use azure_storage_blobs::prelude::*;
 use futures::stream::StreamExt;
+use std::env;
+use std::io::{Error, ErrorKind, Result};
+use std::path::Path;
+use std::process::Command;
 use tokio::runtime::Runtime;
 
 fn read_env_var(name: &str) -> String {
-  return env::var(name).expect(&format!("Unable to read environment variable: {}", name));
+    return env::var(name).expect(&format!("Unable to read environment variable: {}", name));
 }
 
 fn azure_error(err: azure_storage::Error) -> Error {
-  return Error::new(
-    ErrorKind::Other,
-    format!("error accessing azure: {}", err.to_string()),
-  );
+    return Error::new(
+        ErrorKind::Other,
+        format!("error accessing azure: {}", err.to_string()),
+    );
 }
 
 fn get_container_client() -> ContainerClient {
-  let account_name = read_env_var("AZURE_ACCOUNT_NAME");
-  let access_key = read_env_var("AZURE_ACCESS_KEY");
-  let container_name = read_env_var("AZURE_CONTAINER_NAME");
+    let account_name = read_env_var("AZURE_ACCOUNT_NAME");
+    let access_key = read_env_var("AZURE_ACCESS_KEY");
+    let container_name = read_env_var("AZURE_CONTAINER_NAME");
 
-  let storage_credentials = StorageCredentials::access_key(account_name.clone(), access_key);
-  return ClientBuilder::new(account_name, storage_credentials).container_client(container_name);
+    let storage_credentials = StorageCredentials::access_key(account_name.clone(), access_key);
+    return ClientBuilder::new(account_name, storage_credentials).container_client(container_name);
 }
 
 pub async fn ls_async(path: &str) -> Result<Vec<String>> {
     let mut stream = get_container_client()
-      .list_blobs()
-      .prefix(path.to_string())
-      .into_stream();
+        .list_blobs()
+        .prefix(path.to_string())
+        .into_stream();
 
     let mut blobs: Vec<String> = Vec::new();
     while let Some(value) = stream.next().await {
-      match value {
-        Ok(value) => {
-          for blob in value.blobs.items {
-            match blob {
-              BlobItem::Blob(blob) => {
-                blobs.push(blob.name);
-              }
-              BlobItem::BlobPrefix(_) => ()
+        match value {
+            Ok(value) => {
+                for blob in value.blobs.items {
+                    match blob {
+                        BlobItem::Blob(blob) => {
+                            blobs.push(blob.name);
+                        }
+                        BlobItem::BlobPrefix(_) => (),
+                    }
+                }
             }
-          }
+            Err(err) => {
+                return Result::Err(azure_error(err));
+            }
         }
-        Err(err) => {
-          return Result::Err(azure_error(err));
-        }
-      }
     }
 
     return Ok(blobs);
 }
 
 pub fn ls(path: &str) -> Result<Vec<String>> {
-  return Runtime::new().unwrap().block_on(ls_async(path));
+    return Runtime::new().unwrap().block_on(ls_async(path));
 }
 
 pub async fn cat_async(path: &str) -> Result<Vec<u8>> {
-  let mut stream = get_container_client()
-      .blob_client(path.to_string())
-      .get()
-      .into_stream();
+    let mut stream = get_container_client()
+        .blob_client(path.to_string())
+        .get()
+        .into_stream();
 
-  let mut data: Vec<u8> = Vec::new();
-  while let Some(value) = stream.next().await {
-    match value {
-      Ok(mut value) => {
-        while let Some(bytes) = value.data.next().await {
-          match bytes {
-            Ok(bytes) => {
-              data.extend(bytes);
+    let mut data: Vec<u8> = Vec::new();
+    while let Some(value) = stream.next().await {
+        match value {
+            Ok(mut value) => {
+                while let Some(bytes) = value.data.next().await {
+                    match bytes {
+                        Ok(bytes) => {
+                            data.extend(bytes);
+                        }
+                        Err(err) => {
+                            return Result::Err(azure_error(err));
+                        }
+                    }
+                }
             }
             Err(err) => {
-              return Result::Err(azure_error(err));
+                return Result::Err(azure_error(err));
             }
-          }
         }
-      }
-      Err(err) => {
-        return Result::Err(azure_error(err));
-      }
     }
-  }
 
-  return Ok(data);
+    return Ok(data);
 }
 
 pub fn cat(path: &str) -> Result<Vec<u8>> {
-  return Runtime::new().unwrap().block_on(cat_async(path));
+    return Runtime::new().unwrap().block_on(cat_async(path));
 }
 
 pub fn sign(project_name: &str, path: &str, private_key: &str) -> Result<String> {

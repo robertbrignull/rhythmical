@@ -2,8 +2,8 @@ use std::collections::HashSet;
 use std::iter::FromIterator;
 
 use crate::args::ValidateLibraryArgs;
-use crate::storage;
 use crate::library::Library;
+use crate::storage;
 
 pub fn validate_library(args: ValidateLibraryArgs) {
     let mut library = Library::new();

@@ -2,16 +2,16 @@ extern crate htmlescape;
 extern crate percent_encoding;
 extern crate serde_json;
 
+use htmlescape::decode_html;
 use percent_encoding::percent_decode;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-use htmlescape::decode_html;
 
 use crate::args::SyncRhythmdbArgs;
-use crate::storage;
 use crate::library::{Library, Song};
+use crate::storage;
 
 #[derive(PartialEq)]
 enum Element {
@@ -117,7 +117,7 @@ pub fn sync_rhythmdb(args: SyncRhythmdbArgs) {
                 removed_songs.len()
             );
             let removal_result =
-              storage::rm(&args.project_name, &format!("/Music{}", song.file_location));
+                storage::rm(&args.project_name, &format!("/Music{}", song.file_location));
             if removal_result.is_err() {
                 println!("Failed to delete {}", song.file_location);
             }

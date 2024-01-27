@@ -7,8 +7,8 @@ use regex::Regex;
 use rouille::{Request, Response};
 
 use crate::args::ServeArgs;
-use crate::storage;
 use crate::library::Library;
+use crate::storage;
 
 #[derive(Serialize)]
 struct ApiSong {

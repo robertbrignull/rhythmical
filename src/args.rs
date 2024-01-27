@@ -141,14 +141,12 @@ impl Args {
                     }),
                 }
             }
-            Some(Mode::TestAzure) => {
-              Args {
+            Some(Mode::TestAzure) => Args {
                 mode: Mode::TestAzure,
                 serve: Option::None,
                 sync_rhythmdb: Option::None,
                 validate_library: Option::None,
-              }
-            }
+            },
             None => {
                 println!("{}", USAGE_MESSAGE);
                 std::process::exit(1);
