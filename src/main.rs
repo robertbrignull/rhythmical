@@ -27,7 +27,6 @@ mod validate_library;
 
 use args::{Args, Mode};
 use server::start_server;
-use storage::{cat, rm, upload};
 use sync_rhythmdb::sync_rhythmdb;
 use validate_library::validate_library;
 
@@ -42,13 +41,6 @@ fn main() {
         }
         Mode::ValidateLibrary => {
             validate_library(args.validate_library.unwrap());
-        }
-        Mode::TestAzure => {
-            upload("/home/robertbrignull/coding/rhythmical/test.txt", "test.txt").expect("Unable to upload test file");
-
-            println!("{}", String::from_utf8(cat("test.txt").expect("Unable to read file")).unwrap());
-
-            rm("test.txt").expect("Unable to delete file");
         }
     }
 }
