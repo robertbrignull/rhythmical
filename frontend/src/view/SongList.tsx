@@ -60,86 +60,33 @@ interface SongListProps {
   library: Library;
   songIds: string[];
   currentSongId?: string;
-  playing: boolean;
   onSongSelected: (songId: string) => void;
 }
 
-interface SongListState {
-  sortedSongIds: string[];
-  sortMode: SortMode;
-  sortDirection: SortDirectionType;
-  scrollToIndex: number | undefined;
-}
+export function SongList(props: SongListProps) {
+  const { library, songIds, currentSongId, onSongSelected } = props;
 
-export class SongList extends React.PureComponent<
-  SongListProps,
-  SongListState
-> {
-  constructor(props: SongListProps) {
-    super(props);
+  const [sortMode, setSortMode] = React.useState<SortMode>("artist");
+  const [sortDirection, setSortDirection] = React.useState<SortDirectionType>("ASC");
 
-    const sortMode: SortMode = "artist";
-    const sortDirection: SortDirectionType = "ASC";
-    this.state = {
-      sortedSongIds: sortSongIds(
-        props.library,
-        props.songIds,
-        sortMode,
-        sortDirection,
-      ),
-      sortMode,
-      sortDirection,
-      scrollToIndex: undefined,
-    };
+  const [scrollToIndex, setScrollToIndex] = React.useState<number | undefined>(undefined);
 
-    this.sortList = this.sortList.bind(this);
-    this.rowGetter = this.rowGetter.bind(this);
-    this.onRowDoubleClick = this.onRowDoubleClick.bind(this);
-    this.durationCellRenderer = this.durationCellRenderer.bind(this);
-    this.ratingCellRenderer = this.ratingCellRenderer.bind(this);
-    this.rowClassName = this.rowClassName.bind(this);
-  }
+  const [sortedSongIds, setSortedSongIds] = React.useState<string[]>(sortSongIds(library, songIds, sortMode, sortDirection));
 
-  public componentDidUpdate(prevProps: Readonly<SongListProps>) {
-    const songsChanged = prevProps.songIds !== this.props.songIds;
-    const currentSongChanged =
-      this.props.currentSongId !== undefined &&
-      prevProps.currentSongId !== this.props.currentSongId;
-
-    if (!songsChanged && !currentSongChanged) {
-      return;
+  React.useEffect(() => {
+    if (currentSongId !== undefined) {
+      setScrollToIndex(sortedSongIds.indexOf(currentSongId));
     }
+  }, [currentSongId, sortedSongIds]);
 
-    this.setState((state) => {
-      const sortedSongIds = songsChanged
-        ? sortSongIds(
-            this.props.library,
-            this.props.songIds,
-            state.sortMode,
-            state.sortDirection,
-          )
-        : state.sortedSongIds;
+  React.useEffect(() => {
+    setSortedSongIds(sortSongIds(library, songIds, sortMode, sortDirection));
+  }, [library, songIds, sortMode, sortDirection]);
 
-      let scrollToIndex = undefined;
-      if (currentSongChanged) {
-        scrollToIndex = sortedSongIds.findIndex(
-          (songId) =>
-            this.props.currentSongId !== undefined &&
-            this.props.currentSongId === songId,
-        );
-      }
-
-      return {
-        sortedSongIds,
-        scrollToIndex,
-      };
-    });
-  }
-
-  private headerRenderer(
+  const headerRenderer = (
     label: string | undefined,
     disableSort?: boolean,
-  ): (props: TableHeaderProps) => React.ReactNode {
+  ): (props: TableHeaderProps) => React.ReactNode => {
     // eslint-disable-next-line react/display-name
     return (props: TableHeaderProps) => {
       return (
@@ -153,32 +100,20 @@ export class SongList extends React.PureComponent<
     };
   }
 
-  private sortList(info: { sortBy: string; sortDirection: SortDirectionType }) {
-    this.setState((state, props) => {
-      const sortMode = info.sortBy as SortMode;
-      return {
-        sortedSongIds: sortSongIds(
-          props.library,
-          props.songIds,
-          sortMode,
-          info.sortDirection,
-        ),
-        sortMode,
-        sortDirection: info.sortDirection,
-      };
-    });
-  }
+  const sortList = React.useCallback((info: { sortBy: string; sortDirection: SortDirectionType }) => {
+    setSortMode(info.sortBy as SortMode);
+    setSortDirection(info.sortDirection);
+  }, []);
 
-  private onRowDoubleClick(info: RowMouseEventHandlerParams) {
-    const songId = this.state.sortedSongIds[info.index];
-    this.props.onSongSelected(songId);
-  }
+  const onRowDoubleClick = React.useCallback((info: RowMouseEventHandlerParams) => {
+    onSongSelected(sortedSongIds[info.index]);
+  }, [onSongSelected, sortedSongIds]);
 
-  private rowGetter(index: Index): Song | undefined {
-    return this.props.library.getSong(this.state.sortedSongIds[index.index]);
-  }
+  const rowGetter = React.useCallback((index: Index): Song | undefined => {
+    return library.getSong(sortedSongIds[index.index]);
+  }, [library, sortedSongIds]);
 
-  private durationCellRenderer(props: TableCellProps): React.JSX.Element {
+  const durationCellRenderer = React.useCallback((props: TableCellProps): React.JSX.Element => {
     const song: Song = props.rowData;
     const minutes = Math.floor(song.duration / 60);
     const seconds = song.duration % 60;
@@ -187,86 +122,84 @@ export class SongList extends React.PureComponent<
     } else {
       return <span>{minutes + "m " + seconds + "s"}</span>;
     }
-  }
+  }, []);
 
-  private ratingCellRenderer(props: TableCellProps): React.JSX.Element {
+  const ratingCellRenderer = React.useCallback((props: TableCellProps): React.JSX.Element => {
     const song: Song = props.rowData;
     const stars: React.JSX.Element[] = [];
     for (let i = 0; i < Math.min(song.rating, 5); i++) {
       stars.push(<i key={i} className="fas fa-star" />);
     }
     return <span className="stars">{...stars}</span>;
-  }
+  }, []);
 
-  private rowClassName(info: Index) {
-    const songId = this.state.sortedSongIds[info.index];
-    const song = this.props.library.getSong(songId);
-    if (song && song.id === this.props.currentSongId) {
+  const rowClassName = React.useCallback((info: Index) => {
+    const songId = sortedSongIds[info.index];
+    const song = library.getSong(songId);
+    if (song && song.id === currentSongId) {
       return "song-row selected";
     } else {
       return "song-row";
     }
-  }
+  }, [currentSongId, library, sortedSongIds]);
 
-  public render() {
-    return (
-      <div className="song-list">
-        <AutoSizer>
-          {({ width, height }) => (
-            <Table
-              headerHeight={40}
-              height={height}
-              rowHeight={31}
-              rowGetter={this.rowGetter}
-              rowCount={this.state.sortedSongIds.length}
-              sort={this.sortList}
-              sortBy={this.state.sortMode}
-              sortDirection={this.state.sortDirection}
-              onRowDoubleClick={this.onRowDoubleClick}
-              rowClassName={this.rowClassName}
-              scrollToIndex={this.state.scrollToIndex}
-              width={width}
-            >
-              <Column
-                dataKey={"title"}
-                headerRenderer={this.headerRenderer("Title")}
-                width={200}
-                flexGrow={1}
-              />
-              <Column
-                dataKey={"genre"}
-                headerRenderer={this.headerRenderer("Genre")}
-                width={175}
-              />
-              <Column
-                dataKey={"artist"}
-                headerRenderer={this.headerRenderer("Artist")}
-                width={200}
-                flexGrow={1}
-              />
-              <Column
-                dataKey={"album"}
-                headerRenderer={this.headerRenderer("Album")}
-                width={200}
-                flexGrow={1}
-              />
-              <Column
-                dataKey={"duration"}
-                headerRenderer={this.headerRenderer("Duration")}
-                cellRenderer={this.durationCellRenderer}
-                width={100}
-              />
-              <Column
-                dataKey={"rating"}
-                className={"rating-col"}
-                headerRenderer={this.headerRenderer("Rating")}
-                cellRenderer={this.ratingCellRenderer}
-                width={90}
-              />
-            </Table>
-          )}
-        </AutoSizer>
-      </div>
-    );
-  }
+  return (
+    <div className="song-list">
+      <AutoSizer>
+        {({ width, height }) => (
+          <Table
+            headerHeight={40}
+            height={height}
+            rowHeight={31}
+            rowGetter={rowGetter}
+            rowCount={sortedSongIds.length}
+            sort={sortList}
+            sortBy={sortMode}
+            sortDirection={sortDirection}
+            onRowDoubleClick={onRowDoubleClick}
+            rowClassName={rowClassName}
+            scrollToIndex={scrollToIndex}
+            width={width}
+          >
+            <Column
+              dataKey={"title"}
+              headerRenderer={headerRenderer("Title")}
+              width={200}
+              flexGrow={1}
+            />
+            <Column
+              dataKey={"genre"}
+              headerRenderer={headerRenderer("Genre")}
+              width={175}
+            />
+            <Column
+              dataKey={"artist"}
+              headerRenderer={headerRenderer("Artist")}
+              width={200}
+              flexGrow={1}
+            />
+            <Column
+              dataKey={"album"}
+              headerRenderer={headerRenderer("Album")}
+              width={200}
+              flexGrow={1}
+            />
+            <Column
+              dataKey={"duration"}
+              headerRenderer={headerRenderer("Duration")}
+              cellRenderer={durationCellRenderer}
+              width={100}
+            />
+            <Column
+              dataKey={"rating"}
+              className={"rating-col"}
+              headerRenderer={headerRenderer("Rating")}
+              cellRenderer={ratingCellRenderer}
+              width={90}
+            />
+          </Table>
+        )}
+      </AutoSizer>
+    </div>
+  );
 }

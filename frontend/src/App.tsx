@@ -165,7 +165,6 @@ class App extends React.Component<Record<string, never>, AppState> {
             library={this.state.library}
             songIds={this.state.filteredSongIds}
             currentSongId={this.state.currentSongId}
-            playing={this.state.playing}
             onSongSelected={this.onSongSelected}
           />
         </div>
