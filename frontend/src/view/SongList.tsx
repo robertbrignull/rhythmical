@@ -141,20 +141,20 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
     return this.props.library.getSong(this.state.sortedSongIds[index.index]);
   }
 
-  private durationCellRenderer(props: TableCellProps): React.ReactFragment {
+  private durationCellRenderer(props: TableCellProps): React.JSX.Element {
     const song: Song = props.rowData;
     const minutes = Math.floor(song.duration / 60);
     const seconds = song.duration % 60;
     if (minutes < 1) {
-      return seconds + "s";
+      return <span>{seconds + "s"}</span>;
     } else {
-      return minutes + "m " + seconds + "s";
+      return <span>{minutes + "m " + seconds + "s"}</span>;
     }
   }
 
-  private ratingCellRenderer(props: TableCellProps): React.ReactFragment {
+  private ratingCellRenderer(props: TableCellProps): React.JSX.Element {
     const song: Song = props.rowData;
-    const stars = [];
+    const stars: React.JSX.Element[] = [];
     for (let i = 0; i < Math.min(song.rating, 5); i++) {
       stars.push(<i key={i} className="fas fa-star" />);
     }
