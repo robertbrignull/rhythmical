@@ -12,9 +12,11 @@ export function PlaylistFilter(props: Props) {
 
   const className = "playlist" + (isSelected ? " selected" : "");
   return (
-    <div key={'playlist_' + playlist.name}
+    <div
+      key={"playlist_" + playlist.name}
       className={className}
-      onClick={onSelected}>
+      onClick={onSelected}
+    >
       <i className="fas fa-search" />
       {isSelected ? <i className="fas fa-caret-right" /> : null}
       <span className="playlist-name">{playlist.name}</span>

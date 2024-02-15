@@ -1,31 +1,39 @@
 import * as React from "react";
 
-import 'react-virtualized/styles.css';
-import { AutoSizer } from 'react-virtualized/dist/es/AutoSizer';
-import { Table, Column, TableCellProps, TableHeaderProps, SortIndicator, SortDirectionType, RowMouseEventHandlerParams } from 'react-virtualized/dist/es/Table';
+import "react-virtualized/styles.css";
+import { AutoSizer } from "react-virtualized/dist/es/AutoSizer";
+import {
+  Table,
+  Column,
+  TableCellProps,
+  TableHeaderProps,
+  SortIndicator,
+  SortDirectionType,
+  RowMouseEventHandlerParams,
+} from "react-virtualized/dist/es/Table";
 import { Index } from "react-virtualized";
 import { Library } from "../state/Library";
 
-type SortMode = 'title' | 'genre' | 'artist' | 'album' | 'duration' | 'rating';
+type SortMode = "title" | "genre" | "artist" | "album" | "duration" | "rating";
 
 function sortSongIds(
   library: Library,
   songIds: string[],
   sortMode: SortMode,
-  sortDirection: SortDirectionType): string[] {
-
+  sortDirection: SortDirectionType,
+): string[] {
   let cmp: (a: Song, b: Song) => number;
-  if (sortMode === 'title') {
+  if (sortMode === "title") {
     cmp = (a, b) => a.title.localeCompare(b.title);
-  } else if (sortMode === 'genre') {
+  } else if (sortMode === "genre") {
     cmp = (a, b) => a.genre.localeCompare(b.genre);
-  } else if (sortMode === 'artist') {
+  } else if (sortMode === "artist") {
     cmp = (a, b) => a.artist.localeCompare(b.artist);
-  } else if (sortMode === 'album') {
+  } else if (sortMode === "album") {
     cmp = (a, b) => a.album.localeCompare(b.album);
-  } else if (sortMode === 'duration') {
+  } else if (sortMode === "duration") {
     cmp = (a, b) => a.duration - b.duration;
-  } else if (sortMode === 'rating') {
+  } else if (sortMode === "rating") {
     cmp = (a, b) => a.rating - b.rating;
   } else {
     cmp = () => 0;
@@ -39,8 +47,11 @@ function sortSongIds(
     }
   }
 
-  const directedCmp = (sortDirection === 'ASC') ? cmp : (a: Song, b: Song) => cmp(b, a);
-  sortedSongsWithIds.sort((a: [string, Song], b: [string, Song]) => directedCmp(a[1], b[1]));
+  const directedCmp =
+    sortDirection === "ASC" ? cmp : (a: Song, b: Song) => cmp(b, a);
+  sortedSongsWithIds.sort((a: [string, Song], b: [string, Song]) =>
+    directedCmp(a[1], b[1]),
+  );
 
   return sortedSongsWithIds.map((a: [string, Song]) => a[0]);
 }
@@ -60,17 +71,25 @@ interface SongListState {
   scrollToIndex: number | undefined;
 }
 
-export class SongList extends React.PureComponent<SongListProps, SongListState> {
+export class SongList extends React.PureComponent<
+  SongListProps,
+  SongListState
+> {
   constructor(props: SongListProps) {
     super(props);
 
-    const sortMode: SortMode = 'artist';
-    const sortDirection: SortDirectionType = 'ASC';
+    const sortMode: SortMode = "artist";
+    const sortDirection: SortDirectionType = "ASC";
     this.state = {
-      sortedSongIds: sortSongIds(props.library, props.songIds, sortMode, sortDirection),
+      sortedSongIds: sortSongIds(
+        props.library,
+        props.songIds,
+        sortMode,
+        sortDirection,
+      ),
       sortMode,
       sortDirection,
-      scrollToIndex: undefined
+      scrollToIndex: undefined,
     };
 
     this.sortList = this.sortList.bind(this);
@@ -83,40 +102,52 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
 
   public componentDidUpdate(prevProps: Readonly<SongListProps>) {
     const songsChanged = prevProps.songIds !== this.props.songIds;
-    const currentSongChanged = this.props.currentSongId !== undefined &&
+    const currentSongChanged =
+      this.props.currentSongId !== undefined &&
       prevProps.currentSongId !== this.props.currentSongId;
 
     if (!songsChanged && !currentSongChanged) {
       return;
     }
 
-    this.setState(state => {
+    this.setState((state) => {
       const sortedSongIds = songsChanged
-        ? sortSongIds(this.props.library, this.props.songIds, state.sortMode, state.sortDirection)
+        ? sortSongIds(
+            this.props.library,
+            this.props.songIds,
+            state.sortMode,
+            state.sortDirection,
+          )
         : state.sortedSongIds;
 
       let scrollToIndex = undefined;
       if (currentSongChanged) {
-        scrollToIndex = sortedSongIds.findIndex(songId =>
-          this.props.currentSongId !== undefined &&
-          this.props.currentSongId === songId);
+        scrollToIndex = sortedSongIds.findIndex(
+          (songId) =>
+            this.props.currentSongId !== undefined &&
+            this.props.currentSongId === songId,
+        );
       }
 
       return {
         sortedSongIds,
-        scrollToIndex
+        scrollToIndex,
       };
     });
   }
 
-  private headerRenderer(label: string | undefined, disableSort?: boolean): (props: TableHeaderProps) => React.ReactNode {
+  private headerRenderer(
+    label: string | undefined,
+    disableSort?: boolean,
+  ): (props: TableHeaderProps) => React.ReactNode {
     // eslint-disable-next-line react/display-name
     return (props: TableHeaderProps) => {
       return (
         <div>
           {label}
-          {!disableSort && props.sortBy === props.dataKey &&
-            <SortIndicator sortDirection={props.sortDirection} />}
+          {!disableSort && props.sortBy === props.dataKey && (
+            <SortIndicator sortDirection={props.sortDirection} />
+          )}
         </div>
       );
     };
@@ -126,11 +157,16 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
     this.setState((state, props) => {
       const sortMode = info.sortBy as SortMode;
       return {
-        sortedSongIds: sortSongIds(props.library, props.songIds, sortMode, info.sortDirection),
+        sortedSongIds: sortSongIds(
+          props.library,
+          props.songIds,
+          sortMode,
+          info.sortDirection,
+        ),
         sortMode,
-        sortDirection: info.sortDirection
+        sortDirection: info.sortDirection,
       };
-    })
+    });
   }
 
   private onRowDoubleClick(info: RowMouseEventHandlerParams) {
@@ -138,7 +174,7 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
     this.props.onSongSelected(songId);
   }
 
-  private rowGetter(index: Index): Song  | undefined {
+  private rowGetter(index: Index): Song | undefined {
     return this.props.library.getSong(this.state.sortedSongIds[index.index]);
   }
 
@@ -189,31 +225,44 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
               onRowDoubleClick={this.onRowDoubleClick}
               rowClassName={this.rowClassName}
               scrollToIndex={this.state.scrollToIndex}
-              width={width}>
-              <Column dataKey={'title'}
-                headerRenderer={this.headerRenderer('Title')}
+              width={width}
+            >
+              <Column
+                dataKey={"title"}
+                headerRenderer={this.headerRenderer("Title")}
                 width={200}
-                flexGrow={1} />
-              <Column dataKey={'genre'}
-                headerRenderer={this.headerRenderer('Genre')}
-                width={175} />
-              <Column dataKey={'artist'}
-                headerRenderer={this.headerRenderer('Artist')}
+                flexGrow={1}
+              />
+              <Column
+                dataKey={"genre"}
+                headerRenderer={this.headerRenderer("Genre")}
+                width={175}
+              />
+              <Column
+                dataKey={"artist"}
+                headerRenderer={this.headerRenderer("Artist")}
                 width={200}
-                flexGrow={1} />
-              <Column dataKey={'album'}
-                headerRenderer={this.headerRenderer('Album')}
+                flexGrow={1}
+              />
+              <Column
+                dataKey={"album"}
+                headerRenderer={this.headerRenderer("Album")}
                 width={200}
-                flexGrow={1} />
-              <Column dataKey={'duration'}
-                headerRenderer={this.headerRenderer('Duration')}
+                flexGrow={1}
+              />
+              <Column
+                dataKey={"duration"}
+                headerRenderer={this.headerRenderer("Duration")}
                 cellRenderer={this.durationCellRenderer}
-                width={100} />
-              <Column dataKey={'rating'}
-                className={'rating-col'}
-                headerRenderer={this.headerRenderer('Rating')}
+                width={100}
+              />
+              <Column
+                dataKey={"rating"}
+                className={"rating-col"}
+                headerRenderer={this.headerRenderer("Rating")}
                 cellRenderer={this.ratingCellRenderer}
-                width={90} />
+                width={90}
+              />
             </Table>
           )}
         </AutoSizer>

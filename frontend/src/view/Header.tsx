@@ -22,21 +22,20 @@ interface HeaderProps {
 }
 
 interface HeaderState {
-  playing: 'playing' | 'loading' | 'stopped';
+  playing: "playing" | "loading" | "stopped";
   currentSongSrc?: string;
   currentSongPosition?: number;
   muted: boolean;
 }
 
 export class Header extends React.PureComponent<HeaderProps, HeaderState> {
-
   private readonly audio: RefObject<HTMLAudioElement>;
 
   constructor(props: HeaderProps) {
     super(props);
 
     this.state = {
-      playing: 'stopped',
+      playing: "stopped",
       currentSongSrc: undefined,
       currentSongPosition: undefined,
       muted: false,
@@ -56,43 +55,55 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
     const oldSongId = prevProps.currentSongId;
     const nextSongId = this.props.currentSongId;
     if (!nextSongId && oldSongId) {
-      this.setState({
-        currentSongSrc: undefined,
-        currentSongPosition: undefined,
-      }, () => {
-        this.pause();
-      });
+      this.setState(
+        {
+          currentSongSrc: undefined,
+          currentSongPosition: undefined,
+        },
+        () => {
+          this.pause();
+        },
+      );
       return;
     }
 
     const nextSong = this.props.library.getSong(nextSongId);
     if (nextSong && (!oldSongId || nextSongId != oldSongId)) {
-      this.setState({
-        currentSongPosition: 0,
-        playing: 'loading',
-      }, () => {
-        document.title = nextSong.artist + " - " + nextSong.title;
+      this.setState(
+        {
+          currentSongPosition: 0,
+          playing: "loading",
+        },
+        () => {
+          document.title = nextSong.artist + " - " + nextSong.title;
 
-        if (this.audio.current) {
-          this.audio.current.pause();
-        }
-        this.props.onPlay();
+          if (this.audio.current) {
+            this.audio.current.pause();
+          }
+          this.props.onPlay();
 
-        Api.songs.getSrc(nextSong).then(songSrc => {
-          this.setState({
-            currentSongSrc: songSrc,
-          }, () => {
-            if (this.audio.current) {
-              this.audio.current.load();
-            }
-            if (this.state.playing === 'loading') {
-              this.play();
-            }
-          });
-        }, error => {
-          console.error("Unable to get song src: ", error)
-        });
-      });
+          Api.songs.getSrc(nextSong).then(
+            (songSrc) => {
+              this.setState(
+                {
+                  currentSongSrc: songSrc,
+                },
+                () => {
+                  if (this.audio.current) {
+                    this.audio.current.load();
+                  }
+                  if (this.state.playing === "loading") {
+                    this.play();
+                  }
+                },
+              );
+            },
+            (error) => {
+              console.error("Unable to get song src: ", error);
+            },
+          );
+        },
+      );
     }
   }
 
@@ -100,7 +111,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
     if (this.audio.current && this.state.currentSongSrc !== undefined) {
       this.audio.current.currentTime = 0;
       this.setState({
-        currentSongPosition: 0
+        currentSongPosition: 0,
       });
       this.play();
     }
@@ -110,28 +121,34 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
     if (this.audio.current) {
       this.audio.current.play();
     }
-    this.setState({
-      playing: 'playing',
-    }, () => {
-      this.props.onPlay();
-    });
+    this.setState(
+      {
+        playing: "playing",
+      },
+      () => {
+        this.props.onPlay();
+      },
+    );
   }
 
   public pause() {
     if (this.audio.current) {
       this.audio.current.pause();
     }
-    this.setState({
-      playing: 'stopped',
-    }, () => {
-      this.props.onPause();
-    });
+    this.setState(
+      {
+        playing: "stopped",
+      },
+      () => {
+        this.props.onPause();
+      },
+    );
   }
 
   private onTimeUpdate() {
     if (this.audio.current) {
       this.setState({
-        currentSongPosition: this.audio.current.currentTime
+        currentSongPosition: this.audio.current.currentTime,
       });
     }
   }
@@ -154,7 +171,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   private playPauseClicked() {
-    if (this.state.playing === 'stopped') {
+    if (this.state.playing === "stopped") {
       this.play();
     } else {
       this.pause();
@@ -166,7 +183,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   private volumeClicked() {
-    this.setState(state => {
+    this.setState((state) => {
       if (this.audio.current) {
         if (state.muted) {
           this.audio.current.volume = 1;
@@ -175,7 +192,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
         }
       }
       return {
-        muted: !state.muted
+        muted: !state.muted,
       };
     });
   }
@@ -187,15 +204,14 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
       </button>
     );
 
-    const playPauseIcon = this.state.playing === 'stopped' ? (
-      <i className="fas fa-play fa-2x" />
-    ) : (
-      <i className="fas fa-pause fa-2x" />
-    );
+    const playPauseIcon =
+      this.state.playing === "stopped" ? (
+        <i className="fas fa-play fa-2x" />
+      ) : (
+        <i className="fas fa-pause fa-2x" />
+      );
     const playPauseButton = (
-      <button onClick={this.playPauseClicked}>
-        {playPauseIcon}
-      </button>
+      <button onClick={this.playPauseClicked}>{playPauseIcon}</button>
     );
 
     const forwardButton = (
@@ -224,17 +240,16 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
         </div>
       );
     } else {
-      return (
-        <div className="songTitle">
-          Not playing
-        </div>
-      );
+      return <div className="songTitle">Not playing</div>;
     }
   }
 
   private renderPositionText() {
     const currentSong = this.getCurrentSong();
-    if (currentSong === undefined || this.state.currentSongPosition === undefined) {
+    if (
+      currentSong === undefined ||
+      this.state.currentSongPosition === undefined
+    ) {
       return null;
     }
 
@@ -249,7 +264,10 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
 
   private renderPositionSlider() {
     const currentSong = this.getCurrentSong();
-    if (currentSong === undefined || this.state.currentSongPosition === undefined) {
+    if (
+      currentSong === undefined ||
+      this.state.currentSongPosition === undefined
+    ) {
       return null;
     }
 
@@ -257,12 +275,14 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
     const maxPosition = currentSong.duration;
     return (
       <div className="position-slider">
-        <input type="range"
+        <input
+          type="range"
           min={0}
           max={Math.floor(maxPosition)}
           value={Math.floor(position)}
           step={1}
-          onChange={this.positionSliderChanged} />
+          onChange={this.positionSliderChanged}
+        />
       </div>
     );
   }
@@ -275,9 +295,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
     );
     return (
       <div className="volume-controls">
-        <button onClick={this.volumeClicked}>
-          {volumeIcon}
-        </button>
+        <button onClick={this.volumeClicked}>{volumeIcon}</button>
       </div>
     );
   }
@@ -296,15 +314,17 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
           {this.renderPositionSlider()}
           {this.renderVolumeControls()}
         </div>
-        <audio ref={this.audio}
+        <audio
+          ref={this.audio}
           className="audio-controls"
           onPlay={this.props.onPlay}
           onPause={this.props.onPause}
           onEnded={this.props.onEnded}
-          onTimeUpdate={this.onTimeUpdate}>
-          {this.state.currentSongSrc
-            ? <source src={this.state.currentSongSrc} />
-            : null}
+          onTimeUpdate={this.onTimeUpdate}
+        >
+          {this.state.currentSongSrc ? (
+            <source src={this.state.currentSongSrc} />
+          ) : null}
         </audio>
       </div>
     );

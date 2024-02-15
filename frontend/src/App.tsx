@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 import { SongList } from "./view/SongList";
 import { Header } from "./view/Header";
 import { RefObject } from "react";
@@ -17,7 +17,6 @@ interface AppState {
 }
 
 class App extends React.Component<Record<string, never>, AppState> {
-
   private readonly header: RefObject<Header>;
   private readonly songQueue: RefObject<SongQueue>;
 
@@ -89,8 +88,11 @@ class App extends React.Component<Record<string, never>, AppState> {
   }
 
   private onEnded() {
-    this.setState(state => {
-      if (state.currentSongId === undefined || state.pastSongIds.length >= 100) {
+    this.setState((state) => {
+      if (
+        state.currentSongId === undefined ||
+        state.pastSongIds.length >= 100
+      ) {
         return null;
       }
       const pastSongIds = state.pastSongIds.slice();
@@ -122,24 +124,25 @@ class App extends React.Component<Record<string, never>, AppState> {
   }
 
   public render() {
-    if (this.state.library === undefined || this.state.filteredSongIds === undefined) {
-      return (
-        <div className="loading-message">
-          Loading...
-        </div>
-      );
+    if (
+      this.state.library === undefined ||
+      this.state.filteredSongIds === undefined
+    ) {
+      return <div className="loading-message">Loading...</div>;
     }
 
     return (
       <div className="app">
         <div className="header-container">
-          <Header ref={this.header}
+          <Header
+            ref={this.header}
             library={this.state.library}
             currentSongId={this.state.currentSongId}
             onPlay={this.onPlay}
             onPause={this.onPause}
             onBackwards={this.onBackwards}
-            onEnded={this.onEnded} />
+            onEnded={this.onEnded}
+          />
         </div>
         <div className="playlists-container">
           <Filters onFilterChanged={this.onFilterChanged} />
@@ -148,7 +151,8 @@ class App extends React.Component<Record<string, never>, AppState> {
           <SongQueue
             ref={this.songQueue}
             library={this.state.library}
-            songIds={this.state.filteredSongIds} />
+            songIds={this.state.filteredSongIds}
+          />
         </div>
         <div className="song-list-container">
           <SongList
@@ -156,12 +160,14 @@ class App extends React.Component<Record<string, never>, AppState> {
             songIds={this.state.filteredSongIds}
             currentSongId={this.state.currentSongId}
             playing={this.state.playing}
-            onSongSelected={this.onSongSelected} />
+            onSongSelected={this.onSongSelected}
+          />
         </div>
         <div className="footer-container">
           <Footer
             library={this.state.library}
-            songIds={this.state.filteredSongIds} />
+            songIds={this.state.filteredSongIds}
+          />
         </div>
       </div>
     );

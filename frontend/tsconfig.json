@@ -3,9 +3,7 @@
     "baseUrl": ".",
     "module": "commonjs",
     "target": "es6",
-    "lib": [
-      "dom"
-    ],
+    "lib": ["dom"],
     "sourceMap": false,
     "allowJs": true,
     "jsx": "react",
@@ -18,7 +16,5 @@
     "noUnusedLocals": true,
     "strict": true
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
