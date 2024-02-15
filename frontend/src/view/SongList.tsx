@@ -109,8 +109,9 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
     });
   }
 
-  private headerRenderer(label: string | undefined, disableSort?: boolean) {
-    return React.memo(function HeaderRenderer(props: TableHeaderProps) {
+  private headerRenderer(label: string | undefined, disableSort?: boolean): (props: TableHeaderProps) => React.ReactNode {
+    // eslint-disable-next-line react/display-name
+    return (props: TableHeaderProps) => {
       return (
         <div>
           {label}
@@ -118,7 +119,7 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
             <SortIndicator sortDirection={props.sortDirection} />}
         </div>
       );
-    });
+    };
   }
 
   private sortList(info: { sortBy: string; sortDirection: SortDirectionType }) {
