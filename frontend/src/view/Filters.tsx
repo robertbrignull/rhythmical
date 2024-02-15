@@ -1,7 +1,8 @@
 import * as React from "react";
 import { ChangeEvent } from "react";
+import { PlaylistFilter } from "./PlaylistFilter";
 
-interface Playlist {
+export interface Playlist {
   name: string;
   predicate: (s: Song) => boolean;
 }
@@ -50,79 +51,42 @@ interface PlaylistsProps {
   onFilterChanged: (filter: SongFilter) => void;
 }
 
-interface PlaylistsState {
-  currentPlaylist: Playlist;
-  searchString: string;
-}
+export function Filters(props: PlaylistsProps) {
+  const { onFilterChanged } = props;
 
-export class Filters extends React.Component<PlaylistsProps, PlaylistsState> {
-  constructor(props: PlaylistsProps) {
-    super(props);
+  const [currentPlaylist, setCurrentPlaylist] = React.useState(allPlaylists[0]);
+  const [searchString, setSearchString] = React.useState("");
 
-    this.state = {
-      currentPlaylist: allPlaylists[0],
-      searchString: ""
-    };
+  React.useEffect(() => {
+    onFilterChanged(makeFilter(currentPlaylist, searchString));
+  }, [currentPlaylist, onFilterChanged, searchString]);
 
-    this.onPlaylistSelected = this.onPlaylistSelected.bind(this);
-    this.onSearchBoxChange = this.onSearchBoxChange.bind(this);
-  }
+  const onPlaylistSelectedCallbacks: Array<() => void> = React.useMemo(() => {
+    return allPlaylists.map(playlist => () => setCurrentPlaylist(playlist));
+  }, [])
 
-  public shouldComponentUpdate(nextProps: PlaylistsProps, nextState: PlaylistsState) {
-    return nextState.currentPlaylist.name !== this.state.currentPlaylist.name ||
-      nextState.searchString !== this.state.searchString;
-  }
+  const onSearchBoxChange = React.useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setSearchString(e.target.value);
+  }, []);
 
-  public componentDidUpdate(prevProps: PlaylistsProps, prevState: PlaylistsState) {
-    if (prevState.currentPlaylist.name !== this.state.currentPlaylist.name ||
-      prevState.searchString !== this.state.searchString) {
-      const filter = makeFilter(this.state.currentPlaylist, this.state.searchString);
-      this.props.onFilterChanged(filter);
-    }
-  }
-
-  private onPlaylistSelected(playlist: Playlist) {
-    this.setState({
-      currentPlaylist: playlist
-    });
-  }
-
-  private onSearchBoxChange(e: ChangeEvent<HTMLInputElement>) {
-    const searchString = e.target.value;
-    this.setState(state => {
-      return searchString !== state.searchString ? { searchString } : null;
-    });
-  }
-
-  private renderSearchBox() {
-    return (
+  return (
+    <div className="filters">
       <div className={'search-wrapper'}>
         <input key={'search'}
           className={'search-input'}
-          onChange={this.onSearchBoxChange}
-          value={this.state.searchString} />
+          onChange={onSearchBoxChange}
+          value={searchString} />
       </div>
-    );
-  }
-
-  public render() {
-    return <div className="filters">
-      {this.renderSearchBox()}
       {...
-        allPlaylists.map(p => {
-          const isSelected = p.name === this.state.currentPlaylist.name;
-          const className = "playlist" + (isSelected ? " selected" : "");
-          return (
-            <div key={'playlist_' + p.name}
-              className={className}
-              onClick={() => this.onPlaylistSelected(p)}>
-              <i className="fas fa-search" />
-              {isSelected ? <i className="fas fa-caret-right" /> : null}
-              <span className="playlist-name">{p.name}</span>
-            </div>
-          );
-        })
+        allPlaylists.map((playlist, index) => (
+          <PlaylistFilter
+            key={playlist.name}
+            playlist={playlist}
+            isSelected={playlist === currentPlaylist}
+            onSelected={onPlaylistSelectedCallbacks[index]}
+          ></PlaylistFilter>
+        ))
       }
     </div>
-  }
+  );
 }

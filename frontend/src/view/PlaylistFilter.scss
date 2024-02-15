@@ -1,0 +1,21 @@
+.playlist {
+  padding: 4px 10px;
+  user-select: none;
+
+  &:hover {
+    background-color: #e5e5ff;
+    cursor: pointer;
+  }
+
+  &.selected {
+    color: #6565ff;
+
+    .fa-caret-right {
+      padding-left: 5px;
+    }
+  }
+
+  .playlist-name {
+    padding-left: 5px;
+  }
+}
