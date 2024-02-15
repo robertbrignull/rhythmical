@@ -1,3 +1,6 @@
 {
-  "eslint.workingDirectories": ["frontend"],
+  "eslint.workingDirectories": [
+      "frontend"
+  ],
+  "prettier.prettierPath": "frontend/node_modules/prettier",
 }
