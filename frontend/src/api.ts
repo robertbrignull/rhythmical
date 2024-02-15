@@ -9,12 +9,7 @@ function formatAxiosError(error: unknown): string {
   if (isAxiosResponse(error)) {
     const response = error.response;
     if (response !== undefined) {
-      if (typeof response.data === "string") {
-        return response.data;
-      }
-      if (typeof response.data.error === "string") {
-        return response.data.error;
-      }
+      return "Error: " + response.status + "\n" + JSON.stringify(response.data);
     }
   }
   return "An unknown error occurred";
