@@ -6,31 +6,30 @@ interface FooterProps {
   songIds: string[];
 }
 
-export class Footer extends React.PureComponent<FooterProps, {}> {
-  private calculateTotalLengthSeconds() {
+export const Footer = (props: FooterProps) => {
+  const { library, songIds } = props;
+
+  const numSongs = songIds.length;
+
+  const totalLengthSeconds = React.useMemo(() => {
     let total = 0;
-    for (const songId of this.props.songIds) {
-      const song = this.props.library.getSong(songId);
+    for (const songId of songIds) {
+      const song = library.getSong(songId);
       if (song) {
         total += song.duration;
       }
     }
     return total;
-  }
+  }, [library, songIds]);
 
-  public render() {
-    let numSongs = this.props.songIds.length;
+  const totalDays = Math.floor(totalLengthSeconds / (24 * 60 * 60));
+  const totalHours = Math.floor(totalLengthSeconds / (60 * 60)) % 24;
+  const totalMinutes = Math.floor(totalLengthSeconds / 60) % 60;
 
-    let totalLengthSeconds = this.calculateTotalLengthSeconds();
-    let totalDays = Math.floor(totalLengthSeconds / (24 * 60 * 60));
-    let totalHours = Math.floor(totalLengthSeconds / (60 * 60)) % 24;
-    let totalMinutes = Math.floor(totalLengthSeconds / 60) % 60;
-
-    return <div className="footer">
-      {numSongs + " songs, "}
-      {totalDays > 0 ? totalDays + " days, " : ""}
-      {totalDays > 0 || totalHours > 0 ? totalHours + " hours and " : ""}
-      {totalMinutes + " minutes"}
-    </div>
-  }
+  return <div className="footer">
+    {numSongs + " songs, "}
+    {totalDays > 0 ? totalDays + " days, " : ""}
+    {totalDays > 0 || totalHours > 0 ? totalHours + " hours and " : ""}
+    {totalMinutes + " minutes"}
+  </div>
 }
