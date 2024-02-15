@@ -7,21 +7,21 @@
     "lint": "eslint . --ext .ts,.tsx"
   },
   "dependencies": {
-    "axios": "0.21.4",
+    "axios": "1.6.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-virtualized": "9.22.5",
     "request": "2.88.2"
   },
   "devDependencies": {
-    "@types/jest": "27.0.1",
-    "@types/node": "16.9.2",
-    "@types/react": "17.0.21",
+    "@types/jest": "29.5.12",
+    "@types/node": "20.11.18",
+    "@types/react": "18.2.55",
     "@types/react-dom": "18.2.19",
-    "@types/react-virtualized": "9.21.13",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@types/react-virtualized": "9.21.29",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.21.0",
-    "css-loader": "6.2.0",
+    "css-loader": "6.10.0",
     "eslint": "^8.56.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
     "eslint-plugin-import": "^2.29.1",
@@ -29,14 +29,14 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "node-sass": "8.0.0",
-    "sass-loader": "14.0.0",
-    "source-map-loader": "3.0.0",
-    "style-loader": "3.2.1",
-    "ts-loader": "9.2.5",
+    "node-sass": "9.0.0",
+    "sass-loader": "14.1.0",
+    "source-map-loader": "5.0.0",
+    "style-loader": "3.3.4",
+    "ts-loader": "9.5.1",
     "typescript": "^5.3.3",
-    "webpack": "5.90.0",
+    "webpack": "5.90.1",
     "webpack-cli": "5.1.4",
-    "webpack-dev-server": "4.15.1"
+    "webpack-dev-server": "5.0.1"
   }
 }
