@@ -29,6 +29,7 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "node-sass": "8.0.0",
     "sass-loader": "14.0.0",
     "source-map-loader": "3.0.0",
