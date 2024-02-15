@@ -16,12 +16,12 @@ interface AppState {
   pastSongIds: string[];
 }
 
-class App extends React.Component<{}, AppState> {
+class App extends React.Component<Record<string, never>, AppState> {
 
   private readonly header: RefObject<Header>;
   private readonly songQueue: RefObject<SongQueue>;
 
-  constructor(props: {}) {
+  constructor(props: Record<string, never>) {
     super(props);
 
     this.onSongSelected = this.onSongSelected.bind(this);

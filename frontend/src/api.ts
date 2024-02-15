@@ -1,8 +1,8 @@
 import axios from "axios";
 import { AxiosPromise, AxiosResponse } from "axios";
 
-function printAxiosError(error: any) {
-  if (error.hasOwnProperty("response")) {
+function printAxiosError(error: unknown) {
+  if (error !== null && typeof error === "object" && "response" in error) {
     const response = error.response as AxiosResponse;
     if (typeof response.data === "string") {
       return response.data;
@@ -20,7 +20,7 @@ function fromAxiosPromise<T>(axiosPromise: AxiosPromise): Promise<T> {
       .then((resp: AxiosResponse) => {
         resolve(resp.data);
       })
-      .catch((error: any) => {
+      .catch((error) => {
         reject(printAxiosError(error));
       });
   });

@@ -53,11 +53,13 @@ export class SongQueue extends React.PureComponent<SongQueueProps, SongQueueStat
         this.state.songIdQueue.slice(0, VISIBLE_QUEUE_LENGTH).map(songId => {
           const song = this.props.library.getSong(songId);
           if (song) {
-            return <div className="song-queue-item">
-              <div className="title">{ song.title }</div>
-              <div className="artist">by { song.artist }</div>
-              <div className="album">from { song.album }</div>
-            </div>
+            return (
+              <div key={songId} className="song-queue-item">
+                <div className="title">{ song.title }</div>
+                <div className="artist">by { song.artist }</div>
+                <div className="album">from { song.album }</div>
+              </div>
+            );
           } else {
             return undefined;
           }

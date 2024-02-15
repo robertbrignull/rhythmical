@@ -136,9 +136,9 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
     }
   }
 
-  private positionSliderChanged(event: ChangeEvent) {
+  private positionSliderChanged(event: ChangeEvent<HTMLInputElement>) {
     if (this.audio.current) {
-      this.audio.current.currentTime = (event.target as any).value;
+      this.audio.current.currentTime = parseInt(event.target.value);
     }
   }
 

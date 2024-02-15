@@ -87,8 +87,8 @@ export class Filters extends React.Component<PlaylistsProps, PlaylistsState> {
     });
   }
 
-  private onSearchBoxChange(e: ChangeEvent) {
-    const searchString = (e.target as any).value;
+  private onSearchBoxChange(e: ChangeEvent<HTMLInputElement>) {
+    const searchString = e.target.value;
     this.setState(state => {
       return searchString !== state.searchString ? { searchString } : null;
     });

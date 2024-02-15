@@ -31,7 +31,7 @@ function sortSongIds(
     cmp = () => 0;
   }
 
-  const sortedSongsWithIds = [];
+  const sortedSongsWithIds: Array<[string, Song]> = [];
   for (const songId of songIds) {
     const song = library.getSong(songId);
     if (song) {
@@ -110,7 +110,7 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
   }
 
   private headerRenderer(label: string | undefined, disableSort?: boolean) {
-    return (props: TableHeaderProps) => {
+    return React.memo(function HeaderRenderer(props: TableHeaderProps) {
       return (
         <div>
           {label}
@@ -118,7 +118,7 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
             <SortIndicator sortDirection={props.sortDirection} />}
         </div>
       );
-    };
+    });
   }
 
   private sortList(info: { sortBy: string; sortDirection: SortDirectionType }) {
