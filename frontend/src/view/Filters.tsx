@@ -110,8 +110,8 @@ export class Filters extends React.Component<PlaylistsProps, PlaylistsState> {
       {this.renderSearchBox()}
       {...
         allPlaylists.map(p => {
-          let isSelected = p.name === this.state.currentPlaylist.name;
-          let className = "playlist" + (isSelected ? " selected" : "");
+          const isSelected = p.name === this.state.currentPlaylist.name;
+          const className = "playlist" + (isSelected ? " selected" : "");
           return (
             <div key={'playlist_' + p.name}
               className={className}

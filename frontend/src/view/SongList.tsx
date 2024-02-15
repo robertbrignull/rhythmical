@@ -31,7 +31,7 @@ function sortSongIds(
     cmp = () => 0;
   }
 
-  let sortedSongsWithIds = [];
+  const sortedSongsWithIds = [];
   for (const songId of songIds) {
     const song = library.getSong(songId);
     if (song) {
@@ -64,8 +64,8 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
   constructor(props: SongListProps) {
     super(props);
 
-    let sortMode: SortMode = 'artist';
-    let sortDirection: SortDirectionType = 'ASC';
+    const sortMode: SortMode = 'artist';
+    const sortDirection: SortDirectionType = 'ASC';
     this.state = {
       sortedSongIds: sortSongIds(props.library, props.songIds, sortMode, sortDirection),
       sortMode,
@@ -154,7 +154,7 @@ export class SongList extends React.PureComponent<SongListProps, SongListState> 
 
   private ratingCellRenderer(props: TableCellProps): React.ReactFragment {
     const song: Song = props.rowData;
-    let stars = [];
+    const stars = [];
     for (let i = 0; i < Math.min(song.rating, 5); i++) {
       stars.push(<i key={i} className="fas fa-star" />);
     }

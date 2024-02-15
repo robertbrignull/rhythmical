@@ -4,7 +4,7 @@ import Api from "../api";
 import { Library } from "../state/Library";
 
 function formatDuration(duration: number) {
-  let mins = "" + Math.floor(duration / 60);
+  const mins = "" + Math.floor(duration / 60);
   let secs = "" + Math.floor(duration % 60);
   if (secs.length === 1) {
     secs = "0" + secs;
@@ -181,24 +181,24 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   private renderButtonControls() {
-    let backwardButton = (
+    const backwardButton = (
       <button onClick={this.backwardClicked}>
         <i className="fas fa-backward fa-2x" />
       </button>
     );
 
-    let playPauseIcon = this.state.playing === 'stopped' ? (
+    const playPauseIcon = this.state.playing === 'stopped' ? (
       <i className="fas fa-play fa-2x" />
     ) : (
       <i className="fas fa-pause fa-2x" />
     );
-    let playPauseButton = (
+    const playPauseButton = (
       <button onClick={this.playPauseClicked}>
         {playPauseIcon}
       </button>
     );
 
-    let forwardButton = (
+    const forwardButton = (
       <button onClick={this.forwardClicked}>
         <i className="fas fa-forward fa-2x" />
       </button>
@@ -214,7 +214,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   private renderCurrentSongName() {
-    let song = this.getCurrentSong();
+    const song = this.getCurrentSong();
     if (song !== undefined) {
       return (
         <div className="songTitle">
@@ -233,7 +233,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   private renderPositionText() {
-    let currentSong = this.getCurrentSong();
+    const currentSong = this.getCurrentSong();
     if (currentSong === undefined || this.state.currentSongPosition === undefined) {
       return null;
     }
@@ -248,7 +248,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   private renderPositionSlider() {
-    let currentSong = this.getCurrentSong();
+    const currentSong = this.getCurrentSong();
     if (currentSong === undefined || this.state.currentSongPosition === undefined) {
       return null;
     }
@@ -268,7 +268,7 @@ export class Header extends React.PureComponent<HeaderProps, HeaderState> {
   }
 
   private renderVolumeControls() {
-    let volumeIcon = this.state.muted ? (
+    const volumeIcon = this.state.muted ? (
       <i className="fas fa-volume-mute fa-lg" />
     ) : (
       <i className="fas fa-volume-up fa-lg" />
