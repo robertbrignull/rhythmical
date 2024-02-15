@@ -1,4 +1,5 @@
 /target
 **/*.rs.bk
 /frontend/node_modules
+/frontend/dist
 /rhythmical-music-89bec4cd58be.json
