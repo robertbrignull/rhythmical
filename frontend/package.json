@@ -11,8 +11,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-virtualized": "9.22.5",
-    "request": "2.88.2",
-    "tslib": "^2.6.2"
+    "request": "2.88.2"
   },
   "devDependencies": {
     "@types/jest": "27.0.1",
