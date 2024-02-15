@@ -5,10 +5,12 @@ import { RefObject } from "react";
 import { Filters } from "./view/Filters";
 import { Footer } from "./view/Footer";
 import { Library } from "./state/Library";
-import { SongQueue } from "./view/SongQueue";
+import { UpcomingSongs } from "./view/UpcomingSongs";
+import { SongQueue } from "./state/song-queue";
 
 interface AppState {
   library?: Library;
+  songQueue: SongQueue;
   filteredSongIds?: string[];
   currentSongId?: string;
   playing: boolean;
@@ -18,7 +20,6 @@ interface AppState {
 
 class App extends React.Component<Record<string, never>, AppState> {
   private readonly header: RefObject<Header>;
-  private readonly songQueue: RefObject<SongQueue>;
 
   constructor(props: Record<string, never>) {
     super(props);
@@ -30,11 +31,13 @@ class App extends React.Component<Record<string, never>, AppState> {
     this.onEnded = this.onEnded.bind(this);
     this.onFilterChanged = this.onFilterChanged.bind(this);
 
+    const songQueue = new SongQueue();
+
     this.header = React.createRef();
-    this.songQueue = React.createRef();
 
     this.state = {
       library: undefined,
+      songQueue,
       filteredSongIds: undefined,
       currentSongId: undefined,
       playing: false,
@@ -102,7 +105,11 @@ class App extends React.Component<Record<string, never>, AppState> {
       };
     });
 
-    const nextSongId = this.songQueue.current?.getNextSongId();
+    const [nextSongId, newSongQueue] = this.state.songQueue.getNextSongId(this.state.filteredSongIds || []);
+    this.setState({
+      songQueue: newSongQueue,
+    });
+
     if (nextSongId) {
       this.onSongSelected(nextSongId);
     } else {
@@ -148,10 +155,9 @@ class App extends React.Component<Record<string, never>, AppState> {
           <Filters onFilterChanged={this.onFilterChanged} />
         </div>
         <div className="song-queue-container">
-          <SongQueue
-            ref={this.songQueue}
+          <UpcomingSongs
             library={this.state.library}
-            songIds={this.state.filteredSongIds}
+            songQueue={this.state.songQueue}
           />
         </div>
         <div className="song-list-container">
