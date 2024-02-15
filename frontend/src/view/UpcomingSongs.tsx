@@ -9,27 +9,24 @@ interface SongQueueProps {
 
 const VISIBLE_QUEUE_LENGTH = 5;
 
-export class UpcomingSongs extends React.PureComponent<
-  SongQueueProps
-> {
-  public render() {
-    return (
-      <div className="song-queue">
-        {this.props.songQueue.songIdQueue.slice(0, VISIBLE_QUEUE_LENGTH).map((songId) => {
-          const song = this.props.library.getSong(songId);
-          if (song) {
-            return (
-              <div key={songId} className="song-queue-item">
-                <div className="title">{song.title}</div>
-                <div className="artist">by {song.artist}</div>
-                <div className="album">from {song.album}</div>
-              </div>
-            );
-          } else {
-            return undefined;
-          }
-        })}
-      </div>
-    );
-  }
+export function UpcomingSongs(props: SongQueueProps) {
+  const { library, songQueue } = props;
+  return (
+    <div className="song-queue">
+      {songQueue.songIdQueue.slice(0, VISIBLE_QUEUE_LENGTH).map((songId) => {
+        const song = library.getSong(songId);
+        if (song) {
+          return (
+            <div key={songId} className="song-queue-item">
+              <div className="title">{song.title}</div>
+              <div className="artist">by {song.artist}</div>
+              <div className="album">from {song.album}</div>
+            </div>
+          );
+        } else {
+          return undefined;
+        }
+      })}
+    </div>
+  );
 }
