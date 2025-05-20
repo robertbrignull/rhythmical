@@ -7,8 +7,8 @@ use std::collections::HashMap;
 use std::io::Result;
 use std::path::Path;
 
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
+use rand::distr::Alphanumeric;
+use rand::{rng, Rng};
 use regex::Regex;
 
 use crate::storage;
@@ -125,7 +125,7 @@ impl Library {
 
 fn new_song_id(songs: &HashMap<String, Song>) -> String {
     loop {
-        let id: String = thread_rng()
+        let id: String = rng()
             .sample_iter(&Alphanumeric)
             .take(16)
             .map(char::from)

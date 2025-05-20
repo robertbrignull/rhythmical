@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate lazy_static;
-#[macro_use]
 extern crate rouille;
 extern crate serde;
 #[macro_use]
